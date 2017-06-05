@@ -18,7 +18,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <base-common-util.version>1.1.0-SNAPSHOT</base-common-util.version>
-        <base-dao-core.version>1.1.0-SNAPSHOT</base-dao-core.version>
+        <base-api-core.version>1.1.0-SNAPSHOT</base-api-core.version>
     </properties>
     <dependencies>
         <!-- rf -->
@@ -29,8 +29,8 @@
         </dependency>
         <dependency>
             <groupId>com.shsnc</groupId>
-            <artifactId>base-dao-core</artifactId>
-            <version>${base-dao-core.version}</version>
+            <artifactId>base-api-core</artifactId>
+            <version>${base-api-core.version}</version>
         </dependency>
         <!-- commons -->
         <dependency>
@@ -61,16 +61,10 @@
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
         </dependency>
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <version>1.2</version>
-        </dependency>
         <!-- druid -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
-            <version>1.0.15</version>
         </dependency>
         <!-- jackson -->
         <dependency>
@@ -133,13 +127,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis.generator</groupId>
-            <artifactId>mybatis-generator-core</artifactId>
-            <version>1.3.2</version>
-            <scope>compile</scope>
-            <optional>true</optional>
         </dependency>
     </dependencies>
     <build>
