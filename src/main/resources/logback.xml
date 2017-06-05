@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- scan="true" scanPeriod="30 seconds" 这个配置为自动扫描日志配置文件修改 -->
+<configuration debug="false" >
+<!--  如果用file 属性 则里面就是绝对路径 -->
+ <property resource="logback.properties" /> 
+ 
+    <!-- 日志存放路径 -->
+    <property name="LOG_HOME" value="log" />
+
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{80} - %msg%n</Pattern>
+        </encoder>
+    </appender>
+	
+    <!-- 不同级别的文件记录在不同的日志文件中 -->
+    <appender name="FILEDEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">   
+          <fileNamePattern>${LOG_HOME}/log-debug.%d{yyyy-MM-dd}.log</fileNamePattern>   
+          <maxHistory>10</maxHistory>    
+        </rollingPolicy>   
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{80} - %msg%n</pattern>
+        </encoder>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    
+    <appender name="FILEINFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">   
+          <fileNamePattern>${LOG_HOME}/log-info.%d{yyyy-MM-dd}.log</fileNamePattern>   
+          <maxHistory>60</maxHistory>    
+        </rollingPolicy>   
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{80} - %msg%n</pattern>
+        </encoder>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="FILEERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">   
+          <fileNamePattern>${LOG_HOME}/log-error.%d{yyyy-MM-dd}.log</fileNamePattern>   
+          <maxHistory>60</maxHistory>    
+        </rollingPolicy>   
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{80} - %msg%n</pattern>
+        </encoder>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="FILEWARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">   
+          <fileNamePattern>${LOG_HOME}/log-warn.%d{yyyy-MM-dd}.log</fileNamePattern>   
+          <maxHistory>60</maxHistory>    
+        </rollingPolicy>   
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{80} - %msg%n
+            </pattern>
+        </encoder>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    
+	<logger name="org.apache.http.impl.conn.PoolingHttpClientConnectionManager" level="WARN" />
+	<logger name="SQL" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILEDEBUG" />
+	</logger>
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+        <appender-ref ref="FILEINFO" />
+        <appender-ref ref="FILEERROR" />
+        <appender-ref ref="FILEWARN" />
+	</root>
+</configuration>
