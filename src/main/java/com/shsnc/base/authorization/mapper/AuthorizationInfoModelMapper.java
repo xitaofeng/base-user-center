@@ -1,8 +1,8 @@
-package com.shsnc.authorization.mapper;
+package com.shsnc.base.authorization.mapper;
 
-import com.shsnc.authorization.bean.AuthorizationInfo;
-import com.shsnc.authorization.model.AuthorizationInfoModel;
+import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.sun.xml.internal.txw2.annotation.XmlNamespace;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -32,11 +32,11 @@ public interface AuthorizationInfoModelMapper {
     /**
      * 编辑权限信息 返回数据编辑成功数据条数
      *
-     * @param authorizationStatus 权限状态
      * @param authorizationId     权限id
+     * @param authorizationStatus 权限状态
      * @return
      */
-    public Integer editAuthorizationStatus(Integer authorizationStatus, Integer authorizationId);
+    public Integer editAuthorizationStatus(@Param("authorizationId") Integer authorizationId, @Param("authorizationStatus") Integer authorizationStatus);
 
     /**
      * 批量删除
@@ -45,6 +45,14 @@ public interface AuthorizationInfoModelMapper {
      * @return
      */
     public Integer batchDeleteAuthorization(List<Integer> authorizationIdList);
+
+    /**
+     * 获取单一对象数据
+     *
+     * @param authorizationId
+     * @return
+     */
+    public AuthorizationInfoModel getAuthorizationByAuthorizationId(Integer authorizationId);
 
     /**
      * 获取列表数据
