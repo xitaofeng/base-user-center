@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ActionJobsMapper">
+
+    <!-- 表名用变量表示 -->
+    <sql id="tableName">authorization_info</sql>
+
+    <!-- SQL语句格式美化，关键字用大写字母 -->
+    <insert id="addAuthorization" useGeneratedKeys="true" keyProperty="authorizationId" keyColumn="authorization_id">
+        INSERT INTO
+        <include refid="tableName"/>
+        (
+        authorization_name,
+        authorization_code,
+        authorization_status,
+        description,
+        create_time
+        )
+        VALUES
+        (
+        #{authorizationName},
+        #{authorizationCode},
+        #{authorizationStatus},
+        #{description},
+        #{createTime}
+        )
+    </insert>
+
+    <!-- SQL语句格式美化，关键字用大写字母 -->
+    <update id="editAuthorization">
+        UPDATE
+        <include refid="tableName"/>
+        SET
+        authorization_name = #{authorizationName},
+        authorization_code = #{authorizationCode},
+        authorization_status = #{authorizationStatus}
+        <if test="description !=null and description !=''">
+            ,description = #{description}
+        </if>
+        WHERE authorization_id = #{authorizationId }
+    </update>
+
+    <update id="editAuthorizationStatus">
+        UPDATE
+        <include refid="tableName"/>
+        SET
+        authorization_status = #{authorizationStatus}
+        WHERE authorization_id = #{authorizationId }
+    </update>
+
+    <update id="batchDeleteAuthorization" resultType="java.lang.Integer">
+        DELETE
+        <include refid="tableName"/>
+        WHERE authorization_id in
+        <foreach item="authorizationId" open="(" separator="," close=")">
+            #{authorizationId}
+        </foreach>
+    </update>
+
+
+    <select id="getAuthorizationList" resultType="com.shsnc.authorization.model.AuthorizationInfoModel">
+        SELECT
+        *
+        FROM
+        <include refid="tableName"/>
+        WHERE 1 = 1
+        <if test="authorizationName !=null and authorizationName !=''">
+            AND authorization_name LIKE CONCAT('%', #{authorizationName}, '%')
+        </if>
+        <if test="authorizationCode !=null and authorizationCode !=''">
+            AND authorization_code LIKE CONCAT('%', #{authorizationCode}, '%')
+        </if>
+        <if test="authorizationStatus !=null and authorizationStatus !=''">
+            AND authorization_status = #{authorizationStatus}
+        </if>
+        <if test="description !=null and description !=''">
+            AND description LIKE CONCAT('%', #{description}, '%')
+        </if>
+    </select>
+
+    <select id="getListByAuthorizationName" resultType="com.shsnc.authorization.model.AuthorizationInfoModel">
+        SELECT
+        *
+        FROM
+        <include refid="tableName"/>
+        WHERE authorization_name = #{authorizationName}
+    </select>
+
+    <select id="getListByAuthorizationCode" resultType="com.shsnc.authorization.model.AuthorizationInfoModel">
+        SELECT
+        *
+        FROM
+        <include refid="tableName"/>
+        WHERE authorization_code = #{authorizationCode}
+    </select>
+
+</mapper>
