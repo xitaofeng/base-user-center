@@ -1,9 +1,11 @@
 package com.shsnc.base.authorization.model;
 
+import java.io.Serializable;
+
 /**
  * Created by LuoJun on 2017/6/5.
  */
-public class AuthorizationInfoModel {
+public class AuthorizationInfoModel implements Serializable{
 
     private Integer authorizationId;
 
@@ -20,11 +22,11 @@ public class AuthorizationInfoModel {
     /**
      * 状态
      */
-    public enum AuthorizationStatus {
+    public enum EnumAuthorizationStatus {
         //启用
-        START(1),
+        ENABLED(1),
         //停用
-        STOP(2);
+        DISABLED(2);
 
         private Integer authorizationStatus;
 
@@ -32,7 +34,7 @@ public class AuthorizationInfoModel {
             return authorizationStatus;
         }
 
-        AuthorizationStatus(Integer authorizationStatus) {
+        EnumAuthorizationStatus(Integer authorizationStatus) {
             this.authorizationStatus = authorizationStatus;
         }
     }

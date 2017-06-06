@@ -8,7 +8,7 @@ public final class AuthorizationConstant {
     /**
      * 基本操作
      */
-    public enum BasicOperation {
+    public enum EnumBasicOperation {
         //添加
         ADD(1),
         //编辑
@@ -20,7 +20,7 @@ public final class AuthorizationConstant {
 
         private Integer status;
 
-        BasicOperation(Integer status) {
+        EnumBasicOperation(Integer status) {
             this.status = status;
         }
 
