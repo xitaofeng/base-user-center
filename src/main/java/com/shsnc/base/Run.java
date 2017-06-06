@@ -18,7 +18,7 @@ public class Run
                 .bindAddress(bundle.getString("HOST"))
                 .listenPort(Integer.valueOf(bundle.getString("PORT")))
                 .contextPath(bundle.getString("CONTEXT"))
-                .configPath("classpath:bean.xml")
+                .configPath("classpath:beans.xml")
                 .testMode(true)
                 .build();
         server.start();
