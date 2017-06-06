@@ -49,17 +49,17 @@
         WHERE authorization_id = #{authorizationId }
     </update>
 
-    <update id="batchDeleteAuthorization" resultType="java.lang.Integer">
+    <update id="batchDeleteAuthorization">
         DELETE
         <include refid="tableName"/>
         WHERE authorization_id in
-        <foreach item="authorizationId" open="(" separator="," close=")">
+        <foreach item="authorizationId" collection="list" open="(" separator="," close=")">
             #{authorizationId}
         </foreach>
     </update>
 
 
-    <select id="getAuthorizationList" resultType="com.shsnc.authorization.model.AuthorizationInfoModel">
+    <select id="getAuthorizationList" resultType="com.shsnc.base.authorization.model.AuthorizationInfoModel">
         SELECT
         *
         FROM
@@ -79,7 +79,7 @@
         </if>
     </select>
 
-    <select id="getListByAuthorizationName" resultType="com.shsnc.authorization.model.AuthorizationInfoModel">
+    <select id="getListByAuthorizationName" resultType="com.shsnc.base.authorization.model.AuthorizationInfoModel">
         SELECT
         *
         FROM
@@ -87,7 +87,7 @@
         WHERE authorization_name = #{authorizationName}
     </select>
 
-    <select id="getListByAuthorizationCode" resultType="com.shsnc.authorization.model.AuthorizationInfoModel">
+    <select id="getListByAuthorizationCode" resultType="com.shsnc.base.authorization.model.AuthorizationInfoModel">
         SELECT
         *
         FROM
