@@ -33,7 +33,7 @@ public class AuthorizationInfoService {
      * @return
      * @throws Exception
      */
-    public AuthorizationInfoModel addAuthorizationInfo(AuthorizationInfoModel authorizationInfoModel) throws Exception {
+    public Integer addAuthorizationInfo(AuthorizationInfoModel authorizationInfoModel) throws Exception {
         if (isAuthorizationName(authorizationInfoModel)) {
             throw new BizException("权限名称重复");
         }
@@ -46,7 +46,7 @@ public class AuthorizationInfoService {
         }
         Integer authorizationId = authorizationInfoModelMapper.addAuthorizationInfo(authorizationInfoModel);
         if (authorizationId != null) {
-            return authorizationInfoModel;
+            return authorizationId;
         } else {
             throw new BizException("权限添加失败");
         }
@@ -135,6 +135,21 @@ public class AuthorizationInfoService {
      */
     public List<AuthorizationInfoModel> getAuthorizationList(AuthorizationInfoModel authorizationInfoModel) throws Exception {
         return authorizationInfoModelMapper.getAuthorizationList(authorizationInfoModel);
+    }
+
+    /**
+     * 查询对象
+     *
+     * @param authorizationId
+     * @return
+     * @throws Exception
+     */
+    public AuthorizationInfoModel getAuthorizationByAuthorizationId(Integer authorizationId) throws Exception {
+        if(authorizationId ==null){
+            throw new BizException("无效数据");
+        }
+        AuthorizationInfoModel authorizationInfoModel = authorizationInfoModelMapper.getAuthorizationByAuthorizationId(authorizationId);
+        return authorizationInfoModel;
     }
 
     /**

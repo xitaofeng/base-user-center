@@ -36,8 +36,8 @@ public class AuthorizationInfoHandler implements RequestHandler {
     @RequestMapper("/add")
     @ResponseBody
     @Validate
-    public AuthorizationInfo addAuthorizationInfo(@NotNull String authorizationName, @NotNull String authorizationCode,
-                                                  Integer authorizationStatus, String description) throws Exception {
+    public Integer addAuthorizationInfo(@NotNull String authorizationName, @NotNull String authorizationCode,
+                                        Integer authorizationStatus, String description) throws Exception {
         AuthorizationInfoModel authorizationInfoModel = new AuthorizationInfoModel();
         authorizationInfoModel.setAuthorizationName(authorizationName);
         authorizationInfoModel.setAuthorizationCode(authorizationCode);
@@ -46,8 +46,7 @@ public class AuthorizationInfoHandler implements RequestHandler {
         ApiResult<AuthorizationInfo> apiResult = new ApiResult<>();
         apiResult.setMessageCode(MessageCode.RESP_OK.getMsgCode());
         apiResult.setMessage(MessageCode.RESP_OK.getMessage());
-        AuthorizationInfo authorizationInfo = JsonUtil.convert(authorizationInfoService.addAuthorizationInfo(authorizationInfoModel), AuthorizationInfo.class);
-        return authorizationInfo;
+        return authorizationInfoService.addAuthorizationInfo(authorizationInfoModel);
     }
 
     @RequestMapper("/edit")
@@ -107,5 +106,12 @@ public class AuthorizationInfoHandler implements RequestHandler {
         AuthorizationInfoModel authorizationInfoModel = new AuthorizationInfoModel();
         BeanUtils.copyProperties(authorizationInfo, authorizationInfoModel);
         return authorizationInfoService.getAuthorizationList(authorizationInfoModel);
+    }
+
+    @RequestMapper("/object")
+    @ResponseBody
+    @Validate
+    public AuthorizationInfoModel getAuthorizationList(@NotNull Integer authorizationId) throws Exception {
+        return authorizationInfoService.getAuthorizationByAuthorizationId(authorizationId);
     }
 }
