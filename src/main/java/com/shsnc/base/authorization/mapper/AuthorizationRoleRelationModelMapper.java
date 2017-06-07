@@ -1,0 +1,40 @@
+package com.shsnc.base.authorization.mapper;
+
+import com.shsnc.base.authorization.model.AuthorizationRoleRelationModel;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+/**
+ * Created by Elena on 2017/6/7.
+ */
+public interface AuthorizationRoleRelationModelMapper {
+
+    /**
+     * 插入单条数据 返回主键ID
+     * @param authorizationRoleRelationModel
+     * @return
+     */
+    public Integer addAuthorizationRoleRelationModel(AuthorizationRoleRelationModel authorizationRoleRelationModel);
+
+    /**
+     * 批量插入数据返回 插入条数
+     * @param authorizationRoleRelationModels
+     * @return
+     */
+    public Integer batchAddAuthorizationRoleRelationModel(List<AuthorizationRoleRelationModel> authorizationRoleRelationModels);
+
+    /**
+     * 根据角色ID 获取 角色所有权限
+     * @param roleId
+     * @return
+     */
+    public List<Integer> getAuthorizationIdByRoleId(@Param("roleId") Integer roleId);
+
+    /**
+     * 根据角色ID 删除角色和权限关系
+     * @param roleId
+     * @return
+     */
+    public Integer deleteAuthorizationRoleRelationModelByRoleId(@Param("roleId") Integer roleId);
+}
