@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Elena on 2017/6/7.
@@ -55,5 +57,21 @@ public class AuthorizationRoleRelationService {
      */
     public List<Integer> getAuthorizationIdByRoleId(Integer roleId) {
         return authorizationRoleRelationModelMapper.getAuthorizationIdByRoleId(roleId);
+    }
+
+    /**
+     * 根据用户ID 获取 用户拥有的所有权限
+     *
+     * @param userId
+     * @return
+     */
+    public List<Integer> getAuthorizationIdByUserId(Integer userId) {
+        //return authorizationRoleRelationModelMapper.getAuthorizationIdByRoleId(roleId);
+        Set<Integer> roleIds = new HashSet<>();//角色列表
+        //TODO 根据当前用户获取所属 组
+        List<Integer> groupIds = new ArrayList<>();//组列表
+        //TODO 根据用户所属组获取角色
+
+        return null;
     }
 }

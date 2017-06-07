@@ -32,8 +32,19 @@ public class FunctionAuthorizationHandler {
      * @param roleId
      * @return
      */
-    @RequestMapper("/have/list")
-    public List<Integer> haveAuthorizationList(@NotNull Integer roleId) {
+    @RequestMapper("role/have")
+    public List<Integer> roleHaveAuthorizationList(@NotNull Integer roleId) {
         return authorizationRoleRelationService.getAuthorizationIdByRoleId(roleId);
+    }
+
+
+    /**
+     * 获取用户已有功能权限
+     * @param userId
+     * @return
+     */
+    @RequestMapper("user/have")
+    public List<Integer> userHaveAuthorizationList(@NotNull Integer userId) {
+        return authorizationRoleRelationService.getAuthorizationIdByUserId(userId);
     }
 }
