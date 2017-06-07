@@ -34,7 +34,6 @@ public class AuthorizationInfoHandler implements RequestHandler {
     private AuthorizationInfoService authorizationInfoService;
 
     @RequestMapper("/add")
-    @ResponseBody
     @Validate
     public Integer addAuthorizationInfo(@NotNull String authorizationName, @NotNull String authorizationCode,
                                         Integer authorizationStatus, String description) throws Exception {
@@ -43,14 +42,10 @@ public class AuthorizationInfoHandler implements RequestHandler {
         authorizationInfoModel.setAuthorizationCode(authorizationCode);
         authorizationInfoModel.setAuthorizationStatus(authorizationStatus);
         authorizationInfoModel.setDescription(description);
-        ApiResult<AuthorizationInfo> apiResult = new ApiResult<>();
-        apiResult.setMessageCode(MessageCode.RESP_OK.getMsgCode());
-        apiResult.setMessage(MessageCode.RESP_OK.getMessage());
         return authorizationInfoService.addAuthorizationInfo(authorizationInfoModel);
     }
 
     @RequestMapper("/edit")
-    @ResponseBody
     @Validate
     public boolean editAuthorizationInfo(@NotNull Integer authorizationId, @NotNull String authorizationName, @NotNull String authorizationCode,
                                          Integer authorizationStatus, String description) throws Exception {
@@ -60,47 +55,36 @@ public class AuthorizationInfoHandler implements RequestHandler {
         authorizationInfoModel.setAuthorizationCode(authorizationCode);
         authorizationInfoModel.setAuthorizationStatus(authorizationStatus);
         authorizationInfoModel.setDescription(description);
-        ApiResult<AuthorizationInfo> apiResult = new ApiResult<>();
-        boolean result = authorizationInfoService.editAuthorizationInfo(authorizationInfoModel);
-        return result;
+        return authorizationInfoService.editAuthorizationInfo(authorizationInfoModel);
     }
 
     @RequestMapper("/enabled")
-    @ResponseBody
     @Validate
     public boolean enabledAuthorizationInfo(@NotNull Integer authorizationId) throws Exception {
-        boolean result = authorizationInfoService.changeAuthorizationInfoModelStatus(authorizationId, AuthorizationInfoModel.EnumAuthorizationStatus.ENABLED);
-        return result;
+        return authorizationInfoService.changeAuthorizationInfoModelStatus(authorizationId, AuthorizationInfoModel.EnumAuthorizationStatus.ENABLED);
     }
 
     @RequestMapper("/disabled")
-    @ResponseBody
     @Validate
-    public boolean disabledAuthorizationInfo(@NotNull Integer authorizationId) throws Exception {
-        boolean result = authorizationInfoService.changeAuthorizationInfoModelStatus(authorizationId, AuthorizationInfoModel.EnumAuthorizationStatus.DISABLED);
-        return result;
+    public boolean disabledAuthorizationInfo(@NotNull Integer authorizationId) throws BizException {
+        return authorizationInfoService.changeAuthorizationInfoModelStatus(authorizationId, AuthorizationInfoModel.EnumAuthorizationStatus.DISABLED);
     }
 
     @RequestMapper("/delete")
-    @ResponseBody
     @Validate
     public boolean deleteAuthorizationInfo(@NotNull Integer authorizationId) throws Exception {
         List<Integer> authorizationIdList = new ArrayList<>();
         authorizationIdList.add(authorizationId);
-        boolean result = authorizationInfoService.batchDeleteAuthorizationInfo(authorizationIdList);
-        return result;
+        return authorizationInfoService.batchDeleteAuthorizationInfo(authorizationIdList);
     }
 
     @RequestMapper("/batch/delete")
-    @ResponseBody
     @Validate
     public boolean batchDeleteAuthorizationInfo(@NotEmpty List<Integer> authorizationIdList) throws Exception {
-        boolean result = authorizationInfoService.batchDeleteAuthorizationInfo(authorizationIdList);
-        return result;
+        return authorizationInfoService.batchDeleteAuthorizationInfo(authorizationIdList);
     }
 
     @RequestMapper("/list")
-    @ResponseBody
     @Validate
     public List<AuthorizationInfoModel> getAuthorizationList(AuthorizationInfo authorizationInfo) throws Exception {
         AuthorizationInfoModel authorizationInfoModel = new AuthorizationInfoModel();
@@ -109,9 +93,8 @@ public class AuthorizationInfoHandler implements RequestHandler {
     }
 
     @RequestMapper("/object")
-    @ResponseBody
     @Validate
-    public AuthorizationInfoModel getAuthorizationList(@NotNull Integer authorizationId) throws Exception {
+    public AuthorizationInfoModel getAuthorizationByAuthorizationId(@NotNull Integer authorizationId) throws Exception {
         return authorizationInfoService.getAuthorizationByAuthorizationId(authorizationId);
     }
 }

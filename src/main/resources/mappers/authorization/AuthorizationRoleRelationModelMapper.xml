@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shsnc.base.authorization.mapper.AuthorizationRoleRelationModelMapper">
+
+    <!-- 表名用变量表示 -->
+    <sql id="tableName">authorization_role_relation</sql>
+
+    <sql id="Base_Column">
+        id,
+        role_id,
+        authorization_id
+    </sql>
+
+    <insert id="addAuthorizationRoleRelationModel" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO
+        <include refid="tableName"/>
+        (
+        role_id,
+        authorization_id
+        )
+        VALUES
+        (
+        #{roleId},
+        #{authorizationId}
+        )
+    </insert>
+
+    <insert id="batchAddAuthorizationRoleRelationModel">
+        INSERT INTO
+        <include refid="tableName"/>
+        (
+        role_id,
+        authorization_id
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.roleId},#{item.authorizationId})
+        </foreach>
+    </insert>
+
+    <select id="getAuthorizationIdByRoleId" resultType="java.lang.Integer">
+        SELECT
+        authorization_id
+        FROM
+        <include refid="tableName"/>
+        WHERE role_id = #{roleId }
+    </select>
+
+    <delete id="deleteAuthorizationRoleRelationModelByRoleId">
+        DELETE
+        <include refid="tableName"/>
+        WHERE role_id = #{roleId }
+    </delete>
+
+</mapper>

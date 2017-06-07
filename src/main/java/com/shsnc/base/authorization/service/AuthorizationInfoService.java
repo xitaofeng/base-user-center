@@ -95,7 +95,7 @@ public class AuthorizationInfoService {
      * @return
      * @throws Exception
      */
-    public boolean changeAuthorizationInfoModelStatus(Integer authorizationId, EnumAuthorizationStatus enumAuthorizationStatus) throws Exception {
+    public boolean changeAuthorizationInfoModelStatus(Integer authorizationId, EnumAuthorizationStatus enumAuthorizationStatus) throws BizException {
         if (authorizationId != null) {
             if (authorizationInfoModelMapper.getAuthorizationByAuthorizationId(authorizationId) != null) {
                 return authorizationInfoModelMapper.editAuthorizationStatus(authorizationId, enumAuthorizationStatus.getAuthorizationStatus()) > 0;
