@@ -10,6 +10,7 @@ public class UserInfoParam {
     private String alias;
     private String mobile;
 
+
     public Long getUserId() {
         return userId;
     }

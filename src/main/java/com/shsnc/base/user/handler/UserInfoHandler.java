@@ -25,7 +25,6 @@ public class UserInfoHandler implements RequestHandler {
 
     @RequestMapper("/getList")
     public List<UserInfo> getList(UserInfoParam userInfo){
-        List<UserInfoModel> list = userInfoService.getList(JsonUtil.convert(userInfo, UserInfoModel.class));
-        return JsonUtil.convert(list, List.class, UserInfo.class);
+        return null;
     }
 }
