@@ -1,6 +1,5 @@
 package com.shsnc.base.user.mapper;
 
-import com.shsnc.base.user.bean.result.UserInfo;
 import com.shsnc.base.user.model.UserInfoModel;
 
 import java.util.List;

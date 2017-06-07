@@ -1,14 +1,15 @@
-package com.shsnc.base.user.bean.result;
+package com.shsnc.base.user.bean;
 
 /**
  *
  */
-public class UserInfo {
+public class UserInfoParam {
 
     private Long userId;
     private String username;
     private String alias;
     private String mobile;
+
 
     public Long getUserId() {
         return userId;
