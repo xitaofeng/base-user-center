@@ -4,6 +4,7 @@ import com.shsnc.base.authorization.model.AuthorizationRoleRelationModel;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Elena on 2017/6/7.
@@ -30,6 +31,13 @@ public interface AuthorizationRoleRelationModelMapper {
      * @return
      */
     public List<Integer> getAuthorizationIdByRoleId(@Param("roleId") Integer roleId);
+
+    /**
+     * 根据角色ID 获取 角色所有权限
+     * @param roleIds
+     * @return
+     */
+    public List<Integer> getAuthorizationIdByRoleIds(@Param("roleIds") Set<Integer> roleIds);
 
     /**
      * 根据角色ID 删除角色和权限关系

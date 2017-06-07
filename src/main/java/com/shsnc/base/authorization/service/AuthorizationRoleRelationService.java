@@ -1,6 +1,8 @@
 package com.shsnc.base.authorization.service;
 
+import com.shsnc.base.authorization.mapper.AuthorizationGroupRoleRelationModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationRoleRelationModelMapper;
+import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationRoleRelationModel;
 import com.shsnc.base.util.config.BizException;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -21,6 +23,12 @@ public class AuthorizationRoleRelationService {
 
     @Autowired
     private AuthorizationRoleRelationModelMapper authorizationRoleRelationModelMapper;
+
+    @Autowired
+    private AuthorizationUserRoleRelationModelMapper authorizationUserRoleRelationModelMapper;
+
+    @Autowired
+    private AuthorizationGroupRoleRelationModelMapper authorizationGroupRoleRelationModelMapper;
 
     /**
      * 批量插入数据返回 插入条数
@@ -68,10 +76,26 @@ public class AuthorizationRoleRelationService {
     public List<Integer> getAuthorizationIdByUserId(Integer userId) {
         //return authorizationRoleRelationModelMapper.getAuthorizationIdByRoleId(roleId);
         Set<Integer> roleIds = new HashSet<>();//角色列表
+
+        //获取用户角色列表
+        List<Integer> userRoleIds = authorizationUserRoleRelationModelMapper.getRoleIdByUserId(userId);
+        userRoleIds.forEach(roleId -> {
+            roleIds.add(roleId);
+        });
         //TODO 根据当前用户获取所属 组
         List<Integer> groupIds = new ArrayList<>();//组列表
-        //TODO 根据用户所属组获取角色
 
-        return null;
+        if(!CollectionUtils.isEmpty(groupIds)) {
+            List<Integer> groupRoleIds = authorizationGroupRoleRelationModelMapper.getRoleIdByGroupIds(groupIds);
+            groupRoleIds.forEach(roleId -> {
+                roleIds.add(roleId);
+            });
+        }
+
+        if (!CollectionUtils.isEmpty(roleIds)) {
+            return authorizationRoleRelationModelMapper.getAuthorizationIdByRoleIds(roleIds);
+        } else {
+            return new ArrayList<>();
+        }
     }
 }

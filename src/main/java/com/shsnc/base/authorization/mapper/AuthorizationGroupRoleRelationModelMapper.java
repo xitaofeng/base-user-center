@@ -27,6 +27,13 @@ public interface AuthorizationGroupRoleRelationModelMapper {
     public List<Integer> getRoleIdByGroupId(@Param("groupId") Integer groupId);
 
     /**
+     * 根据分组列表获取角色id
+     * @param groupIds
+     * @return
+     */
+    public List<Integer> getRoleIdByGroupIds(@Param("groupIds") List<Integer> groupIds);
+
+    /**
      * 根据分组id 删除分组和角色关系
      * @param groupId
      * @return
