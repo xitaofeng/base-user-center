@@ -1,3 +1,5 @@
+
+
 package com.shsnc.base.authorization.service;
 
 import com.shsnc.base.authorization.mapper.AuthorizationInfoModelMapper;
@@ -8,6 +10,7 @@ import com.shsnc.base.util.StringUtil;
 import com.shsnc.base.util.config.BizException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -17,7 +20,8 @@ import java.util.List;
 /**
  * Created by Elena on 2017/6/7.
  */
-public class AuthorizationRoleModelService {
+@Service
+public class AuthorizationRoleService {
 
     @Autowired
     private AuthorizationRoleModelMapper authorizationRoleModelMapper;
@@ -37,6 +41,9 @@ public class AuthorizationRoleModelService {
         if (authorizationRoleModel.getIsBuilt() == null) {
             authorizationRoleModel.setIsBuilt(AuthorizationRoleModel.EnumIsBuilt.FALSE.getValue());
         }
+        if (authorizationRoleModel.getOrders() != null) {
+            authorizationRoleModel.setOrders(1);
+        }
         Integer roleId = authorizationRoleModelMapper.addAuthorizationRoleModel(authorizationRoleModel);
         if (roleId != null) {
             return roleId;
@@ -52,7 +59,7 @@ public class AuthorizationRoleModelService {
      * @return
      * @throws Exception
      */
-    public boolean editAuthorizationInfo(AuthorizationRoleModel authorizationRoleModel) throws Exception {
+    public boolean editAuthorizationRoleModel(AuthorizationRoleModel authorizationRoleModel) throws Exception {
         if (authorizationRoleModel != null && authorizationRoleModel.getRoleId() != null) {
             AuthorizationRoleModel editAuthorizationRoleModel = authorizationRoleModelMapper.getAuthorizationRoleModelByRoleId(authorizationRoleModel.getRoleId());
             if (editAuthorizationRoleModel != null) {
@@ -103,7 +110,7 @@ public class AuthorizationRoleModelService {
      * @return
      * @throws Exception
      */
-    public List<AuthorizationRoleModel> getAuthorizationList(AuthorizationRoleModel authorizationRoleModel) throws Exception {
+    public List<AuthorizationRoleModel> getAuthorizationRoleModelList(AuthorizationRoleModel authorizationRoleModel) throws Exception {
         return authorizationRoleModelMapper.getAuthorizationRoleModelList(authorizationRoleModel);
     }
 
