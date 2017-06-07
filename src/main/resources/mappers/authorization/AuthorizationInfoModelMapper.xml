@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="ActionJobsMapper">
+<mapper namespace="com.shsnc.base.authorization.mapper.AuthorizationInfoModelMapper">
 
     <!-- 表名用变量表示 -->
     <sql id="tableName">authorization_info</sql>
 
     <!-- SQL语句格式美化，关键字用大写字母 -->
-    <insert id="addAuthorization" useGeneratedKeys="true" keyProperty="authorizationId" keyColumn="authorization_id">
+    <insert id="addAuthorizationInfo" useGeneratedKeys="true" keyProperty="authorizationId" keyColumn="authorization_id">
         INSERT INTO
         <include refid="tableName"/>
         (
@@ -28,7 +28,7 @@
     </insert>
 
     <!-- SQL语句格式美化，关键字用大写字母 -->
-    <update id="editAuthorization">
+    <update id="editAuthorizationInfo">
         UPDATE
         <include refid="tableName"/>
         SET
@@ -49,17 +49,24 @@
         WHERE authorization_id = #{authorizationId }
     </update>
 
-    <update id="batchDeleteAuthorization" resultType="java.lang.Integer">
+    <update id="batchDeleteAuthorization">
         DELETE
         <include refid="tableName"/>
         WHERE authorization_id in
-        <foreach item="authorizationId" open="(" separator="," close=")">
+        <foreach item="authorizationId" collection="list" open="(" separator="," close=")">
             #{authorizationId}
         </foreach>
     </update>
 
+    <select id="getAuthorizationByAuthorizationId" resultType="com.shsnc.base.authorization.model.AuthorizationInfoModel">
+        SELECT
+        *
+        FROM
+        <include refid="tableName"/>
+        WHERE authorization_id = #{authorizationId }
+    </select>
 
-    <select id="getAuthorizationList" resultType="com.shsnc.authorization.model.AuthorizationInfoModel">
+    <select id="getAuthorizationList" resultType="com.shsnc.base.authorization.model.AuthorizationInfoModel">
         SELECT
         *
         FROM
@@ -79,7 +86,7 @@
         </if>
     </select>
 
-    <select id="getListByAuthorizationName" resultType="com.shsnc.authorization.model.AuthorizationInfoModel">
+    <select id="getListByAuthorizationName" resultType="com.shsnc.base.authorization.model.AuthorizationInfoModel">
         SELECT
         *
         FROM
@@ -87,7 +94,7 @@
         WHERE authorization_name = #{authorizationName}
     </select>
 
-    <select id="getListByAuthorizationCode" resultType="com.shsnc.authorization.model.AuthorizationInfoModel">
+    <select id="getListByAuthorizationCode" resultType="com.shsnc.base.authorization.model.AuthorizationInfoModel">
         SELECT
         *
         FROM
