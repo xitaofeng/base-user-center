@@ -37,7 +37,7 @@ public class AuthorizationRoleRelationService {
      * @param authorizationIdList
      * @return
      */
-    public boolean roleBatchAuthorization(Integer roleId, List<Integer> authorizationIdList) throws BizException {
+    public boolean roleBatchAuthorization(Long roleId, List<Long> authorizationIdList) throws BizException {
         if (roleId == null) {
             throw new BizException("选择授权的角色");
         }
@@ -63,7 +63,7 @@ public class AuthorizationRoleRelationService {
      * @param roleId
      * @return
      */
-    public List<Integer> getAuthorizationIdByRoleId(Integer roleId) {
+    public List<Integer> getAuthorizationIdByRoleId(Long roleId) {
         return authorizationRoleRelationModelMapper.getAuthorizationIdByRoleId(roleId);
     }
 
@@ -73,20 +73,20 @@ public class AuthorizationRoleRelationService {
      * @param userId
      * @return
      */
-    public List<Integer> getAuthorizationIdByUserId(Integer userId) {
+    public List<Integer> getAuthorizationIdByUserId(Long userId) {
         //return authorizationRoleRelationModelMapper.getAuthorizationIdByRoleId(roleId);
-        Set<Integer> roleIds = new HashSet<>();//角色列表
+        Set<Long> roleIds = new HashSet<>();//角色列表
 
         //获取用户角色列表
-        List<Integer> userRoleIds = authorizationUserRoleRelationModelMapper.getRoleIdByUserId(userId);
+        List<Long> userRoleIds = authorizationUserRoleRelationModelMapper.getRoleIdByUserId(userId);
         userRoleIds.forEach(roleId -> {
             roleIds.add(roleId);
         });
         //TODO 根据当前用户获取所属 组
-        List<Integer> groupIds = new ArrayList<>();//组列表
+        List<Long> groupIds = new ArrayList<>();//组列表
 
         if(!CollectionUtils.isEmpty(groupIds)) {
-            List<Integer> groupRoleIds = authorizationGroupRoleRelationModelMapper.getRoleIdByGroupIds(groupIds);
+            List<Long> groupRoleIds = authorizationGroupRoleRelationModelMapper.getRoleIdByGroupIds(groupIds);
             groupRoleIds.forEach(roleId -> {
                 roleIds.add(roleId);
             });

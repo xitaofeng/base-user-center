@@ -22,7 +22,7 @@ public class FunctionAuthorizationHandler {
     private AuthorizationRoleRelationService authorizationRoleRelationService;
 
     @RequestMapper("")
-    public boolean roleBatchAuthorization(@NotNull Integer roleId, @NotEmpty List<Integer> authorizationIdList) throws BizException {
+    public boolean roleBatchAuthorization(@NotNull Long roleId, @NotEmpty List<Long> authorizationIdList) throws BizException {
         return authorizationRoleRelationService.roleBatchAuthorization(roleId,authorizationIdList);
     }
 
@@ -33,7 +33,7 @@ public class FunctionAuthorizationHandler {
      * @return
      */
     @RequestMapper("role/have")
-    public List<Integer> roleHaveAuthorizationList(@NotNull Integer roleId) {
+    public List<Integer> roleHaveAuthorizationList(@NotNull Long roleId) {
         return authorizationRoleRelationService.getAuthorizationIdByRoleId(roleId);
     }
 
@@ -44,7 +44,7 @@ public class FunctionAuthorizationHandler {
      * @return
      */
     @RequestMapper("user/have")
-    public List<Integer> userHaveAuthorizationList(@NotNull Integer userId) {
+    public List<Integer> userHaveAuthorizationList(@NotNull Long userId) {
         return authorizationRoleRelationService.getAuthorizationIdByUserId(userId);
     }
 }

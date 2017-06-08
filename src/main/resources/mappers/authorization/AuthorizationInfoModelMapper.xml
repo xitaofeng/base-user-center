@@ -49,14 +49,14 @@
         WHERE authorization_id = #{authorizationId }
     </update>
 
-    <update id="batchDeleteAuthorization">
-        DELETE
+    <delete id="batchDeleteAuthorization">
+        DELETE FROM
         <include refid="tableName"/>
         WHERE authorization_id in
         <foreach item="authorizationId" collection="list" open="(" separator="," close=")">
             #{authorizationId}
         </foreach>
-    </update>
+    </delete>
 
     <select id="getAuthorizationByAuthorizationId" resultType="com.shsnc.base.authorization.model.AuthorizationInfoModel">
         SELECT

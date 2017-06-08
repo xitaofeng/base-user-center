@@ -7,33 +7,33 @@ import java.io.Serializable;
  */
 public class AuthorizationRoleRelationModel implements Serializable {
 
-    private Integer id;
+    private Long id;
 
-    private Integer authorizationId;
+    private Long authorizationId;
 
-    private Integer roleId;
+    private Long roleId;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public Integer getAuthorizationId() {
+    public Long getAuthorizationId() {
         return authorizationId;
     }
 
-    public void setAuthorizationId(Integer authorizationId) {
+    public void setAuthorizationId(Long authorizationId) {
         this.authorizationId = authorizationId;
     }
 
-    public Integer getRoleId() {
+    public Long getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(Integer roleId) {
+    public void setRoleId(Long roleId) {
         this.roleId = roleId;
     }
 }

@@ -24,12 +24,12 @@ public interface AuthorizationUserRoleRelationModelMapper {
      * @param userId
      * @return
      */
-    public List<Integer> getRoleIdByUserId(@Param("userId") Integer userId);
+    public List<Long> getRoleIdByUserId(@Param("userId") Long userId);
 
     /**
      * 根据用户id 删除分组和角色关系
      * @param userId
      * @return
      */
-    public Integer deleteAuthorizationUserRoleRelationModelByUserId(@Param("userId") Integer userId);
+    public Long deleteAuthorizationUserRoleRelationModelByUserId(@Param("userId") Long userId);
 }

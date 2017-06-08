@@ -32,7 +32,7 @@ public interface AuthorizationRoleModelMapper {
      * @param roleIdList
      * @return
      */
-    public Integer batchDeleteAuthorizationRole(List<Integer> roleIdList);
+    public Integer batchDeleteAuthorizationRole(List<Long> roleIdList);
 
     /**
      * 获取单一对象数据
@@ -40,7 +40,7 @@ public interface AuthorizationRoleModelMapper {
      * @param roleId
      * @return
      */
-    public AuthorizationRoleModel getAuthorizationRoleModelByRoleId(Integer roleId);
+    public AuthorizationRoleModel getAuthorizationRoleModelByRoleId(Long roleId);
 
     /**
      * 获取列表数据
