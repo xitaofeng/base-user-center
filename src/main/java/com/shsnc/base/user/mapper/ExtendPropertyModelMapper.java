@@ -28,4 +28,5 @@ public interface ExtendPropertyModelMapper {
     List<ExtendPropertyModel> getPageByCondition(@Param("condition") ExtendPropertyCondition condition, @Param("pagination") Pagination pagination);
 
     List<ExtendPropertyModel> getExtendPropertyList();
+
 }

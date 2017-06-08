@@ -7,7 +7,6 @@ import com.shsnc.base.user.model.ExtendPropertyModel;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIXDom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,9 +53,10 @@ public class ExtendPropertyService {
      * @return 新增成功返回ture，否则返回false
      * @throws BizException 业务异常
      */
-    public boolean addExtendProperty(ExtendPropertyModel extendPropertyModel) throws BizException {
+    public Long addExtendProperty(ExtendPropertyModel extendPropertyModel) throws BizException {
         checkExtendProperty(extendPropertyModel);
-        return extendPropertyModelMapper.insertSelective(extendPropertyModel)>0;
+        extendPropertyModelMapper.insertSelective(extendPropertyModel);
+        return extendPropertyModel.getPropertyId();
     }
 
     /**
@@ -104,5 +104,17 @@ public class ExtendPropertyService {
         }
     }
 
+    /**
+     * 获取某个扩展属性
+     * @param propertyId 属性id
+     * @return 返回扩展属性
+     * @throws BizException 业务异常
+     */
+    public ExtendPropertyModel getExtendProperty(Long propertyId) throws BizException {
+        if(propertyId == null){
+            throw new BizException("属性id不能为空！");
+        }
+        return extendPropertyModelMapper.selectByPrimaryKey(propertyId);
+    }
 
 }
