@@ -82,9 +82,6 @@ public class ExtendPropertyValueService {
      */
     public boolean deleteExtendPropertyValue(Long propertyValueId) throws BizException {
         Assert.notNull(propertyValueId,"属性值id不能为空！");
-        ExtendPropertyValueModel dbExtendPropertyValue = extendPropertyValueMapper.selectByPrimaryKey(propertyValueId);
-        Assert.notNull(dbExtendPropertyValue, String.format("属性值id：%s不存在！",propertyValueId));
-
         return extendPropertyValueMapper.deleteByPrimaryKey(propertyValueId) > 0;
     }
 
@@ -95,6 +92,7 @@ public class ExtendPropertyValueService {
      */
     public List<ExtendPropertyValueModel> getExtendPropertyValueByUserId(Long userId){
         ExtendPropertyValueModel extendPropertyValueModel = new ExtendPropertyValueModel();
+        extendPropertyValueModel.setUserId(userId);
         return extendPropertyValueMapper.findExtendPropertyValueList(extendPropertyValueModel);
     }
 }
