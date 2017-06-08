@@ -62,8 +62,8 @@ public class ExtendPropertyHandler implements RequestHandler {
     }
 
     @RequestMapper("/delete")
-    @Validate(groups = ValidationType.Delete.class)
-    public boolean delete(@NotEmpty Long propertyId){
+    @Validate
+    public boolean delete(@NotEmpty Long propertyId) throws BizException {
         return extendPropertyService.deleteExtendProperty(propertyId);
     }
 
