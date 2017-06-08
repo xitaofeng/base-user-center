@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class BeanHelper {
 
-    public <T, E> List<T> extractToList(Collection<E> collection, PropertyGetter<T, E> getter){
+    public static  <T, E> List<T> extractToList(Collection<E> collection, PropertyGetter<T, E> getter){
         List<T> list = new ArrayList<T>();
         if(collection != null){
             for(E item : collection){
@@ -22,7 +22,7 @@ public class BeanHelper {
         return list;
     }
 
-    public <T, E> Set<T> extractToSet(Collection<E> collection, PropertyGetter<T, E> getter){
+    public static  <T, E> Set<T> extractToSet(Collection<E> collection, PropertyGetter<T, E> getter){
         Set<T> set = new HashSet<T>();
         if(collection != null){
             for(E item : collection){
@@ -35,7 +35,7 @@ public class BeanHelper {
         return set;
     }
 
-    public <T, E> Map<T, E> extractToMap(Collection<E> collection, PropertyGetter<T, E> getter){
+    public static  <T, E> Map<T, E> extractToMap(Collection<E> collection, PropertyGetter<T, E> getter){
         Map<T, E> map = new HashMap<T, E>();
         if(collection != null){
             for(E item : collection){
