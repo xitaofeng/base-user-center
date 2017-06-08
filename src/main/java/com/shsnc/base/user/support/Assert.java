@@ -33,6 +33,10 @@ public abstract class Assert {
         }
     }
 
+    public static void notNull(Object object) throws BizException {
+        notNull(object, "输入参数不能为空！");
+    }
+
     public static void hasLength(String text, String message) throws BizException {
         if(!StringUtils.hasLength(text)) {
             throw new BizException(message);
