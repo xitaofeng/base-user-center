@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shsnc.base.authorization.mapper.AuthorizationGroupRoleRelationModelMapper">
+
+    <!-- 表名用变量表示 -->
+    <sql id="tableName">authorization_group_role_relation</sql>
+
+    <sql id="Base_Column">
+        id,
+        group_id,
+        role_id
+    </sql>
+
+    <insert id="batchAddAuthorizationGroupRoleRelationModel">
+        INSERT INTO
+        <include refid="tableName"/>
+        (
+        group_id,
+        role_id
+        )
+        VALUES
+        <foreach collection="authorizationGroupRoleRelationModels" item="item" index="index" separator="," >
+            (#{item.groupId},#{item.roleId})
+        </foreach>
+    </insert>
+
+    <select id="getRoleIdByGroupId" resultType="java.lang.Integer">
+        SELECT
+        role_id
+        FROM
+        <include refid="tableName"/>
+        WHERE group_id = #{groupId }
+    </select>
+
+    <select id="getRoleIdByGroupIds" resultType="java.lang.Integer">
+        SELECT
+        role_id
+        FROM
+        <include refid="tableName"/>
+        WHERE group_id in
+        <foreach collection="groupIds" item="groupId" index="index" separator="," open="(" close=")">
+            #{groupId}
+        </foreach>
+    </select>
+
+    <delete id="deleteAuthorizationGroupRoleRelationModelByGroupId">
+        DELETE
+        <include refid="tableName"/>
+        WHERE group_id = #{groupId }
+    </delete>
+
+</mapper>
