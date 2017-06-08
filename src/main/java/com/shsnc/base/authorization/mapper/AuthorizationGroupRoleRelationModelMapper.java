@@ -31,12 +31,12 @@ public interface AuthorizationGroupRoleRelationModelMapper {
      * @param groupIds
      * @return
      */
-    public List<Integer> getRoleIdByGroupIds(@Param("groupIds") List<Integer> groupIds);
+    public List<Long> getRoleIdByGroupIds(@Param("groupIds") List<Long> groupIds);
 
     /**
      * 根据分组id 删除分组和角色关系
      * @param groupId
      * @return
      */
-    public Integer deleteAuthorizationGroupRoleRelationModelByGroupId(@Param("groupId") Integer groupId);
+    public Integer deleteAuthorizationGroupRoleRelationModelByGroupId(@Param("groupId") Long groupId);
 }

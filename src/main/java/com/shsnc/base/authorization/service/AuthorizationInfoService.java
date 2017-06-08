@@ -3,6 +3,7 @@ package com.shsnc.base.authorization.service;
 
 import com.shsnc.base.authorization.config.AuthorizationConstant;
 import com.shsnc.base.authorization.mapper.AuthorizationInfoModelMapper;
+import com.shsnc.base.authorization.mapper.AuthorizationRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel.EnumAuthorizationStatus;
 import com.shsnc.base.util.JsonUtil;
@@ -26,6 +27,9 @@ public class AuthorizationInfoService {
     @Autowired
     private AuthorizationInfoModelMapper authorizationInfoModelMapper;
 
+    @Autowired
+    private AuthorizationRoleRelationModelMapper authorizationRoleRelationModelMapper;
+
     /**
      * 添加 权限 信息
      *
@@ -33,7 +37,7 @@ public class AuthorizationInfoService {
      * @return
      * @throws Exception
      */
-    public Integer addAuthorizationInfo(AuthorizationInfoModel authorizationInfoModel) throws Exception {
+    public Long addAuthorizationInfo(AuthorizationInfoModel authorizationInfoModel) throws Exception {
         if (isAuthorizationName(authorizationInfoModel)) {
             throw new BizException("权限名称重复");
         }
@@ -44,7 +48,7 @@ public class AuthorizationInfoService {
         if (authorizationInfoModel.getAuthorizationStatus() == null) {
             authorizationInfoModel.setAuthorizationStatus(EnumAuthorizationStatus.ENABLED.getAuthorizationStatus());
         }
-        Integer authorizationId = authorizationInfoModelMapper.addAuthorizationInfo(authorizationInfoModel);
+        Long authorizationId = authorizationInfoModelMapper.addAuthorizationInfo(authorizationInfoModel);
         if (authorizationId != null) {
             return authorizationId;
         } else {
@@ -77,7 +81,7 @@ public class AuthorizationInfoService {
                 if (count != null && count > 0) {
                     return true;
                 } else {
-                    throw new BizException("数据编辑失败");
+                    return false;
                 }
             } else {
                 throw new BizException("编辑数据不存在");
@@ -95,7 +99,7 @@ public class AuthorizationInfoService {
      * @return
      * @throws Exception
      */
-    public boolean changeAuthorizationInfoModelStatus(Integer authorizationId, EnumAuthorizationStatus enumAuthorizationStatus) throws BizException {
+    public boolean editAuthorizationInfoModelStatus(Long authorizationId, EnumAuthorizationStatus enumAuthorizationStatus) throws BizException {
         if (authorizationId != null) {
             if (authorizationInfoModelMapper.getAuthorizationByAuthorizationId(authorizationId) != null) {
                 return authorizationInfoModelMapper.editAuthorizationStatus(authorizationId, enumAuthorizationStatus.getAuthorizationStatus()) > 0;
@@ -115,11 +119,19 @@ public class AuthorizationInfoService {
      * @throws Exception
      */
     @Transactional
-    public boolean batchDeleteAuthorizationInfo(List<Integer> authorizationIdList) throws Exception {
+    public boolean batchDeleteAuthorizationInfo(List<Long> authorizationIdList) throws Exception {
         if (!CollectionUtils.isEmpty(authorizationIdList)) {
-            authorizationIdList.forEach(authorizationId -> {
-                //TODO 验证权限是否 使用
-            });
+            for (int i = 0; i < authorizationIdList.size(); i++) {
+                Long authorizationId = authorizationIdList.get(i);
+                if (!CollectionUtils.isEmpty(authorizationRoleRelationModelMapper.getRoleIdByAuthorizationId(authorizationId))) {
+                    String authorizationName = authorizationId + "";
+                    AuthorizationInfoModel authorizationInfoModel = authorizationInfoModelMapper.getAuthorizationByAuthorizationId(authorizationId);
+                    if (authorizationInfoModel != null) {
+                        authorizationName = authorizationInfoModel.getAuthorizationName();
+                    }
+                    throw new BizException("权限【" + authorizationName + "】存在使用的角色");
+                }
+            }
             return authorizationInfoModelMapper.batchDeleteAuthorization(authorizationIdList) > 0;
         } else {
             throw new BizException("请选择需要删除的数据");
@@ -144,8 +156,8 @@ public class AuthorizationInfoService {
      * @return
      * @throws Exception
      */
-    public AuthorizationInfoModel getAuthorizationByAuthorizationId(Integer authorizationId) throws Exception {
-        if(authorizationId ==null){
+    public AuthorizationInfoModel getAuthorizationByAuthorizationId(Long authorizationId) throws Exception {
+        if (authorizationId == null) {
             throw new BizException("无效数据");
         }
         AuthorizationInfoModel authorizationInfoModel = authorizationInfoModelMapper.getAuthorizationByAuthorizationId(authorizationId);
@@ -159,7 +171,7 @@ public class AuthorizationInfoService {
      * @return
      */
     public boolean isAuthorizationName(AuthorizationInfoModel authorizationInfoModel) throws BizException {
-        Integer authorizationId = authorizationInfoModel.getAuthorizationId();
+        Long authorizationId = authorizationInfoModel.getAuthorizationId();
         String authorizationName = authorizationInfoModel.getAuthorizationName();
         if (StringUtil.isNotEmpty(authorizationName)) {
             List<AuthorizationInfoModel> list = authorizationInfoModelMapper.getListByAuthorizationName(authorizationName);
@@ -180,7 +192,7 @@ public class AuthorizationInfoService {
      * @return
      */
     public boolean isAuthorizationCode(AuthorizationInfoModel authorizationInfoModel) throws BizException {
-        Integer authorizationId = authorizationInfoModel.getAuthorizationId();
+        Long authorizationId = authorizationInfoModel.getAuthorizationId();
         String authorizationCode = authorizationInfoModel.getAuthorizationCode();
         if (StringUtil.isNotEmpty(authorizationCode)) {
             List<AuthorizationInfoModel> list = authorizationInfoModelMapper.getListByAuthorizationCode(authorizationCode);
@@ -200,7 +212,7 @@ public class AuthorizationInfoService {
      * @param list
      * @return
      */
-    private boolean checkDataRepetition(Integer authorizationId, List<AuthorizationInfoModel> list) {
+    private boolean checkDataRepetition(Long authorizationId, List<AuthorizationInfoModel> list) {
         //authorizationId == null 添加否则编辑
         if (authorizationId != null) {
             boolean isRepetition = false;

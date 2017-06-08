@@ -34,7 +34,7 @@
     </select>
 
     <delete id="deleteAuthorizationUserRoleRelationModelByUserId">
-        DELETE
+        DELETE FROM
         <include refid="tableName"/>
         WHERE user_id = #{userId }
     </delete>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shsnc.base.user.mapper.AccountModelMapper">
+
+    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.AccountModel">
+        <id column="account_id" property="accountId" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="account_name" property="accountName" jdbcType="VARCHAR"/>
+        <result column="account_type" property="accountType" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="BaseColumn">
+        account_id, user_id, account_name, account_type
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_account
+        WHERE
+            account_id = #{accountId}
+    </select>
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM
+            user_account
+        WHERE
+            account_id = #{accountId}
+    </delete>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="accountId">
+        INSERT INTO user_account (
+            user_id,
+            account_name,
+            account_type
+        )
+        values (
+            #{userId},
+            #{accountName},
+            #{accountType}
+        )
+    </insert>
+
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="accountId">
+        INSERT INTO user_account
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="accountName != null">
+                account_name,
+            </if>
+            <if test="accountType != null">
+                account_type,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                #{userId},
+            </if>
+            <if test="accountName != null">
+                #{accountName},
+            </if>
+            <if test="accountType != null">
+                #{accountType},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        UPDATE user_account
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="accountName != null">
+                account_name = #{accountName},
+            </if>
+            <if test="accountType != null">
+                account_type = #{accountType},
+            </if>
+        </set>
+        WHERE account_id = #{accountId}
+    </update>
+
+    <update id="updateByPrimaryKey">
+        UPDATE user_account
+        SET user_id = #{userId},
+            account_name = #{accountName},
+            account_type = #{accountType}
+        WHERE account_id = #{accountId}
+    </update>
+</mapper>

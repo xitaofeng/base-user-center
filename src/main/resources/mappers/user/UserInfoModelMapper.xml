@@ -1,7 +1,233 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.shsnc.base.user.mapper.UserInfoModelMapper" >
-    <select id="getList" resultType="userInfoModel">
-      SELECT * FROM user_info
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shsnc.base.user.mapper.UserInfoModelMapper">
+
+    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.UserInfoModel">
+        <id column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="password" jdbcType="CHAR" property="password"/>
+        <result column="alias" jdbcType="VARCHAR" property="alias"/>
+        <result column="mobile" jdbcType="VARCHAR" property="mobile"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="internal" jdbcType="TINYINT" property="internal"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="attempt_time" jdbcType="BIGINT" property="attemptTime"/>
+        <result column="attempt_ip" jdbcType="VARCHAR" property="attemptIp"/>
+        <result column="is_delete" jdbcType="TINYINT" property="isDelete"/>
+    </resultMap>
+
+    <sql id="BaseColumn">
+        user_id,
+        username,
+        alias,
+        mobile,
+        email,
+        internal,
+        status,
+        create_time,
+        attempt_time,
+        attempt_ip,
+        is_delete
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+          <include refid="BaseColumn"/>
+        FROM user_info
+        WHERE user_id = #{userId}
+    </select>
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM user_info
+        WHERE user_id = #{userId}
+    </delete>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO user_info (
+            username,
+            password,
+            alias,
+            mobile,
+            email,
+            internal,
+            status,
+            create_time,
+            attempt_time,
+            attempt_ip,
+            is_delete
+        )
+        VALUES (
+            #{username},
+            #{password},
+            #{alias},
+            #{mobile},
+            #{email},
+            #{internal},
+            #{status},
+            #{createTime},
+            #{attemptTime},
+            #{attemptIp},
+            #{isDelete}
+        )
+    </insert>
+
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO user_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="username != null">
+                username,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="alias != null">
+                alias,
+            </if>
+            <if test="mobile != null">
+                mobile,
+            </if>
+            <if test="email != null">
+                email,
+            </if>
+            <if test="internal != null">
+                internal,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="attemptTime != null">
+                attempt_time,
+            </if>
+            <if test="attemptIp != null">
+                attempt_ip,
+            </if>
+            <if test="isDelete != null">
+                is_delete,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                #{userId},
+            </if>
+            <if test="username != null">
+                #{username},
+            </if>
+            <if test="password != null">
+                #{password},
+            </if>
+            <if test="alias != null">
+                #{alias},
+            </if>
+            <if test="mobile != null">
+                #{mobile},
+            </if>
+            <if test="email != null">
+                #{email},
+            </if>
+            <if test="internal != null">
+                #{internal},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="attemptTime != null">
+                #{attemptTime},
+            </if>
+            <if test="attemptIp != null">
+                #{attemptIp},
+            </if>
+            <if test="isDelete != null">
+                #{isDelete},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        UPDATE user_info
+        <set>
+            <if test="username != null">
+                username = #{username},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="alias != null">
+                alias = #{alias},
+            </if>
+            <if test="mobile != null">
+                mobile = #{mobile},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="internal != null">
+                internal = #{internal},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="attemptTime != null">
+                attempt_time = #{attemptTime},
+            </if>
+            <if test="attemptIp != null">
+                attempt_ip = #{attemptIp},
+            </if>
+            <if test="isDelete != null">
+                is_delete = #{isDelete},
+            </if>
+        </set>
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateByPrimaryKey">
+        UPDATE user_info
+        SET
+            username = #{username},
+            password = #{password},
+            alias = #{alias},
+            mobile = #{mobile},
+            email = #{email},
+            internal = #{internal},
+            status = #{status},
+            create_time = #{createTime},
+            attempt_time = #{attemptTime},
+            attempt_ip = #{attemptIp},
+            is_delete = #{isDelete}
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="findUserInfoList" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_info
+    </select>
+
+    <select id="existUserInfo" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_info
+        <where>
+            is_delete = 1
+            <if test="username != null">
+                AND username = #{username}
+            </if>
+            <if test="mobile != null">
+                AND mobile = #{mobile}
+            </if>
+            <if test="email != null">
+                AND email = #{email}
+            </if>
+        </where>
+        LIMIT 1
     </select>
 </mapper>

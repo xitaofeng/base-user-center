@@ -19,7 +19,7 @@ public interface AuthorizationInfoModelMapper {
      * @param authorizationInfoModel
      * @return
      */
-    public Integer addAuthorizationInfo(AuthorizationInfoModel authorizationInfoModel);
+    public Long addAuthorizationInfo(AuthorizationInfoModel authorizationInfoModel);
 
     /**
      * 编辑权限信息 返回数据编辑成功数据条数
@@ -36,7 +36,7 @@ public interface AuthorizationInfoModelMapper {
      * @param authorizationStatus 权限状态
      * @return
      */
-    public Integer editAuthorizationStatus(@Param("authorizationId") Integer authorizationId, @Param("authorizationStatus") Integer authorizationStatus);
+    public Integer editAuthorizationStatus(@Param("authorizationId") Long authorizationId, @Param("authorizationStatus") Integer authorizationStatus);
 
     /**
      * 批量删除
@@ -44,7 +44,7 @@ public interface AuthorizationInfoModelMapper {
      * @param authorizationIdList
      * @return
      */
-    public Integer batchDeleteAuthorization(List<Integer> authorizationIdList);
+    public Integer batchDeleteAuthorization(List<Long> authorizationIdList);
 
     /**
      * 获取单一对象数据
@@ -52,7 +52,7 @@ public interface AuthorizationInfoModelMapper {
      * @param authorizationId
      * @return
      */
-    public AuthorizationInfoModel getAuthorizationByAuthorizationId(Integer authorizationId);
+    public AuthorizationInfoModel getAuthorizationByAuthorizationId(Long authorizationId);
 
     /**
      * 获取列表数据

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shsnc.base.user.mapper.GroupModelMapper">
+
+    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.GroupModel">
+        <id column="group_id" property="groupId" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="BaseColumn">
+        group_id,
+        name,
+        code,
+        description,
+        status
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM
+            user_group
+        WHERE
+            group_id = #{groupId}
+    </select>
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM
+            user_group
+        WHERE
+            group_id = #{groupId}
+    </delete>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="groupId">
+        INSERT INTO user_group (
+            name,
+            code,
+            description,
+            status
+        )
+        VALUES (
+            #{name},
+            #{code},
+            #{description},
+            #{status}
+        )
+    </insert>
+
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="groupId">
+        INSERT INTO
+            user_group
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                name,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                #{name},
+            </if>
+            <if test="code != null">
+                #{code},
+            </if>
+            <if test="description != null">
+                #{description},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        UPDATE
+            user_group
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        WHERE
+            group_id = #{groupId}
+    </update>
+
+    <update id="updateByPrimaryKey">
+        UPDATE
+            user_group
+        SET
+            name= #{name},
+            code= #{code},
+            description= #{description},
+            status= #{status}
+        WHERE
+            group_id=#{groupId}
+    </update>
+
+    <select id="existGroup" resultMap="BaseResultMap">
+        SELECT
+              <include refid="BaseColumn"/>
+        FROM
+            user_group
+        <where>
+            <if test="code != null">
+                code = #{code}
+            </if>
+        </where>
+        LIMIT 1
+    </select>
+
+    <select id="existByGroupIds" resultType="java.lang.Long">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM
+            user_group
+        WHERE
+            group_id IN
+            <foreach collection="groupIds" index="groupId" open="(" close=")" separator=",">
+                #{groupId}
+            </foreach>
+    </select>
+</mapper>

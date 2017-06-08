@@ -1,9 +1,9 @@
-package com.shsnc.base.user.bean.param;
+package com.shsnc.base.user.bean;
 
 /**
  *
  */
-public class UserInfoParam {
+public class UserInfo {
 
     private Long userId;
     private String username;

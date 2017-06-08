@@ -38,7 +38,7 @@ public class AuthorizationRoleHandler implements RequestHandler {
 
     @RequestMapper("/edit")
     @Validate
-    public boolean editAuthorizationInfo(@NotNull Integer roleId, @NotNull String roleName, String description) throws Exception {
+    public boolean editAuthorizationInfo(@NotNull Long roleId, @NotNull String roleName, String description) throws Exception {
         AuthorizationRoleModel authorizationRoleModel = new AuthorizationRoleModel();
         authorizationRoleModel.setRoleId(roleId);
         authorizationRoleModel.setRoleName(roleName);
@@ -48,15 +48,15 @@ public class AuthorizationRoleHandler implements RequestHandler {
 
     @RequestMapper("/delete")
     @Validate
-    public boolean deleteAuthorizationRole(@NotNull Integer roleId) throws Exception {
-        List<Integer> roleIdList = new ArrayList<>();
+    public boolean deleteAuthorizationRole(@NotNull Long roleId) throws Exception {
+        List<Long> roleIdList = new ArrayList<>();
         roleIdList.add(roleId);
         return authorizationRoleService.batchDeleteAuthorizationRole(roleIdList);
     }
 
     @RequestMapper("/batch/delete")
     @Validate
-    public boolean batchDeleteAuthorizationRole(@NotEmpty List<Integer> roleIdList) throws Exception {
+    public boolean batchDeleteAuthorizationRole(@NotEmpty List<Long> roleIdList) throws Exception {
         return authorizationRoleService.batchDeleteAuthorizationRole(roleIdList);
     }
 
@@ -70,7 +70,7 @@ public class AuthorizationRoleHandler implements RequestHandler {
 
     @RequestMapper("/object")
     @Validate
-    public AuthorizationRoleModel getAuthorizationRoleByRoleId(@NotNull Integer roleId) throws Exception {
+    public AuthorizationRoleModel getAuthorizationRoleByRoleId(@NotNull Long roleId) throws Exception {
         return authorizationRoleService.getAuthorizationRoleByRoleId(roleId);
     }
 }

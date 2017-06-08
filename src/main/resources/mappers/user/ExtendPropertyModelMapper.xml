@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shsnc.base.user.mapper.ExtendPropertyModelMapper">
+
+    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.ExtendPropertyModel">
+        <id column="property_id" property="propertyId" jdbcType="BIGINT"/>
+        <result column="property_name" property="propertyName" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="BaseColumn">
+        property_id, property_name, description
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_extend_property
+        WHERE property_id = #{propertyId}
+    </select>
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM user_extend_property
+        WHERE property_id = #{propertyId}
+    </delete>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="propertyId">
+        INSERT INTO user_extend_property (property_name,description)
+        VALUES (#{propertyName},#{description})
+    </insert>
+
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="propertyId">
+        INSERT INTO user_extend_property
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="propertyName != null">
+                property_name,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="propertyName != null">
+                #{propertyName},
+            </if>
+            <if test="description != null">
+                #{description},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        UPDATE user_extend_property
+        <set>
+            <if test="propertyName != null">
+                property_name = #{propertyName},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+        </set>
+        WHERE property_id = #{propertyId}
+    </update>
+
+    <update id="updateByPrimaryKey">
+        UPDATE user_extend_property
+        SET
+            property_name = #{propertyName},
+            description = #{description}
+        WHERE property_id = #{propertyId}
+    </update>
+
+    <select id="existExtendProperty" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_extend_property
+        <where>
+            <if test="propertyName != null">
+                AND property_name = #{propertyName}
+            </if>
+        </where>
+        LIMIT 1
+    </select>
+
+    <sql id="pageSql">
+        <if test="pagination != null" >
+            LIMIT #{pagination.start}, #{pagination.pageSize}
+        </if>
+    </sql>
+
+    <sql id="orderSql">
+        <if test="pagination != null and pagination.orderField != null and pagination.orderField != ''">
+            ORDER BY #{pagination.orderField}
+            <if test="pagination.orderType != null and pagination.orderType!=''">
+                #{pagination.orderType}
+            </if>
+        </if>
+    </sql>
+
+    <sql id="conditionSql">
+        <where>
+            <if test="condition.propertyName != null and condition.propertyName != ''">
+                INSTR(property_name,#{condition.propertyName})>0
+            </if>
+        </where>
+    </sql>
+
+    <select id="getTotalCountByCondition" resultType="java.lang.Integer">
+        SELECT
+            COUNT(1)
+        FROM user_extend_property
+        <include refid="conditionSql"/>
+    </select>
+
+    <select id="getPageByCondition" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_extend_property
+        <include refid="conditionSql"/>
+        <include refid="orderSql"/>
+        <include refid="pageSql"/>
+    </select>
+
+    <select id="getExtendPropertyList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumn"/>
+        FROM user_extend_property
+    </select>
+</mapper>
