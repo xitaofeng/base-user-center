@@ -20,12 +20,31 @@
         WHERE
             account_id = #{accountId}
     </select>
+    <select id="getAccountByUserId" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_account
+        WHERE
+            user_id = #{userId}
+    </select>
+    <select id="getUserIdByAccountName" resultType="java.lang.Long">
+        SELECT user_id
+        FROM user_account
+        WHERE account_name=#{accountName}
+    </select>
 
     <delete id="deleteByPrimaryKey">
         DELETE FROM
             user_account
         WHERE
             account_id = #{accountId}
+    </delete>
+
+    <delete id="deleteByUserId">
+        DELETE FROM
+            user_account
+        WHERE
+            user_id = #{userId}
     </delete>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="accountId">

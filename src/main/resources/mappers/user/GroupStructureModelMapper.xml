@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shsnc.base.user.mapper.GroupStructureModelMapper">
+
+    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.GroupStructureModel">
+        <id column="structure_id" property="structureId" jdbcType="BIGINT"/>
+        <result column="ancestor_id" property="ancestorId" jdbcType="BIGINT"/>
+        <result column="descendant_id" property="descendantId" jdbcType="BIGINT"/>
+        <result column="level" property="level" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="BaseColumn">
+        structure_id, ancestor_id, descendant_id, level
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_group_structure
+        WHERE structure_id = #{structureId}
+    </select>
+
+    <select id="getParentIdByGroupId" resultType="java.lang.Long">
+        SELECT
+            ancestor_id
+        FROM
+            user_group_structure
+        WHERE descendant_id = #{groupId} AND level = 1
+    </select>
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM user_group_structure
+        WHERE structure_id = #{structureId}
+    </delete>
+    <delete id="deleteOldRelation">
+        DELETE FROM user_group_structure
+        WHERE ancestor_id IN (
+            SELECT * FROM (
+                SELECT ancestor_id
+                FROM user_group_structure
+                <![CDATA[WHERE descendant_id=#{groupId} AND ancestor_id<>descendant_id ]]>
+            ) a
+        )
+        AND descendant_id IN (
+            SELECT * FROM (
+                SELECT descendant_id
+                FROM user_group_structure
+                WHERE ancestor_id=#{groupId}
+            ) a
+        )
+    </delete>
+
+    <delete id="deleteGroupStructure">
+        DELETE FROM user_group_structure WHERE ancestor_id=#{groupId} OR descendant_id=#{groupId}
+    </delete>
+
+    <delete id="deleteGroupAndChildrenRelation">
+        DELETE FROM user_group_structure
+        WHERE ancestor_id IN (
+            SELECT * FROM (
+                SELECT descendant_id FROM user_group_structure WHERE ancestor_id=#{groupId}
+            ) a
+        )
+        OR descendant_id IN (
+            SELECT * FROM (
+                SELECT descendant_id FROM user_group_structure WHERE ancestor_id=#{groupId}
+            ) a
+        )
+    </delete>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="structureId">
+        INSERT INTO user_group_structure (
+            ancestor_id,
+            descendant_id,
+            level
+        )
+        VALUES (
+            #{ancestorId},
+            #{descendantId},
+            #{level}
+        )
+    </insert>
+
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="structureId">
+        INSERT INTO user_group_structure
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="structureId != null">
+                structure_id,
+            </if>
+            <if test="ancestorId != null">
+                ancestor_id,
+            </if>
+            <if test="descendantId != null">
+                descendant_id,
+            </if>
+            <if test="level != null">
+                level,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="structureId != null">
+                #{structureId},
+            </if>
+            <if test="ancestorId != null">
+                #{ancestorId},
+            </if>
+            <if test="descendantId != null">
+                #{descendantId},
+            </if>
+            <if test="level != null">
+                #{level},
+            </if>
+        </trim>
+    </insert>
+
+    <insert id="insertGroupStructure">
+        INSERT INTO user_group_structure(ancestor_id,descendant_id,level)
+            SELECT ancestor_id,#{groupId},level+1
+            FROM user_group_structure
+            WHERE descendant_id=#{parentId}
+            UNION ALL
+            SELECT #{groupId},#{groupId}, 0;
+    </insert>
+    <insert id="insertNewRelation">
+        INSERT INTO user_group_structure(ancestor_id,descendant_id,level)
+            SELECT ugs1.ancestor_id,ugs2.descendant_id,ugs1.level+ugs2.level+1
+            FROM user_group_structure ugs1, (SELECT descendant_id,level FROM user_group_structure WHERE ancestor_id=#{groupId}) ugs2
+            WHERE ugs1.descendant_id=#{parentId}
+    </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        UPDATE user_group_structure
+        <set>
+            <if test="ancestorId != null">
+                ancestor_id = #{ancestorId},
+            </if>
+            <if test="descendantId != null">
+                descendant_id = #{descendantId},
+            </if>
+            <if test="level != null">
+                level = #{level},
+            </if>
+        </set>
+        WHERE structure_id = #{structureId,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey">
+        UPDATE user_group_structure
+        SET ancestor_id = #{ancestorId},
+            descendant_id = #{descendantId},
+            level = #{level}
+        WHERE structure_id = #{structureId}
+    </update>
+
+    <update id="updateChildrenLevel">
+        UPDATE user_group_structure SET level=level-1
+        WHERE ancestor_id IN (
+            SELECT * FROM (
+                SELECT ancestor_id FROM user_group_structure WHERE descendant_id=#{groupId}
+            ) a
+        )
+        AND descendant_id IN (
+            SELECT * FROM (
+                SELECT descendant_id FROM user_group_structure WHERE ancestor_id=#{groupId}
+            ) a
+        );
+    </update>
+
+</mapper>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shsnc.base.user.mapper.ExtendPropertyValueMapper">
+
+    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.ExtendPropertyValueModel">
+        <id column="property_value_id" property="propertyValueId" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="property_id" property="propertyId" jdbcType="BIGINT"/>
+        <result column="property_value" property="propertyValue" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="BaseColumn">
+        property_value_id, user_id, property_id, property_value
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_extend_property_value
+        WHERE property_value_id = #{propertyValueId}
+    </select>
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM user_extend_property_value
+        WHERE property_value_id = #{propertyValueId}
+    </delete>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="propertyValueId">
+        INSERT INTO user_extend_property_value (
+            user_id,
+            property_id,
+            property_value
+        )
+        VALUES (
+            #{userId},
+            #{propertyId},
+            #{propertyValue}
+        )
+    </insert>
+
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="propertyValueId">
+        INSERT INTO user_extend_property_value
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="propertyId != null">
+                property_id,
+            </if>
+            <if test="propertyValue != null">
+                property_value,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                #{userId},
+            </if>
+            <if test="propertyId != null">
+                #{propertyId},
+            </if>
+            <if test="propertyValue != null">
+                #{propertyValue},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        UPDATE user_extend_property_value
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="propertyId != null">
+                property_id = #{propertyId},
+            </if>
+            <if test="propertyValue != null">
+                property_value = #{propertyValue},
+            </if>
+        </set>
+        WHERE property_value_id = #{propertyValueId}
+    </update>
+
+    <update id="updateByPrimaryKey">
+        UPDATE user_extend_property_value
+        SET user_id = #{userId},
+            property_id = #{propertyId},
+            property_value = #{propertyValue}
+        WHERE property_value_id = #{propertyValueId}
+    </update>
+
+    <select id="findExtendPropertyValueList" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_extend_property_value
+        <where>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="propertyId != null">
+                property_id = #{propertyId},
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertExtendPropertyValueList" useGeneratedKeys="true" keyProperty="propertyValueId">
+        INSERT INTO user_extend_property_value (
+            user_id,
+            property_id,
+            property_value
+        )
+        VALUES (
+            <foreach collection="extendPropertyValueModels" item="extendPropertyValueModel" separator="),(">
+                #{extendPropertyValueModel.userId},#{extendPropertyValueModel.propertyId},#{extendPropertyValueModel.propertyValue}
+            </foreach>
+        )
+    </insert>
+</mapper>

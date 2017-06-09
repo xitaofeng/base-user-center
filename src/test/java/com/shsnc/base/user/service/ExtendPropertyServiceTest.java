@@ -1,6 +1,7 @@
 package com.shsnc.base.user.service;
 
 import com.shsnc.base.user.BaseUserTest;
+import com.shsnc.base.user.bean.ExtendProperty;
 import com.shsnc.base.user.mapper.ExtendPropertyModelMapper;
 import com.shsnc.base.user.model.ExtendPropertyCondition;
 import com.shsnc.base.user.model.ExtendPropertyModel;
@@ -49,7 +50,7 @@ public class ExtendPropertyServiceTest extends BaseUserTest {
     public void addExtendProperty() throws Exception {
         ExtendPropertyModel extendPropertyModel = new ExtendPropertyModel();
         extendPropertyModel.setPropertyName("test");
-        assertTrue(extendPropertyService.addExtendProperty(extendPropertyModel));
+        assertTrue(extendPropertyService.addExtendProperty(extendPropertyModel) != null);
     }
 
     @Test
@@ -65,4 +66,9 @@ public class ExtendPropertyServiceTest extends BaseUserTest {
         assertTrue(extendPropertyService.deleteExtendProperty(1L));
     }
 
+    @Test
+    public void getExtendProperty() throws Exception {
+        ExtendPropertyModel extendProperty = extendPropertyService.getExtendProperty(1L);
+        System.out.println(JsonUtil.toJsonString(extendProperty));
+    }
 }

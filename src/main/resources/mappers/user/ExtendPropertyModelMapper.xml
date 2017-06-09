@@ -123,7 +123,16 @@
 
     <select id="getExtendPropertyList" resultMap="BaseResultMap">
         SELECT
-        <include refid="BaseColumn"/>
+            <include refid="BaseColumn"/>
         FROM user_extend_property
+    </select>
+    <select id="getPropertyIdsByPropertyIds" resultType="java.lang.Long">
+        SELECT
+            property_id
+        FROM user_extend_property
+        WHERE property_id IN
+        <foreach collection="propertyIds" item="propertyId" open="(" close=")" separator=",">
+            #{propertyId}
+        </foreach>
     </select>
 </mapper>
