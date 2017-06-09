@@ -17,16 +17,10 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <base-common-util.version>1.1.0-SNAPSHOT</base-common-util.version>
         <base-api-core.version>1.1.0-SNAPSHOT</base-api-core.version>
     </properties>
     <dependencies>
         <!-- rf -->
-        <dependency>
-            <groupId>com.shsnc</groupId>
-            <artifactId>base-common-util</artifactId>
-            <version>${base-common-util.version}</version>
-        </dependency>
         <dependency>
             <groupId>com.shsnc</groupId>
             <artifactId>base-api-core</artifactId>
