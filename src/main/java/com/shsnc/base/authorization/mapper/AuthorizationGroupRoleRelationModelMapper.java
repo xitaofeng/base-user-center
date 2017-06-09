@@ -24,7 +24,14 @@ public interface AuthorizationGroupRoleRelationModelMapper {
      * @param groupId
      * @return
      */
-    public List<Integer> getRoleIdByGroupId(@Param("groupId") Integer groupId);
+    public List<Long> getRoleIdByGroupId(@Param("groupId") Long groupId);
+
+    /**
+     * 根据roleId获取groupId
+     * @param roleId
+     * @return
+     */
+    public List<Long> getGroupIdByRoleId(@Param("roleId") Long roleId);
 
     /**
      * 根据分组列表获取角色id
@@ -39,4 +46,11 @@ public interface AuthorizationGroupRoleRelationModelMapper {
      * @return
      */
     public Integer deleteAuthorizationGroupRoleRelationModelByGroupId(@Param("groupId") Long groupId);
+
+    /**
+     * 根据角色删除 角色和组的关系
+     * @param roleId
+     * @return
+     */
+    public Integer deleteAuthorizationGroupRoleRelationModelByRoleId(@Param("roleId") Long roleId);
 }

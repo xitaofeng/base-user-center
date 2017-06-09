@@ -1,5 +1,6 @@
 package com.shsnc.base.authorization.handler;
 
+import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.annotation.RequestMapper;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.stereotype.Component;
@@ -13,7 +14,7 @@ import java.util.List;
  */
 @Component
 @RequestMapper("/data/authorization")
-public class DataAuthorizationHandler {
+public class DataAuthorizationHandler implements RequestHandler {
 
 
     @RequestMapper("/user")

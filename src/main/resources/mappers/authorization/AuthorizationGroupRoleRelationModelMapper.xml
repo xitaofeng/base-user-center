@@ -33,6 +33,13 @@
         WHERE group_id = #{groupId }
     </select>
 
+    <select id="getGroupIdByRoleId" resultType="java.lang.Integer">
+        SELECT
+        group_id
+        <include refid="tableName"/>
+        WHERE role_id = #{roleId }
+    </select>
+
     <select id="getRoleIdByGroupIds" resultType="java.lang.Integer">
         SELECT
         role_id
@@ -48,6 +55,12 @@
         DELETE FROM
         <include refid="tableName"/>
         WHERE group_id = #{groupId }
+    </delete>
+
+    <delete id="deleteAuthorizationGroupRoleRelationModelByRoleId">
+        DELETE FROM
+        <include refid="tableName"/>
+        WHERE role_id = #{roleId }
     </delete>
 
 </mapper>

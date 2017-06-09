@@ -2,8 +2,10 @@
 
 package com.shsnc.base.authorization.service;
 
+import com.shsnc.base.authorization.mapper.AuthorizationGroupRoleRelationModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationInfoModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationRoleModelMapper;
+import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.shsnc.base.authorization.model.AuthorizationRoleModel;
 import com.shsnc.base.util.StringUtil;
@@ -26,6 +28,12 @@ public class AuthorizationRoleService {
     @Autowired
     private AuthorizationRoleModelMapper authorizationRoleModelMapper;
 
+    @Autowired
+    private AuthorizationUserRoleRelationModelMapper authorizationUserRoleRelationModelMapper;
+
+    @Autowired
+    private AuthorizationGroupRoleRelationModelMapper authorizationGroupRoleRelationModelMapper;
+
     /**
      * 添加 角色 信息
      *
@@ -37,13 +45,13 @@ public class AuthorizationRoleService {
         if (isRoleName(authorizationRoleModel)) {
             throw new BizException("角色名称重复");
         }
-        authorizationRoleModel.setCreateTime(new Date().getTime());
         if (authorizationRoleModel.getIsBuilt() == null) {
             authorizationRoleModel.setIsBuilt(AuthorizationRoleModel.EnumIsBuilt.FALSE.getValue());
         }
         if (authorizationRoleModel.getOrders() != null) {
             authorizationRoleModel.setOrders(1);
         }
+        authorizationRoleModel.setCreateTime(System.currentTimeMillis());
         Integer roleId = authorizationRoleModelMapper.addAuthorizationRoleModel(authorizationRoleModel);
         if (roleId != null) {
             return roleId;
@@ -94,9 +102,25 @@ public class AuthorizationRoleService {
     @Transactional
     public boolean batchDeleteAuthorizationRole(List<Long> roleIdList) throws Exception {
         if (!CollectionUtils.isEmpty(roleIdList)) {
-            roleIdList.forEach(authorizationId -> {
-                //TODO 验证权限是否 使用
-            });
+            for (int i = 0; i < roleIdList.size(); i++) {
+                Long roleId = roleIdList.get(i);
+                AuthorizationRoleModel authorizationRoleModel = authorizationRoleModelMapper.getByRoleId(roleId);
+                if(authorizationRoleModel != null){
+                    if (AuthorizationRoleModel.EnumIsBuilt.TRUE.getValue() == authorizationRoleModel.getIsBuilt()){
+                        throw new BizException("内置数据不支持删除");
+                    }
+                    if (!CollectionUtils.isEmpty(authorizationUserRoleRelationModelMapper.getUserIdByRoleId(roleId))) {
+                        String roleName = authorizationRoleModel.getRoleName();
+                        throw new BizException("角色【" + roleName + "】存在使用的用户");
+                    }
+                    if (!CollectionUtils.isEmpty(authorizationGroupRoleRelationModelMapper.getGroupIdByRoleId(roleId))) {
+                        String roleName = authorizationRoleModel.getRoleName();
+                        throw new BizException("角色【" + roleName + "】存在使用的用户组");
+                    }
+                }else{
+                    throw new BizException("无效数据");
+                }
+            }
             return authorizationRoleModelMapper.batchDeleteAuthorizationRole(roleIdList) > 0;
         } else {
             throw new BizException("请选择需要删除的数据");

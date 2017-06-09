@@ -1,13 +1,14 @@
 package com.shsnc.base.authorization.service;
 
-import com.shsnc.base.authorization.mapper.AuthorizationGroupRoleRelationModelMapper;
-import com.shsnc.base.authorization.mapper.AuthorizationRoleRelationModelMapper;
-import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
+import com.shsnc.base.authorization.bean.AuthorizationRole;
+import com.shsnc.base.authorization.mapper.*;
 import com.shsnc.base.authorization.model.AuthorizationRoleRelationModel;
+import com.shsnc.base.authorization.model.AuthorizationUserRoleRelationModel;
 import com.shsnc.base.util.config.BizException;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -30,6 +31,12 @@ public class AuthorizationRoleRelationService {
     @Autowired
     private AuthorizationGroupRoleRelationModelMapper authorizationGroupRoleRelationModelMapper;
 
+    @Autowired
+    private AuthorizationInfoModelMapper authorizationInfoModelMapper;
+
+    @Autowired
+    private AuthorizationRoleModelMapper authorizationRoleModelMapper;
+
     /**
      * 批量插入数据返回 插入条数
      *
@@ -37,9 +44,13 @@ public class AuthorizationRoleRelationService {
      * @param authorizationIdList
      * @return
      */
+    @Transactional
     public boolean roleBatchAuthorization(Long roleId, List<Long> authorizationIdList) throws BizException {
         if (roleId == null) {
             throw new BizException("选择授权的角色");
+        }
+        if (authorizationRoleModelMapper.getAuthorizationRoleModelByRoleId(roleId) == null) {
+            throw new BizException("无效角色");
         }
         if (CollectionUtils.isEmpty(authorizationIdList)) {
             throw new BizException("选择授权的权限");
@@ -48,12 +59,16 @@ public class AuthorizationRoleRelationService {
         authorizationRoleRelationModelMapper.deleteAuthorizationRoleRelationModelByRoleId(roleId);
 
         List<AuthorizationRoleRelationModel> authorizationRoleRelationModels = new ArrayList<>();
-        authorizationIdList.forEach(authorizationId -> {
+        for (int i = 0; i < authorizationIdList.size(); i++) {
+            Long authorizationId = authorizationIdList.get(i);
+            if (authorizationInfoModelMapper.getAuthorizationByAuthorizationId(authorizationId) == null) {
+                throw new BizException("无效权限数据");
+            }
             AuthorizationRoleRelationModel authorizationRoleRelationModel = new AuthorizationRoleRelationModel();
             authorizationRoleRelationModel.setAuthorizationId(authorizationId);
             authorizationRoleRelationModel.setRoleId(roleId);
             authorizationRoleRelationModels.add(authorizationRoleRelationModel);
-        });
+        }
         return authorizationRoleRelationModelMapper.batchAddAuthorizationRoleRelationModel(authorizationRoleRelationModels) > 0;
     }
 
@@ -73,7 +88,10 @@ public class AuthorizationRoleRelationService {
      * @param userId
      * @return
      */
-    public List<Integer> getAuthorizationIdByUserId(Long userId) {
+    public List<Long> getAuthorizationIdByUserId(Long userId) throws BizException {
+        if (userId == null) {
+            throw new BizException("选择用户");
+        }
         //return authorizationRoleRelationModelMapper.getAuthorizationIdByRoleId(roleId);
         Set<Long> roleIds = new HashSet<>();//角色列表
 
@@ -85,7 +103,7 @@ public class AuthorizationRoleRelationService {
         //TODO 根据当前用户获取所属 组
         List<Long> groupIds = new ArrayList<>();//组列表
 
-        if(!CollectionUtils.isEmpty(groupIds)) {
+        if (!CollectionUtils.isEmpty(groupIds)) {
             List<Long> groupRoleIds = authorizationGroupRoleRelationModelMapper.getRoleIdByGroupIds(groupIds);
             groupRoleIds.forEach(roleId -> {
                 roleIds.add(roleId);
@@ -97,5 +115,19 @@ public class AuthorizationRoleRelationService {
         } else {
             return new ArrayList<>();
         }
+    }
+
+    /**
+     * 验证用户是否拥有该权限
+     * @param userId
+     * @param authorizationId
+     * @return
+     */
+    public boolean userHaveAuthorization(Long userId, Long authorizationId) throws BizException {
+        if(authorizationId == null){
+            throw new BizException("选择权限");
+        }
+        List<Long> authorizationIdList = getAuthorizationIdByUserId(userId);
+        return authorizationIdList.contains(authorizationId);
     }
 }
