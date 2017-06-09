@@ -1,7 +1,10 @@
 package com.shsnc.base.user.support.helper;
 
 import com.shsnc.base.user.support.accessor.PropertyGetter;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 
+import java.beans.PropertyDescriptor;
 import java.util.*;
 
 /**
@@ -46,5 +49,28 @@ public class BeanHelper {
             }
         }
         return map;
+    }
+
+
+    /**
+     * 用source填充target为null的属性
+     * @param source
+     * @param target
+     */
+    public static <T> void populateNullProperties(T source, T target){
+        BeanWrapper targetBeanWarpper = new BeanWrapperImpl(target);
+        BeanWrapper sourceBeanWarpper = new BeanWrapperImpl(source);
+
+        PropertyDescriptor[] pds = targetBeanWarpper.getPropertyDescriptors();
+        for(PropertyDescriptor pd : pds){
+            String property = pd.getName();
+            if(sourceBeanWarpper.isReadableProperty(property) && targetBeanWarpper.isWritableProperty(property)){
+                Object value = targetBeanWarpper.getPropertyValue(property);
+                if(value == null){
+                    value = sourceBeanWarpper.getPropertyValue(property);
+                    targetBeanWarpper.setPropertyValue(property, value);
+                }
+            }
+        }
     }
 }

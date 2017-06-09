@@ -34,6 +34,10 @@
             group_id = #{groupId}
     </delete>
 
+    <delete id="deleteGroupAndChildren">
+        DELETE FROM user_groups WHERE group_id IN (SELECT descendant_id FROM user_group_structure WHERE ancestor_id=#{groupId})
+    </delete>
+
     <insert id="insert" useGeneratedKeys="true" keyProperty="groupId">
         INSERT INTO user_group (
             name,
@@ -115,7 +119,7 @@
             group_id=#{groupId}
     </update>
 
-    <select id="existGroup" resultMap="BaseResultMap">
+    <select id="selectOneGroup" resultMap="BaseResultMap">
         SELECT
               <include refid="BaseColumn"/>
         FROM
@@ -128,15 +132,12 @@
         LIMIT 1
     </select>
 
-    <select id="existByGroupIds" resultType="java.lang.Long">
-        SELECT
-            <include refid="BaseColumn"/>
-        FROM
-            user_group
-        WHERE
-            group_id IN
-            <foreach collection="groupIds" index="groupId" open="(" close=")" separator=",">
-                #{groupId}
-            </foreach>
+    <select id="getGroupIdsByGroupIds" resultType="java.lang.Long">
+        SELECT group_id
+        FROM user_group
+        WHERE group_id IN
+        <foreach collection="groupIds" index="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
     </select>
 </mapper>

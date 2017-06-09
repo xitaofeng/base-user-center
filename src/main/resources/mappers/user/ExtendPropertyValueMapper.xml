@@ -102,4 +102,16 @@
         </where>
     </select>
 
+    <insert id="insertExtendPropertyValueList" useGeneratedKeys="true" keyProperty="propertyValueId">
+        INSERT INTO user_extend_property_value (
+            user_id,
+            property_id,
+            property_value
+        )
+        VALUES (
+            <foreach collection="extendPropertyValueModels" item="extendPropertyValueModel" separator="),(">
+                #{extendPropertyValueModel.userId},#{extendPropertyValueModel.propertyId},#{extendPropertyValueModel.propertyValue}
+            </foreach>
+        )
+    </insert>
 </mapper>

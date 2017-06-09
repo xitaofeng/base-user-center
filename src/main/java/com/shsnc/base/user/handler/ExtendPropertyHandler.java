@@ -28,13 +28,13 @@ public class ExtendPropertyHandler implements RequestHandler {
     @Autowired
     private ExtendPropertyService extendPropertyService;
 
-    @RequestMapper("/list")
-    public List<ExtendProperty> list(){
+    @RequestMapper("/getList")
+    public List<ExtendProperty> getList(){
         List<ExtendPropertyModel> extendPropertyList = extendPropertyService.getExtendPropertyList();
         return JsonUtil.convert(extendPropertyList, List.class, ExtendProperty.class) ;
     }
 
-    @RequestMapper("/page")
+    @RequestMapper("/getPage")
     public QueryData page(ExtendPropertyCondition condition, Pagination pagination){
         QueryData queryData = extendPropertyService.getExtendPropertyPage(condition, pagination);
         queryData.setDataList(JsonUtil.convert(queryData.getDataList(),List.class,ExtendProperty.class));

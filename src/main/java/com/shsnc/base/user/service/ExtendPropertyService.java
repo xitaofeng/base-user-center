@@ -97,7 +97,7 @@ public class ExtendPropertyService {
         exist.setPropertyName(propertyName);
         exist = extendPropertyModelMapper.existExtendProperty(exist);
 
-        Assert.isTrue(exist == null || (extendPropertyModel.getPropertyId() != null && extendPropertyModel.getPropertyId().equals(exist.getPropertyId())), "属性名称格式错误！");
+        Assert.isTrue(exist == null || exist.getPropertyId().equals(extendPropertyModel.getPropertyId()), "属性名称格式错误！");
 
     }
 

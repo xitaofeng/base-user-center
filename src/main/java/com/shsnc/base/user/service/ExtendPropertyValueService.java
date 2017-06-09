@@ -1,6 +1,5 @@
 package com.shsnc.base.user.service;
 
-import com.shsnc.api.core.ThreadContext;
 import com.shsnc.base.user.bean.ExtendPropertyValue;
 import com.shsnc.base.user.mapper.ExtendPropertyModelMapper;
 import com.shsnc.base.user.mapper.ExtendPropertyValueMapper;
@@ -10,11 +9,13 @@ import com.shsnc.base.user.model.ExtendPropertyValueModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.support.Assert;
 import com.shsnc.base.util.config.BizException;
-import com.sun.xml.internal.fastinfoset.algorithm.BooleanEncodingAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by houguangqiang on 2017/6/8.
@@ -51,6 +52,38 @@ public class ExtendPropertyValueService {
     }
 
     /**
+     * 批量新增用户扩展属性值
+     * @param extendPropertyValueModels 扩展属性值列表
+     * @return 返回新增记录id列表
+     * @throws BizException 业务异常
+     */
+    public List<Long> batchAddExtendPropertyValue(List<ExtendPropertyValueModel> extendPropertyValueModels) throws BizException {
+        Assert.notEmpty(extendPropertyValueModels);
+        Set<Long> propertyIds = new HashSet<>();
+        Set<Long> userIds = new HashSet<>();
+        for (ExtendPropertyValueModel extendPropertyValueModel : extendPropertyValueModels){
+            Long propertyId = extendPropertyValueModel.getPropertyId();
+            Assert.notNull(propertyId,"属性id不能为空！");
+            Long userId = extendPropertyValueModel.getUserId();
+            Assert.notNull(userId,"用户id不能为空！");
+            Assert.notNull(extendPropertyValueModel.getPropertyValue(),"属性值不能为空！");
+
+            propertyIds.add(propertyId);
+            userIds.add(userId);
+        }
+        List<Long> dbUserIds = userInfoModelMapper.getUserIdsByUserIds(userIds);
+        Assert.isTrue(dbUserIds.size() == userIds.size(),"含有不存在的用户id！");
+        List<Long> dbPropertyIds = extendPropertyModelMapper.getPropertyIdsByPropertyIds(propertyIds);
+        Assert.isTrue(dbPropertyIds.size() == propertyIds.size(), "含有不存在的属性id！");
+        extendPropertyValueMapper.insertExtendPropertyValueList(extendPropertyValueModels);
+        List<Long> ids = new ArrayList<>();
+        for (ExtendPropertyValueModel extendPropertyValueModel : extendPropertyValueModels){
+            ids.add(extendPropertyValueModel.getPropertyValueId());
+        }
+        return ids;
+    }
+
+    /**
      * 更新用户扩展属性值
      * @param extendPropertyValueModel 扩展属性值
      * @return 数据有更新返回true，否则返回false
@@ -63,7 +96,7 @@ public class ExtendPropertyValueService {
         Assert.notNull(dbExtendPropertyValue, String.format("属性值id：%s不存在！",propertyValueId));
 
         Long userId = extendPropertyValueModel.getUserId();
-        Assert.isTrue(userId != null && !userId.equals(dbExtendPropertyValue.getUserId()),"不能改变属性所属的用户！");
+        Assert.isTrue(userId != null && userId.equals(dbExtendPropertyValue.getUserId()),"不能改变属性所属的用户！");
 
         Long propertyId = extendPropertyValueModel.getPropertyId();
         if(propertyId != null && !propertyId.equals(dbExtendPropertyValue.getPropertyId())){
@@ -72,6 +105,35 @@ public class ExtendPropertyValueService {
         }
 
         return extendPropertyValueMapper.updateByPrimaryKeySelective(extendPropertyValueModel) > 0;
+    }
+
+    /**
+     * 批量更新用户扩展属性值，如果没有id表示新增，有id表示更新
+     * @param extendPropertyValues 扩展属性值列表
+     * @return 始终返回true
+     * @throws BizException 业务异常
+     */
+    public boolean batchUpdateExtendPropertyValue(List<ExtendPropertyValueModel> extendPropertyValues) throws BizException {
+        Assert.notEmpty(extendPropertyValues);
+
+        List<ExtendPropertyValueModel> addExtendPropertyValues = new ArrayList<>();
+        List<ExtendPropertyValueModel> updateExtendPropertyValues = new ArrayList<>();
+        for (ExtendPropertyValueModel extendPropertyValueModel : extendPropertyValues){
+            if(extendPropertyValueModel.getPropertyValueId() == null){
+                addExtendPropertyValues.add(extendPropertyValueModel);
+            } else {
+                updateExtendPropertyValues.add(extendPropertyValueModel);
+            }
+        }
+        if(addExtendPropertyValues.size()>0){
+            batchAddExtendPropertyValue(addExtendPropertyValues);
+        }
+        if(updateExtendPropertyValues.size()>0){
+            for (ExtendPropertyValueModel extendPropertyValueModel : updateExtendPropertyValues){
+                updateExtendPropertyValue(extendPropertyValueModel);
+            }
+        }
+        return true;
     }
 
     /**
@@ -95,4 +157,5 @@ public class ExtendPropertyValueService {
         extendPropertyValueModel.setUserId(userId);
         return extendPropertyValueMapper.findExtendPropertyValueList(extendPropertyValueModel);
     }
+
 }

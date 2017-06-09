@@ -82,6 +82,10 @@ public abstract class Assert {
         }
     }
 
+    public static void notEmpty(Collection<?> collection) throws BizException {
+        notEmpty(collection, "输入参数不能为空！");
+    }
+
     public static void notEmpty(Map<?, ?> map, String message) throws BizException {
         if(CollectionUtils.isEmpty(map)) {
             throw new BizException(message);
