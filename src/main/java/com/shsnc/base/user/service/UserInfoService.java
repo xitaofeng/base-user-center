@@ -1,5 +1,6 @@
 package com.shsnc.base.user.service;
 
+import com.fasterxml.jackson.databind.deser.Deserializers;
 import com.shsnc.base.user.bean.ExtendPropertyValue;
 import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.mapper.AccountModelMapper;
@@ -10,12 +11,14 @@ import com.shsnc.base.user.model.ExtendPropertyValueModel;
 import com.shsnc.base.user.model.UserInfoGroupRelationModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.support.Assert;
+import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.crypto.SHAMaker;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,6 +28,7 @@ import java.util.List;
  *
  */
 @Service
+@Transactional(rollbackFor = BaseException.class)
 public class UserInfoService {
 
     @Autowired
@@ -54,7 +58,6 @@ public class UserInfoService {
     public Long addUserInfo(UserInfoModel userInfoModel, List<Long> groupIds, List<ExtendPropertyValueModel> extendPropertyValues) throws BizException {
         // 数据校验以及设置默认值
         checkAdd(userInfoModel);
-        Assert.notEmpty(groupIds,"至少为用户选择一个用户组！");
 
         // 新增用户信息
         userInfoModelMapper.insert(userInfoModel);
@@ -63,7 +66,9 @@ public class UserInfoService {
         accountService.addAccount(userInfoModel);
 
         // 关联用户组
-        userInfoGroupRelationService.batchAddUserInfoGroupRelation(userInfoModel.getUserId(), groupIds);
+        if(groupIds != null){
+            userInfoGroupRelationService.batchAddUserInfoGroupRelation(userInfoModel.getUserId(), groupIds);
+        }
 
         Long userId = userInfoModel.getUserId();
         if(CollectionUtils.isNotEmpty(extendPropertyValues)){
@@ -133,6 +138,9 @@ public class UserInfoService {
         if (!Integer.valueOf(UserConstant.USER_STATUS_DISABLED).equals(userInfoModel.getStatus())){
             userInfoModel.setStatus(UserConstant.USER_STATUS_ENABLED);
         }
+        if(userInfoModel.getAlias() == null){
+            userInfoModel.setAlias("");
+        }
         userInfoModel.setInternal(UserConstant.USER_INTERNAL_FALSE);
         userInfoModel.setIsDelete(UserConstant.USER_DELETEED_FALSE);
         userInfoModel.setAttemptIp("");
@@ -187,8 +195,6 @@ public class UserInfoService {
             exist.setMobile(mobile);
             exist = existUserInfo(exist);
             Assert.isTrue(exist == null || exist.getUserId().equals (userId), "该手机号已被使用！");
-
-            userInfoModel.setMobile(mobile);
         }
     }
 
@@ -208,13 +214,11 @@ public class UserInfoService {
             exist.setEmail(email);
             exist = existUserInfo(exist);
             Assert.isTrue(exist == null || exist.getUserId().equals (userId),"该邮箱已经被使用！");
-
-            userInfoModel.setEmail(email);
         }
     }
 
     /**
-     * 校验密码并且加密
+     * 校验密码
      * @param userInfoModel 密码
      * @throws BizException 业务异常
      */
@@ -226,7 +230,6 @@ public class UserInfoService {
         }
         if(password != null){
             Assert.isTrue(password.length()>4, "密码长度不能小于5！");
-            userInfoModel.setPassword(SHAMaker.sha256String(password));
         }
     }
 
@@ -248,8 +251,6 @@ public class UserInfoService {
             exist.setUsername(username);
             exist = existUserInfo(exist);
             Assert.isTrue(exist == null || exist.getUserId().equals(userId), "用户名已存在！");
-
-            userInfoModel.setUsername(username);
         }
     }
 

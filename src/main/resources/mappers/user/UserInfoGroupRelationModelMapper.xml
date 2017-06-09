@@ -29,6 +29,15 @@
         WHERE relation_id = #{userId}
     </delete>
 
+    <delete id="deleteByGroupId">
+        DELETE FROM user_info_group_relation
+        WHERE group_id = #{groupId}
+    </delete>
+
+    <delete id="deleteWithChildrenByGroupId">
+        DELETE FROM user_info_group_relation WHERE group_id IN (SELECT descendant_id FROM user_group_structure WHERE ancestor_id=#{groupId})
+    </delete>
+
     <insert id="insert" useGeneratedKeys="true" keyProperty="relationId">
         INSERT INTO user_info_group_relation (user_id, group_id)
         VALUES (#{userId}, #{groupId})
@@ -74,7 +83,7 @@
         WHERE relation_id = #{relationId}
     </update>
 
-    <insert id="insertRelationList" useGeneratedKeys="true" keyProperty="relationId">
+    <insert id="insertRelationList">
         INSERT INTO
         user_info_group_relation(user_id, group_id)
         VALUES (
@@ -88,5 +97,12 @@
         SELECT group_id
         FROM user_info_group_relation
         WHERE user_id = #{userId}
+    </select>
+
+    <select id="getUserIdsByGroupId" resultType="java.lang.Long">
+        SELECT
+            user_id
+        FROM user_info_group_relation
+        WHERE group_id=#{groupId}
     </select>
 </mapper>

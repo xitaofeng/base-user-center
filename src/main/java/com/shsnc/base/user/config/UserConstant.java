@@ -42,6 +42,6 @@ public abstract class UserConstant {
     /** 用户组禁用状态 */
     public static final int GROUP_STATUS_DISABLED = 2;
 
-    public static final String REDIS_LOGIN_KEY = "USER_CENTER_LOGIN_TOKEN";
+    public static final String REDIS_LOGIN_KEY = "USERCENTER_LOGIN_TOKEN";
 
 }

@@ -1,7 +1,9 @@
 package com.shsnc.base.user.service;
 
+import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.mapper.AccountModelMapper;
+import com.shsnc.base.user.mapper.UserInfoModelMapper;
 import com.shsnc.base.user.model.AccountModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.support.Assert;
@@ -21,6 +23,8 @@ public class AccountService {
 
     @Autowired
     private AccountModelMapper accountModelMapper;
+    @Autowired
+    private UserInfoModelMapper userInfoModelMapper;
 
     public boolean addAccount(UserInfoModel userInfoModel) throws BizException {
         Assert.notNull(userInfoModel);
@@ -107,5 +111,14 @@ public class AccountService {
     public boolean deleteAccount(Long userId) {
         accountModelMapper.deleteByUserId(userId);
         return true;
+    }
+
+    public UserInfoModel getUserInfoByAccountName(String account) throws BizException {
+        Assert.notNull(account,"账户名不能为空！");
+        Long userId = accountModelMapper.getUserIdByAccountName(account);
+        Assert.notNull(userId, "账户名不存在！");
+        UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
+        Assert.notNull(userInfoModel, "用户不存在！");
+        return userInfoModel;
     }
 }

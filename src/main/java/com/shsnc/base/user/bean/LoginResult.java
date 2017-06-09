@@ -5,11 +5,30 @@ package com.shsnc.base.user.bean;
  */
 public class LoginResult {
 
-    private Long userId;
-    private String username;
-    private String alias;
-    private String mobile;
-    private String email;
+    private UserInfo userInfo;
+    private Certification certification;
 
-    private String token;
+    public LoginResult() {
+    }
+
+    public LoginResult(UserInfo userInfo, Certification certification) {
+        this.userInfo = userInfo;
+        this.certification = certification;
+    }
+
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
+    }
+
+    public Certification getCertification() {
+        return certification;
+    }
+
+    public void setCertification(Certification certification) {
+        this.certification = certification;
+    }
 }

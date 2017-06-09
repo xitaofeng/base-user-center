@@ -19,6 +19,7 @@
 
     <sql id="BaseColumn">
         user_id,
+        password,
         username,
         alias,
         mobile,

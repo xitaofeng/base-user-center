@@ -1,6 +1,7 @@
 package com.shsnc.base.user.mapper;
 
 import com.shsnc.base.user.model.UserInfoGroupRelationModel;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -17,9 +18,15 @@ public interface UserInfoGroupRelationModelMapper {
 
     int updateByPrimaryKey(UserInfoGroupRelationModel record);
 
-    int insertRelationList(List<UserInfoGroupRelationModel> userInfoGroupRelationModels);
+    int insertRelationList(@Param("userInfoGroupRelationModels") List<UserInfoGroupRelationModel> userInfoGroupRelationModels);
 
     List<Long> getGroupIdsByUserId(Long userId);
 
     int deleteByUserId(Long userId);
+
+    List<Long> getUserIdsByGroupId(Long groupId);
+
+    int deleteByGroupId(Long groupId);
+
+    int deleteWithChildrenByGroupId(Long groupId);
 }
