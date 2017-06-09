@@ -40,10 +40,7 @@
         UPDATE
         <include refid="tableName"/>
         SET
-        role_name = #{roleName},
-        <if test="isBuilt !=null and isBuilt !=''">
-            ,is_built = #{isBuilt}
-        </if>
+        role_name = #{roleName}
         <if test="description !=null and description !=''">
             ,description = #{description}
         </if>
@@ -53,14 +50,14 @@
         WHERE role_id = #{roleId }
     </update>
 
-    <update id="batchDeleteAuthorizationRole">
-        DELETE
+    <delete id="batchDeleteAuthorizationRole">
+        DELETE FROM
         <include refid="tableName"/>
         WHERE role_id in
         <foreach item="roleId" collection="list" open="(" separator="," close=")">
             #{roleId}
         </foreach>
-    </update>
+    </delete>
 
     <select id="getAuthorizationRoleModelByRoleId" resultType="com.shsnc.base.authorization.model.AuthorizationRoleModel">
         SELECT
@@ -91,6 +88,14 @@
         FROM
         <include refid="tableName"/>
         WHERE role_name = #{roleName}
+    </select>
+
+    <select id="getByRoleId" resultType="com.shsnc.base.authorization.model.AuthorizationRoleModel">
+        SELECT
+        <include refid="Base_Column"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE role_id = #{roleId}
     </select>
 
 </mapper>

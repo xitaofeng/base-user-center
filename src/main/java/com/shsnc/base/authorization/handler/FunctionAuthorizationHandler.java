@@ -1,5 +1,6 @@
 package com.shsnc.base.authorization.handler;
 
+import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.base.authorization.service.AuthorizationRoleRelationService;
 import com.shsnc.base.util.config.BizException;
@@ -16,35 +17,48 @@ import java.util.List;
  */
 @Component
 @RequestMapper("/function/authorization")
-public class FunctionAuthorizationHandler {
+public class FunctionAuthorizationHandler implements RequestHandler {
 
     @Autowired
     private AuthorizationRoleRelationService authorizationRoleRelationService;
 
     @RequestMapper("")
     public boolean roleBatchAuthorization(@NotNull Long roleId, @NotEmpty List<Long> authorizationIdList) throws BizException {
-        return authorizationRoleRelationService.roleBatchAuthorization(roleId,authorizationIdList);
+        return authorizationRoleRelationService.roleBatchAuthorization(roleId, authorizationIdList);
     }
 
 
     /**
      * 获取角色已有功能权限
+     *
      * @param roleId
      * @return
      */
-    @RequestMapper("role/have")
+    @RequestMapper("/role/have")
     public List<Integer> roleHaveAuthorizationList(@NotNull Long roleId) {
         return authorizationRoleRelationService.getAuthorizationIdByRoleId(roleId);
     }
 
-
     /**
      * 获取用户已有功能权限
+     *
      * @param userId
      * @return
      */
-    @RequestMapper("user/have")
-    public List<Integer> userHaveAuthorizationList(@NotNull Long userId) {
+    @RequestMapper("user/have/list")
+    public List<Long> userHaveAuthorizationList(@NotNull Long userId) {
         return authorizationRoleRelationService.getAuthorizationIdByUserId(userId);
     }
+
+    /**
+     * 判断权限是否拥有该用户
+     * @param userId
+     * @return
+     */
+    @RequestMapper("/user/have")
+    public boolean userHaveAuthorization(@NotNull Long userId, @NotNull Long authorizationId) {
+        return authorizationRoleRelationService.userHaveAuthorization(userId, authorizationId);
+    }
+
+
 }

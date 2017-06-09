@@ -6,19 +6,11 @@ import com.shsnc.api.core.validation.Validate;
 import com.shsnc.base.authorization.bean.AuthorizationInfo;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.shsnc.base.authorization.service.AuthorizationInfoService;
-import com.shsnc.base.user.model.UserInfoModel;
-import com.shsnc.base.util.JsonUtil;
-import com.shsnc.base.util.api.ApiResult;
-import com.shsnc.base.util.config.BizException;
-import com.shsnc.base.util.config.MessageCode;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -67,7 +59,7 @@ public class AuthorizationInfoHandler implements RequestHandler {
 
     @RequestMapper("/disabled")
     @Validate
-    public boolean disabledAuthorizationInfo(@NotNull Long authorizationId) throws BizException {
+    public boolean disabledAuthorizationInfo(@NotNull Long authorizationId) throws Exception {
         return authorizationInfoService.editAuthorizationInfoModelStatus(authorizationId, AuthorizationInfoModel.EnumAuthorizationStatus.DISABLED);
     }
 
