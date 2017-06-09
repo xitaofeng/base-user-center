@@ -3,6 +3,7 @@ package com.shsnc.base.user.service;
 import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.mapper.GroupModelMapper;
 import com.shsnc.base.user.mapper.GroupStructureModelMapper;
+import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
 import com.shsnc.base.user.model.GroupModel;
 import com.shsnc.base.user.support.Assert;
 import com.shsnc.base.user.support.helper.BeanHelper;
@@ -25,6 +26,8 @@ public class GroupService {
     private GroupModelMapper groupModelMapper;
     @Autowired
     private GroupStructureModelMapper groupStructureModelMapper;
+    @Autowired
+    private UserInfoGroupRelationModelMapper userInfoGroupRelationModelMapper;
 
     /**
      * 新增用户组
@@ -96,12 +99,15 @@ public class GroupService {
         Assert.notNull(groupId,"用户组id不能为空！");
         GroupModel dbGroupModel = groupModelMapper.selectByPrimaryKey(groupId);
         Assert.notNull(dbGroupModel,"用户组id不存在！");
+        // 删除与用户的关系
+        userInfoGroupRelationModelMapper.deleteByGroupId(groupId);
         // 更新要删除节点的后代节点与祖先节点的层级减去1
         groupStructureModelMapper.updateChildrenLevel(groupId);
         // 删除用户组
         groupModelMapper.deleteByPrimaryKey(groupId);
         // 删除节点关系
         groupStructureModelMapper.deleteGroupStructure(groupId);
+
         return true;
     }
 
@@ -116,6 +122,8 @@ public class GroupService {
         Assert.notNull(dbGroupModel,"用户组id不存在！");
         // 删除用户组以及它的所有后台节点
         groupModelMapper.deleteGroupAndChildren(groupId);
+        // 删除用户组与用户的关系
+        userInfoGroupRelationModelMapper.deleteWithChildrenByGroupId(groupId);
         // 删除节点关系
         groupStructureModelMapper.deleteGroupAndChildrenRelation(groupId);
         return true;
@@ -124,7 +132,7 @@ public class GroupService {
     private void checkName(GroupModel groupModel) throws BizException {
         Long groupId = groupModel.getGroupId();
         String name = groupModel.getName();
-        if(groupId != null){
+        if(groupId == null){
             Assert.notNull(name, "用户组名称不能为空！");
         }
     }

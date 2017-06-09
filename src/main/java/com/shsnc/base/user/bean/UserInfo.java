@@ -13,6 +13,7 @@ public class UserInfo {
     private String username;
     private String alias;
     private String mobile;
+    private String email;
     private Integer internal;
     private Integer status;
 
@@ -62,5 +63,13 @@ public class UserInfo {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

@@ -13,6 +13,7 @@ import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BizException;
+import com.shsnc.base.util.crypto.SHAMaker;
 import com.sun.tools.corba.se.idl.constExpr.BooleanAnd;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -50,6 +51,7 @@ public class UserInfoHandler implements RequestHandler {
     @RequestMapper("/add")
     @Validate(groups = ValidationType.Add.class)
     public Long add(UserInfoParam userInfo) throws BizException {
+        userInfo.setPassword(SHAMaker.sha256String(userInfo.getPassword()));
         UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
         List<ExtendPropertyValue> extendPropertyValues = userInfo.getExtendPropertyValues();
         List<ExtendPropertyValueModel> extendPropertyValueModels = null;

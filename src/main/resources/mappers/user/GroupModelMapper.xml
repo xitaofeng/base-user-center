@@ -136,7 +136,7 @@
         SELECT group_id
         FROM user_group
         WHERE group_id IN
-        <foreach collection="groupIds" index="groupId" open="(" close=")" separator=",">
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
             #{groupId}
         </foreach>
     </select>
