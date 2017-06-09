@@ -88,7 +88,7 @@ public class AuthorizationRoleRelationService {
      * @param userId
      * @return
      */
-    public List<Long> getAuthorizationIdByUserId(Long userId) {
+    public List<Long> getAuthorizationIdByUserId(Long userId) throws BizException {
         if (userId == null) {
             throw new BizException("选择用户");
         }
@@ -123,7 +123,7 @@ public class AuthorizationRoleRelationService {
      * @param authorizationId
      * @return
      */
-    public boolean userHaveAuthorization(Long userId, Long authorizationId) {
+    public boolean userHaveAuthorization(Long userId, Long authorizationId) throws BizException {
         if(authorizationId == null){
             throw new BizException("选择权限");
         }

@@ -6,6 +6,7 @@ import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMap
 import com.shsnc.base.authorization.model.AuthorizationGroupRoleRelationModel;
 import com.shsnc.base.authorization.model.AuthorizationRoleRelationModel;
 import com.shsnc.base.authorization.model.AuthorizationUserRoleRelationModel;
+import com.shsnc.base.util.config.BizException;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class AssignService {
      * @return
      */
     @Transactional
-    public boolean userAssignRole(@NotNull Long userId, @NotEmpty List<Long> roleIdList) {
+    public boolean userAssignRole(@NotNull Long userId, @NotEmpty List<Long> roleIdList) throws BizException {
         if (userId == null) {
             throw new BizException("选择授权的用户");
         }
@@ -75,7 +76,7 @@ public class AssignService {
      * @return
      */
     @Transactional
-    public boolean roleAssignUser(@NotNull Long roleId, @NotEmpty List<Long> userIdList) {
+    public boolean roleAssignUser(@NotNull Long roleId, @NotEmpty List<Long> userIdList) throws BizException {
         if (roleId == null) {
             throw new BizException("选择授权的角色");
         }
@@ -111,7 +112,7 @@ public class AssignService {
      * @return
      */
     @Transactional
-    public boolean groupAssignRole(@NotNull Long groupId, @NotEmpty List<Long> roleIdList) {
+    public boolean groupAssignRole(@NotNull Long groupId, @NotEmpty List<Long> roleIdList) throws BizException {
         if (groupId == null) {
             throw new BizException("选择分配的用户组");
         }
@@ -147,7 +148,7 @@ public class AssignService {
      * @return
      */
     @Transactional
-    public boolean roleAssignGroup(@NotNull Long roleId, @NotEmpty List<Long> groupIdList) {
+    public boolean roleAssignGroup(@NotNull Long roleId, @NotEmpty List<Long> groupIdList) throws BizException {
         if (roleId == null) {
             throw new BizException("选择分配的角色");
         }
