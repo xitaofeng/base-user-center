@@ -47,8 +47,16 @@
         WHERE role_id = #{roleId }
     </select>
 
+    <select id="getRoleIdByAuthorizationId" resultType="java.lang.Integer">
+        SELECT
+        role_id
+        FROM
+        <include refid="tableName"/>
+        WHERE authorization_id = #{authorizationId }
+    </select>
+
     <delete id="deleteAuthorizationRoleRelationModelByRoleId">
-        DELETE
+        DELETE FROM
         <include refid="tableName"/>
         WHERE role_id = #{roleId }
     </delete>

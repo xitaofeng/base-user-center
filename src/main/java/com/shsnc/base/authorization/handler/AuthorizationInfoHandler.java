@@ -15,6 +15,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -35,8 +36,8 @@ public class AuthorizationInfoHandler implements RequestHandler {
 
     @RequestMapper("/add")
     @Validate
-    public Integer addAuthorizationInfo(@NotNull String authorizationName, @NotNull String authorizationCode,
-                                        Integer authorizationStatus, String description) throws Exception {
+    public Long addAuthorizationInfo(@NotNull String authorizationName, @NotNull String authorizationCode,
+                                     Integer authorizationStatus, String description) throws Exception {
         AuthorizationInfoModel authorizationInfoModel = new AuthorizationInfoModel();
         authorizationInfoModel.setAuthorizationName(authorizationName);
         authorizationInfoModel.setAuthorizationCode(authorizationCode);
@@ -47,7 +48,7 @@ public class AuthorizationInfoHandler implements RequestHandler {
 
     @RequestMapper("/edit")
     @Validate
-    public boolean editAuthorizationInfo(@NotNull Integer authorizationId, @NotNull String authorizationName, @NotNull String authorizationCode,
+    public boolean editAuthorizationInfo(@NotNull Long authorizationId, @NotNull String authorizationName, @NotNull String authorizationCode,
                                          Integer authorizationStatus, String description) throws Exception {
         AuthorizationInfoModel authorizationInfoModel = new AuthorizationInfoModel();
         authorizationInfoModel.setAuthorizationId(authorizationId);
@@ -60,41 +61,62 @@ public class AuthorizationInfoHandler implements RequestHandler {
 
     @RequestMapper("/enabled")
     @Validate
-    public boolean enabledAuthorizationInfo(@NotNull Integer authorizationId) throws Exception {
-        return authorizationInfoService.changeAuthorizationInfoModelStatus(authorizationId, AuthorizationInfoModel.EnumAuthorizationStatus.ENABLED);
+    public boolean enabledAuthorizationInfo(@NotNull Long authorizationId) throws Exception {
+        return authorizationInfoService.editAuthorizationInfoModelStatus(authorizationId, AuthorizationInfoModel.EnumAuthorizationStatus.ENABLED);
     }
 
     @RequestMapper("/disabled")
     @Validate
-    public boolean disabledAuthorizationInfo(@NotNull Integer authorizationId) throws BizException {
-        return authorizationInfoService.changeAuthorizationInfoModelStatus(authorizationId, AuthorizationInfoModel.EnumAuthorizationStatus.DISABLED);
+    public boolean disabledAuthorizationInfo(@NotNull Long authorizationId) throws BizException {
+        return authorizationInfoService.editAuthorizationInfoModelStatus(authorizationId, AuthorizationInfoModel.EnumAuthorizationStatus.DISABLED);
     }
 
     @RequestMapper("/delete")
     @Validate
-    public boolean deleteAuthorizationInfo(@NotNull Integer authorizationId) throws Exception {
-        List<Integer> authorizationIdList = new ArrayList<>();
+    public boolean deleteAuthorizationInfo(@NotNull Long authorizationId) throws Exception {
+        List<Long> authorizationIdList = new ArrayList<>();
         authorizationIdList.add(authorizationId);
         return authorizationInfoService.batchDeleteAuthorizationInfo(authorizationIdList);
     }
 
     @RequestMapper("/batch/delete")
     @Validate
-    public boolean batchDeleteAuthorizationInfo(@NotEmpty List<Integer> authorizationIdList) throws Exception {
+    public boolean batchDeleteAuthorizationInfo(@NotEmpty List<Long> authorizationIdList) throws Exception {
         return authorizationInfoService.batchDeleteAuthorizationInfo(authorizationIdList);
     }
 
     @RequestMapper("/list")
     @Validate
-    public List<AuthorizationInfoModel> getAuthorizationList(AuthorizationInfo authorizationInfo) throws Exception {
+    public List<AuthorizationInfo> getAuthorizationList(String authorizationName, String authorizationCode, Integer authorizationStatus, String description) throws Exception {
+        AuthorizationInfo authorizationInfo = new AuthorizationInfo();
+        authorizationInfo.setAuthorizationName(authorizationName);
+        authorizationInfo.setAuthorizationCode(authorizationCode);
+        authorizationInfo.setAuthorizationStatus(authorizationStatus);
+        authorizationInfo.setDescription(description);
+
         AuthorizationInfoModel authorizationInfoModel = new AuthorizationInfoModel();
         BeanUtils.copyProperties(authorizationInfo, authorizationInfoModel);
-        return authorizationInfoService.getAuthorizationList(authorizationInfoModel);
+
+        List<AuthorizationInfoModel> list = authorizationInfoService.getAuthorizationList(authorizationInfoModel);
+        List<AuthorizationInfo> result = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(list)) {
+            list.forEach(item -> {
+                AuthorizationInfo tempAuthorizationInfo = new AuthorizationInfo();
+                BeanUtils.copyProperties(item, tempAuthorizationInfo);
+                result.add(tempAuthorizationInfo);
+            });
+        }
+        return result;
     }
 
-    @RequestMapper("/object")
+    @RequestMapper("/one")
     @Validate
-    public AuthorizationInfoModel getAuthorizationByAuthorizationId(@NotNull Integer authorizationId) throws Exception {
-        return authorizationInfoService.getAuthorizationByAuthorizationId(authorizationId);
+    public AuthorizationInfo getAuthorizationByAuthorizationId(@NotNull Long authorizationId) throws Exception {
+        AuthorizationInfo authorizationInfo = new AuthorizationInfo();
+        AuthorizationInfoModel authorizationInfoModel = authorizationInfoService.getAuthorizationByAuthorizationId(authorizationId);
+        if (authorizationInfoModel != null) {
+            BeanUtils.copyProperties(authorizationInfoModel, authorizationInfo);
+        }
+        return authorizationInfo;
     }
 }

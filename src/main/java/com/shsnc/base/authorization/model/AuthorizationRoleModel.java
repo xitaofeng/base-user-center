@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 public class AuthorizationRoleModel implements Serializable {
 
-    private Integer roleId;
+    private Long roleId;
 
     private String roleName;
 
@@ -39,11 +39,11 @@ public class AuthorizationRoleModel implements Serializable {
         }
     }
 
-    public Integer getRoleId() {
+    public Long getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(Integer roleId) {
+    public void setRoleId(Long roleId) {
         this.roleId = roleId;
     }
 

@@ -92,7 +92,7 @@ public class AuthorizationRoleService {
      * @throws Exception
      */
     @Transactional
-    public boolean batchDeleteAuthorizationRole(List<Integer> roleIdList) throws Exception {
+    public boolean batchDeleteAuthorizationRole(List<Long> roleIdList) throws Exception {
         if (!CollectionUtils.isEmpty(roleIdList)) {
             roleIdList.forEach(authorizationId -> {
                 //TODO 验证权限是否 使用
@@ -121,7 +121,7 @@ public class AuthorizationRoleService {
      * @return
      * @throws Exception
      */
-    public AuthorizationRoleModel getAuthorizationRoleByRoleId(Integer roleId) throws Exception {
+    public AuthorizationRoleModel getAuthorizationRoleByRoleId(Long roleId) throws Exception {
         if (roleId == null) {
             throw new BizException("无效数据");
         }
@@ -136,7 +136,7 @@ public class AuthorizationRoleService {
      * @return
      */
     public boolean isRoleName(AuthorizationRoleModel authorizationRoleModel) throws BizException {
-        Integer roleId = authorizationRoleModel.getRoleId();
+        Long roleId = authorizationRoleModel.getRoleId();
         String roleName = authorizationRoleModel.getRoleName();
         if (StringUtil.isNotEmpty(roleName)) {
             List<AuthorizationRoleModel> list = authorizationRoleModelMapper.getListByRoleName(roleName);
@@ -157,7 +157,7 @@ public class AuthorizationRoleService {
      * @param list
      * @return
      */
-    private boolean checkDataRepetition(Integer roleId, List<AuthorizationRoleModel> list) {
+    private boolean checkDataRepetition(Long roleId, List<AuthorizationRoleModel> list) {
         //authorizationId == null 添加否则编辑
         if (roleId != null) {
             boolean isRepetition = false;

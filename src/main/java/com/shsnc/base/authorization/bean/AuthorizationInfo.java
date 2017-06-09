@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 public class AuthorizationInfo implements Serializable {
 
-    private Integer authorizationId;
+    private Long authorizationId;
 
     private String authorizationName;
 
@@ -19,11 +19,11 @@ public class AuthorizationInfo implements Serializable {
 
     private Long createTime;
 
-    public Integer getAuthorizationId() {
+    public Long getAuthorizationId() {
         return authorizationId;
     }
 
-    public void setAuthorizationId(Integer authorizationId) {
+    public void setAuthorizationId(Long authorizationId) {
         this.authorizationId = authorizationId;
     }
 
