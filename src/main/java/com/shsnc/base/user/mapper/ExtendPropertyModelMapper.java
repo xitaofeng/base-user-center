@@ -5,7 +5,9 @@ import com.shsnc.base.user.model.ExtendPropertyModel;
 import com.shsnc.base.util.sql.Pagination;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface ExtendPropertyModelMapper {
 
@@ -28,4 +30,6 @@ public interface ExtendPropertyModelMapper {
     List<ExtendPropertyModel> getPageByCondition(@Param("condition") ExtendPropertyCondition condition, @Param("pagination") Pagination pagination);
 
     List<ExtendPropertyModel> getExtendPropertyList();
+
+    List<Long> getPropertyIdsByPropertyIds(@Param("propertyIds") Collection<Long> propertyIds);
 }

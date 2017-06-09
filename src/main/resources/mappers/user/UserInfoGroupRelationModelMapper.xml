@@ -24,6 +24,11 @@
         WHERE relation_id = #{relationId}
     </delete>
 
+    <delete id="deleteByUserId">
+        DELETE FROM user_info_group_relation
+        WHERE relation_id = #{userId}
+    </delete>
+
     <insert id="insert" useGeneratedKeys="true" keyProperty="relationId">
         INSERT INTO user_info_group_relation (user_id, group_id)
         VALUES (#{userId}, #{groupId})
@@ -72,10 +77,16 @@
     <insert id="insertRelationList" useGeneratedKeys="true" keyProperty="relationId">
         INSERT INTO
         user_info_group_relation(user_id, group_id)
-        VALUES
-        <foreach collection="userInfoGroupRelationModels" item="userInfoGroupRelationModel" open="(" close=")"
-                 separator="),(">
-            #{userInfoGroupRelationModel.userId},#{userInfoGroupRelationModel.groupId}
-        </foreach>
+        VALUES (
+            <foreach collection="userInfoGroupRelationModels" item="userInfoGroupRelationModel" separator="),(">
+                #{userInfoGroupRelationModel.userId},#{userInfoGroupRelationModel.groupId}
+            </foreach>
+        )
     </insert>
+
+    <select id="getGroupIdsByUserId" resultType="java.lang.Long">
+        SELECT group_id
+        FROM user_info_group_relation
+        WHERE user_id = #{userId}
+    </select>
 </mapper>

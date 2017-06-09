@@ -2,6 +2,8 @@ package com.shsnc.base.user.mapper;
 
 import com.shsnc.base.user.model.AccountModel;
 
+import java.util.List;
+
 public interface AccountModelMapper {
     int deleteByPrimaryKey(Long accountId);
 
@@ -14,4 +16,10 @@ public interface AccountModelMapper {
     int updateByPrimaryKeySelective(AccountModel record);
 
     int updateByPrimaryKey(AccountModel record);
+
+    List<AccountModel> getAccountByUserId(Long userId);
+
+    Long getUserIdByAccountName(String accountName);
+
+    int deleteByUserId(Long userId);
 }

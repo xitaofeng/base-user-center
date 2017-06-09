@@ -4,10 +4,10 @@ import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.mapper.ExtendPropertyModelMapper;
 import com.shsnc.base.user.model.ExtendPropertyCondition;
 import com.shsnc.base.user.model.ExtendPropertyModel;
+import com.shsnc.base.user.support.Assert;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIXDom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,12 +51,13 @@ public class ExtendPropertyService {
     /**
      * 添加一个用户扩展属性
      * @param extendPropertyModel 要添加的用户扩展属性
-     * @return 新增成功返回ture，否则返回false
+     * @return 返回新增数据的id
      * @throws BizException 业务异常
      */
-    public boolean addExtendProperty(ExtendPropertyModel extendPropertyModel) throws BizException {
-        checkExtendProperty(extendPropertyModel);
-        return extendPropertyModelMapper.insertSelective(extendPropertyModel)>0;
+    public Long addExtendProperty(ExtendPropertyModel extendPropertyModel) throws BizException {
+        checkPropertyName(extendPropertyModel);
+        extendPropertyModelMapper.insertSelective(extendPropertyModel);
+        return extendPropertyModel.getPropertyId();
     }
 
     /**
@@ -66,10 +67,8 @@ public class ExtendPropertyService {
      * @throws BizException 业务异常
      */
     public boolean updateExtendProperty(ExtendPropertyModel extendPropertyModel) throws BizException {
-        if(extendPropertyModel.getPropertyId() == null){
-            throw new BizException("属性id不能为空！");
-        }
-        checkExtendProperty(extendPropertyModel);
+        Assert.notNull(extendPropertyModel.getPropertyId(), "属性id不能为空！");
+        checkPropertyName(extendPropertyModel);
         return extendPropertyModelMapper.updateByPrimaryKeySelective(extendPropertyModel)>0;
     }
 
@@ -78,7 +77,8 @@ public class ExtendPropertyService {
      * @param propertyId 属性id
      * @return  删除成功返回true，否则false
      */
-    public boolean deleteExtendProperty(Long propertyId){
+    public boolean deleteExtendProperty(Long propertyId) throws BizException {
+        Assert.notNull(propertyId, "属性id不能为空！");
         return extendPropertyModelMapper.deleteByPrimaryKey(propertyId)>0;
     }
 
@@ -87,22 +87,29 @@ public class ExtendPropertyService {
      * @param extendPropertyModel 属性名称
      * @throws BizException 业务异常
      */
-    private void checkExtendProperty(ExtendPropertyModel extendPropertyModel) throws BizException {
+    private void checkPropertyName(ExtendPropertyModel extendPropertyModel) throws BizException {
         String propertyName = extendPropertyModel.getPropertyName();
-        if(propertyName == null){
-            throw new BizException("属性名称不能为空！");
-        }
-        if(!propertyName.matches(UserConstant.Regex.PROPERTY_NAME)){
-            throw new BizException("属性名称格式错误！");
-        }
+        Assert.notNull(propertyName,"属性名称不能为空！");
+
+        Assert.isTrue(propertyName.matches(UserConstant.Regex.PROPERTY_NAME), "属性名称格式错误！");
+
         ExtendPropertyModel exist = new ExtendPropertyModel();
         exist.setPropertyName(propertyName);
         exist = extendPropertyModelMapper.existExtendProperty(exist);
 
-        if(exist != null && (extendPropertyModel.getPropertyId() == null || !extendPropertyModel.getPropertyId().equals(exist.getPropertyId()))){
-            throw new BizException("属性名称已经存在！");
-        }
+        Assert.isTrue(exist == null || exist.getPropertyId().equals(extendPropertyModel.getPropertyId()), "属性名称格式错误！");
+
     }
 
+    /**
+     * 获取某个扩展属性
+     * @param propertyId 属性id
+     * @return 返回扩展属性
+     * @throws BizException 业务异常
+     */
+    public ExtendPropertyModel getExtendProperty(Long propertyId) throws BizException {
+        Assert.notNull(propertyId, "属性id不能为空！");
+        return extendPropertyModelMapper.selectByPrimaryKey(propertyId);
+    }
 
 }

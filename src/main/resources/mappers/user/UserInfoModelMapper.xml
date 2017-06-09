@@ -230,4 +230,12 @@
         </where>
         LIMIT 1
     </select>
+    <select id="getUserIdsByUserIds" resultType="java.lang.Long">
+        SELECT user_id
+        FROM user_info
+        WHERE user_id IN
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+    </select>
 </mapper>

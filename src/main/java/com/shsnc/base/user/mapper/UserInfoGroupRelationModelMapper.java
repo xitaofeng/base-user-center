@@ -18,4 +18,8 @@ public interface UserInfoGroupRelationModelMapper {
     int updateByPrimaryKey(UserInfoGroupRelationModel record);
 
     int insertRelationList(List<UserInfoGroupRelationModel> userInfoGroupRelationModels);
+
+    List<Long> getGroupIdsByUserId(Long userId);
+
+    int deleteByUserId(Long userId);
 }

@@ -1,13 +1,6 @@
-package com.shsnc.base.user.bean;
+package com.shsnc.base.user.model;
 
-import com.shsnc.api.core.validation.ValidationType;
-
-import javax.validation.constraints.NotNull;
-
-/**
- *
- */
-public class UserInfo {
+public class UserInfoCondition {
 
     private Long userId;
     private String username;
