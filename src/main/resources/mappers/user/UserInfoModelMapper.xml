@@ -206,6 +206,22 @@
             is_delete = #{isDelete}
         WHERE user_id = #{userId}
     </update>
+    
+    <update id="updateUserInfoByUserIds">
+        UPDATE user_info
+        <set>
+            <if test="userInfoModel.status != null">
+                status = #{userInfoModel.status},
+            </if>
+            <if test="userInfoModel.isDelete != null">
+                is_delete = #{userInfoModel.isDelete},
+            </if>
+        </set>
+        WHERE user_id IN
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+    </update>
 
     <select id="findUserInfoList" resultMap="BaseResultMap">
         SELECT
@@ -238,5 +254,56 @@
         <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
             #{userId}
         </foreach>
+    </select>
+    <sql id="pageSql">
+        <if test="pagination != null" >
+            LIMIT #{pagination.start}, #{pagination.pageSize}
+        </if>
+    </sql>
+
+    <sql id="orderSql">
+        <if test="pagination != null and pagination.orderField != null and pagination.orderField != ''">
+            ORDER BY #{pagination.orderField}
+            <if test="pagination.orderType != null and pagination.orderType!=''">
+                #{pagination.orderType}
+            </if>
+        </if>
+    </sql>
+
+    <sql id="conditionSql">
+        <where>
+            <if test="condition != null">
+                <if test="condition.username != null and condition.username != ''">
+                    INSTR(username,#{condition.username})>0
+                </if>
+                <if test="condition.alias != null and condition.alias != ''">
+                    AND INSTR(alias,#{condition.alias})>0
+                </if>
+                <if test="condition.mobile != null and condition.mobile != ''">
+                    AND INSTR(mobile,#{condition.mobile})>0
+                </if>
+                <if test="condition.email != null and condition.email != ''">
+                    AND INSTR(email,#{condition.email})>0
+                </if>
+                <if test="condition.status != null">
+                    AND status=#{status}
+                </if>
+            </if>
+        </where>
+    </sql>
+    <select id="getTotalCountByCondition" resultType="java.lang.Integer">
+        SELECT
+            COUNT(1)
+        FROM
+            user_info
+        <include refid="conditionSql"/>
+    </select>
+    <select id="getPageByCondition" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_info
+        <include refid="conditionSql"/>
+        <include refid="orderSql"/>
+        <include refid="pageSql"/>
     </select>
 </mapper>

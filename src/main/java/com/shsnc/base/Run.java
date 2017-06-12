@@ -17,7 +17,6 @@ public class Run
         HttpServer server = new HttpServer.HttpServerBuilder()
                 .bindAddress(bundle.getString("HOST"))
                 .listenPort(Integer.valueOf(bundle.getString("PORT")))
-                .contextPath("/user-center")
                 .configPath("classpath:beans.xml")
                 .testMode(true)
                 .build();

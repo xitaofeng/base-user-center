@@ -1,6 +1,5 @@
 package com.shsnc.base.user.service;
 
-import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.mapper.AccountModelMapper;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;
@@ -109,16 +108,22 @@ public class AccountService {
     }
 
     public boolean deleteAccount(Long userId) {
-        accountModelMapper.deleteByUserId(userId);
-        return true;
+        boolean result = accountModelMapper.deleteByUserId(userId) > 0;
+        return result;
     }
 
     public UserInfoModel getUserInfoByAccountName(String account) throws BizException {
         Assert.notNull(account,"账户名不能为空！");
         Long userId = accountModelMapper.getUserIdByAccountName(account);
         Assert.notNull(userId, "账户名不存在！");
+
         UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
         Assert.notNull(userInfoModel, "用户不存在！");
         return userInfoModel;
+    }
+
+    public void batchDeleteAccount(List<Long> userIds) throws BizException {
+        Assert.notEmpty(userIds, "用户id不能为空！");
+        accountModelMapper.deleteByUserIds(userIds);
     }
 }

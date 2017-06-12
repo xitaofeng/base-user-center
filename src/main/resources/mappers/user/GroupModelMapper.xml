@@ -8,6 +8,7 @@
         <result column="code" property="code" jdbcType="VARCHAR"/>
         <result column="description" property="description" jdbcType="VARCHAR"/>
         <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="parent_id" property="parentId" jdbcType="BIGINT"/>
     </resultMap>
 
     <sql id="BaseColumn">
@@ -139,5 +140,77 @@
         <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
             #{groupId}
         </foreach>
+    </select>
+
+    <select id="getGroupsByUserId" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM
+            user_group ug, user_info_group_relation ugr
+        WHERE ug.group_id=ugr.group_id AND ug.status=1 AND ugr.user_id=#{userId}
+    </select>
+    <sql id="pageSql">
+        <if test="pagination != null" >
+            LIMIT #{pagination.start}, #{pagination.pageSize}
+        </if>
+    </sql>
+
+    <sql id="orderSql">
+        <if test="pagination != null and pagination.orderField != null and pagination.orderField != ''">
+            ORDER BY #{pagination.orderField}
+            <if test="pagination.orderType != null and pagination.orderType!=''">
+                #{pagination.orderType}
+            </if>
+        </if>
+    </sql>
+
+    <sql id="conditionSql">
+        <where>
+            <if test="condition != null">
+                <if test="condition.name != null and condition.name != ''">
+                    INSTR(name,#{condition.name})>0
+                </if>
+                <if test="condition.code != null and condition.code != ''">
+                    AND INSTR(code,#{condition.code})>0
+                </if>
+                <if test="condition.description != null and condition.description != ''">
+                    AND INSTR(description,#{condition.description})>0
+                </if>
+                <if test="condition.status != null and condition.status != ''">
+                    AND status=#{status}
+                </if>
+            </if>
+        </where>
+    </sql>
+    <select id="getTotalCountByCondition" resultType="java.lang.Integer">
+        SELECT
+            COUNT(1)
+        FROM
+            user_group
+        <include refid="conditionSql"/>
+    </select>
+    <select id="getPageByCondition" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_group
+        <include refid="conditionSql"/>
+        <include refid="orderSql"/>
+        <include refid="pageSql"/>
+    </select>
+    <select id="getNodeList" resultMap="BaseResultMap">
+        SELECT ug.*,ugs.ancestor_id parent_id
+        FROM user_groups ug
+        JOIN (
+            SELECT ancestor_id,descendant_id
+            FROM user_group_structure
+            WHERE level=1
+        ) ugs ON ug.group_id=ugs.descendant_id
+        <where>
+            <if test="parentId != null">
+                ugs.ancestor_id=#{parentId}
+            </if>
+        </where>
+
+
     </select>
 </mapper>

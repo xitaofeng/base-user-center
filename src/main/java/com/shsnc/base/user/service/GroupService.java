@@ -4,10 +4,14 @@ import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.mapper.GroupModelMapper;
 import com.shsnc.base.user.mapper.GroupStructureModelMapper;
 import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
+import com.shsnc.base.user.model.ExtendPropertyModel;
+import com.shsnc.base.user.model.GroupCondition;
 import com.shsnc.base.user.model.GroupModel;
 import com.shsnc.base.user.support.Assert;
 import com.shsnc.base.user.support.helper.BeanHelper;
 import com.shsnc.base.util.config.BizException;
+import com.shsnc.base.util.sql.Pagination;
+import com.shsnc.base.util.sql.QueryData;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -163,4 +167,31 @@ public class GroupService {
         return dbGroupIds.size() == groupIds.size();
     }
 
+    public List<GroupModel> getGroupsByUserId(Long userId) throws BizException {
+        Assert.notNull(userId,"用户id不能为空！");
+        return groupModelMapper.getGroupsByUserId(userId);
+    }
+
+    public GroupModel getGroup(Long groupId) throws BizException {
+        Assert.notNull(groupId, "用户组id不能为空！");
+        GroupModel groupModel = groupModelMapper.selectByPrimaryKey(groupId);
+        groupModel.setParentId(groupStructureModelMapper.getParentIdByGroupId(groupId));
+        return groupModel;
+    }
+
+    public QueryData getGroupPage(GroupCondition condition, Pagination pagination) {
+        QueryData queryData = new QueryData();
+        queryData.setPageSize(pagination.getPageSize());
+        queryData.setCurrPage(pagination.getCurrentPage());
+        int totalCount = groupModelMapper.getTotalCountByCondition(condition);
+        queryData.setTotalCount(totalCount);
+        queryData.build();
+        List<ExtendPropertyModel> list = groupModelMapper.getPageByCondition(condition, pagination);
+        queryData.setDataList(list);
+        return queryData;
+    }
+
+    public List<GroupModel> getNodeList(Long parentId) {
+        return  groupModelMapper.getNodeList(parentId);
+    }
 }

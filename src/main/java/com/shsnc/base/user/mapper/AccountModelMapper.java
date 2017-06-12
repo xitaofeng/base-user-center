@@ -22,4 +22,6 @@ public interface AccountModelMapper {
     Long getUserIdByAccountName(String accountName);
 
     int deleteByUserId(Long userId);
+
+    int deleteByUserIds(List<Long> userIds);
 }

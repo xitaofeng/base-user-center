@@ -21,7 +21,6 @@ public class UserInfoParam {
     private String email;
     private String mobile;
     private Integer status;
-    @NotEmpty(groups = {ValidationType.Add.class})
     private List<Long> groupIds;
     private List<ExtendPropertyValue> extendPropertyValues;
 

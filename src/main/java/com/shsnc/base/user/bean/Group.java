@@ -12,6 +12,8 @@ public class Group {
 
     private Integer status;
 
+    private Long parentId;
+
     public Long getGroupId() {
         return groupId;
     }
@@ -50,5 +52,13 @@ public class Group {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
     }
 }

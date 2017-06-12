@@ -1,10 +1,10 @@
 package com.shsnc.base.user.handler;
 
 import com.shsnc.api.core.RequestHandler;
+import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
-import com.shsnc.base.user.bean.ExtendPropertyValue;
 import com.shsnc.base.user.bean.ExtendPropertyValueParam;
 import com.shsnc.base.user.model.ExtendPropertyValueModel;
 import com.shsnc.base.user.service.ExtendPropertyValueService;
@@ -14,13 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * Created by houguangqiang on 2017/6/8.
  */
 @Component
 @RequestMapper("/user/extendPropertyValue")
+@LoginRequired
 public class ExtendPropertyValueHandler implements RequestHandler {
 
     @Autowired
@@ -41,13 +41,10 @@ public class ExtendPropertyValueHandler implements RequestHandler {
     }
 
     @RequestMapper("/delete")
+    @Validate
     public boolean delete(@NotNull Long propertyValueId) throws BizException {
         return extendPropertyValueService.deleteExtendPropertyValue(propertyValueId);
     }
 
-    @RequestMapper("/getExtendPropertyValueByUserId")
-    public List<ExtendPropertyValue> getExtendPropertyValueByUserId(@NotNull Long userId){
-        List<ExtendPropertyValueModel> extendPropertyValueModelList = extendPropertyValueService.getExtendPropertyValueByUserId(userId);
-        return JsonUtil.convert(extendPropertyValueModelList, List.class, ExtendPropertyValue.class);
-    }
+
 }

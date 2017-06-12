@@ -11,15 +11,15 @@ import java.util.Properties;
 public class ServerConfig {
 
     private static Boolean isSingleLogin;
-    private static Integer session;
+    private static Integer sessionTime;
 
     static {
         try {
             Properties properties = PropertiesLoaderUtils.loadAllProperties("server.properties");
             String isSingleLogin = properties.getProperty("isSingleLogin","false");
-            String session = properties.getProperty("session","60");
+            String session = properties.getProperty("sessionTime","1800");
             ServerConfig.isSingleLogin = Boolean.valueOf(isSingleLogin);
-            ServerConfig.session = Integer.valueOf(session);
+            ServerConfig.sessionTime = Integer.valueOf(session);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -32,7 +32,7 @@ public class ServerConfig {
         return isSingleLogin;
     }
 
-    public static Integer getSession() {
-        return session;
+    public static Integer getSessionTime() {
+        return sessionTime;
     }
 }
