@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shsnc.base.authorization.mapper.AuthorizationResourceAuthModelMapper">
+
+    <sql id="tableName">authorization_resource_auth</sql>
+
+    <sql id="Base_Column">
+        id,
+        resource_type,
+        resource_id,
+        property_id,
+        auth_type,
+        auth_value
+    </sql>
+
+    <insert id="addAuthorizationResourceAuthModel">
+        INSERT INTO
+        <include refid="tableName"/>
+        (
+        resource_type,
+        resource_id,
+        property_id,
+        auth_type,
+        auth_value
+        )
+        VALUES
+        (#{item.resourceType},#{item.resourceId},#{item.propertyId},#{item.authType},#{item.authValue})
+    </insert>
+
+    <insert id="addBatchAuthorizationResourceAuthModel">
+        INSERT INTO
+        <include refid="tableName"/>
+        (
+        resource_type,
+        resource_id,
+        property_id,
+        auth_type,
+        auth_value
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.resourceType},#{item.resourceId},#{item.propertyId},#{item.authType},#{item.authValue})
+        </foreach>
+    </insert>
+
+
+</mapper>

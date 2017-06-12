@@ -16,7 +16,7 @@ import java.util.List;
  * 功能权限处理器
  */
 @Component
-@RequestMapper("/function/authorization")
+@RequestMapper("/authorization/function")
 public class FunctionAuthorizationHandler implements RequestHandler {
 
     @Autowired
@@ -45,7 +45,7 @@ public class FunctionAuthorizationHandler implements RequestHandler {
      * @param userId
      * @return
      */
-    @RequestMapper("user/have/list")
+    @RequestMapper("/user/have/list")
     public List<Long> userHaveAuthorizationList(@NotNull Long userId) throws BizException {
         return authorizationRoleRelationService.getAuthorizationIdByUserId(userId);
     }

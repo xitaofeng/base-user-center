@@ -111,7 +111,9 @@ public class AuthorizationRoleRelationService {
         }
 
         if (!CollectionUtils.isEmpty(roleIds)) {
-            return authorizationRoleRelationModelMapper.getAuthorizationIdByRoleIds(roleIds);
+            List<Long> tempList = new ArrayList<Long>();
+            tempList.addAll(roleIds);
+            return authorizationRoleRelationModelMapper.getAuthorizationIdByRoleIds(tempList);
         } else {
             return new ArrayList<>();
         }
@@ -119,12 +121,13 @@ public class AuthorizationRoleRelationService {
 
     /**
      * 验证用户是否拥有该权限
+     *
      * @param userId
      * @param authorizationId
      * @return
      */
     public boolean userHaveAuthorization(Long userId, Long authorizationId) throws BizException {
-        if(authorizationId == null){
+        if (authorizationId == null) {
             throw new BizException("选择权限");
         }
         List<Long> authorizationIdList = getAuthorizationIdByUserId(userId);
