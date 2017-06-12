@@ -20,7 +20,7 @@
         role_id
         )
         VALUES
-        <foreach collection="authorizationGroupRoleRelationModels" item="item" index="index" separator="," >
+        <foreach collection="list" item="item" index="index" separator="," >
             (#{item.groupId},#{item.roleId})
         </foreach>
     </insert>
@@ -31,6 +31,13 @@
         FROM
         <include refid="tableName"/>
         WHERE group_id = #{groupId }
+    </select>
+
+    <select id="getGroupIdByRoleId" resultType="java.lang.Integer">
+        SELECT
+        group_id
+        <include refid="tableName"/>
+        WHERE role_id = #{roleId }
     </select>
 
     <select id="getRoleIdByGroupIds" resultType="java.lang.Integer">
@@ -48,6 +55,12 @@
         DELETE FROM
         <include refid="tableName"/>
         WHERE group_id = #{groupId }
+    </delete>
+
+    <delete id="deleteAuthorizationGroupRoleRelationModelByRoleId">
+        DELETE FROM
+        <include refid="tableName"/>
+        WHERE role_id = #{roleId }
     </delete>
 
 </mapper>

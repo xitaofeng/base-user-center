@@ -62,15 +62,32 @@ public class AuthorizationRoleHandler implements RequestHandler {
 
     @RequestMapper("/list")
     @Validate
-    public List<AuthorizationRoleModel> getAuthorizationRoleModelList(AuthorizationRole authorizationRole) throws Exception {
+    public List<AuthorizationRoleModel> getAuthorizationRoleModelList(String roleName, String description) throws Exception {
+        AuthorizationRole authorizationRole = new AuthorizationRole();
+        authorizationRole.setRoleName(roleName);
+        authorizationRole.setDescription(description);
         AuthorizationRoleModel authorizationRoleModel = new AuthorizationRoleModel();
         BeanUtils.copyProperties(authorizationRole, authorizationRoleModel);
         return authorizationRoleService.getAuthorizationRoleModelList(authorizationRoleModel);
     }
 
-    @RequestMapper("/object")
+    @RequestMapper("/one")
     @Validate
     public AuthorizationRoleModel getAuthorizationRoleByRoleId(@NotNull Long roleId) throws Exception {
         return authorizationRoleService.getAuthorizationRoleByRoleId(roleId);
     }
+
+    /**
+     * 用户分配角色
+     * @param userId
+     * @param roleIdList
+     * @return
+     * @throws Exception
+     */
+    @RequestMapper("/user/assign")
+    @Validate
+    public boolean userAssignRole(@NotNull Long userId,@NotEmpty List<Long> roleIdList) throws Exception {
+        return authorizationRoleService.batchDeleteAuthorizationRole(roleIdList);
+    }
+
 }
