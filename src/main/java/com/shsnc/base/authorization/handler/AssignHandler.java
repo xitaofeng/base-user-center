@@ -16,7 +16,7 @@ import java.util.List;
  * Created by Elena on 2017/6/8.
  */
 @Component
-@RequestMapper("/assign")
+@RequestMapper("/authorization/assign")
 public class AssignHandler implements RequestHandler {
 
     @Autowired

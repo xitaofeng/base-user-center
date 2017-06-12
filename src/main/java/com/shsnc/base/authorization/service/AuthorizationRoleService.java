@@ -61,7 +61,7 @@ public class AuthorizationRoleService {
     }
 
     /**
-     * 添加 角色 信息
+     * 编辑 角色 信息
      *
      * @param authorizationRoleModel
      * @return

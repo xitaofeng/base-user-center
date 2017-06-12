@@ -20,7 +20,7 @@
         role_id
         )
         VALUES
-        <foreach collection="authorizationGroupRoleRelationModels" item="item" index="index" separator="," >
+        <foreach collection="list" item="item" index="index" separator="," >
             (#{item.groupId},#{item.roleId})
         </foreach>
     </insert>

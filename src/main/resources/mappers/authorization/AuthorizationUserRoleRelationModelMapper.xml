@@ -20,12 +20,12 @@
         role_id
         )
         VALUES
-        <foreach collection="authorizationGroupRoleRelationModels" item="item" index="index" separator="," >
+        <foreach collection="list" item="item" index="index" separator="," >
             (#{item.userId},#{item.roleId})
         </foreach>
     </insert>
 
-    <select id="getRoleIdByGroupId" resultType="java.lang.Long">
+    <select id="getRoleIdByUserId" resultType="java.lang.Long">
         SELECT
         role_id
         FROM

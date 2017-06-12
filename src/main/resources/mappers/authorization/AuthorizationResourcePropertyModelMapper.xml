@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shsnc.base.authorization.mapper.AuthorizationResourcePropertyModelMapper">
+
+    <!-- 表名用变量表示 -->
+    <sql id="tableName">authorization_resource_property</sql>
+
+    <!-- SQL语句格式美化，关键字用大写字母 -->
+    <insert id="addAuthorizationResourcePropertyModel" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO
+        <include refid="tableName"/>
+        (
+        resource_type,
+        resource_type_name,
+        property_name,
+        property_value,
+        parent_id
+        )
+        VALUES
+        (
+        #{resourceType},
+        #{resourceTypeName},
+        #{propertyName},
+        #{propertyValue},
+        #{parentId}
+        )
+    </insert>
+
+    <update id="editAuthorizationResourcePropertyModel">
+        UPDATE
+        <include refid="tableName"/>
+        SET
+        resource_type = #{resourceType}
+        <if test="resourceTypeName !=null and resourceTypeName !=''">
+            ,resource_type_name = #{resourceTypeName}
+        </if>
+        <if test="propertyName !=null and propertyName !=''">
+            ,property_name = #{propertyName}
+        </if>
+        <if test="propertyValue !=null and propertyValue !=''">
+            ,property_value = #{propertyValue}
+        </if>
+        WHERE id = #{id }
+    </update>
+
+    <delete id="batchDeleteAuthorizationResourceProperty">
+        DELETE FROM
+        <include refid="tableName"/>
+        WHERE id in
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getAuthorizationResourcePropertyModelById" resultType="com.shsnc.base.authorization.model.AuthorizationResourcePropertyModel">
+        SELECT * FROM
+        <include refid="tableName"/>
+        WHERE id = #{id}
+    </select>
+
+    <select id="getAuthorizationResourcePropertyModelList" resultType="com.shsnc.base.authorization.model.AuthorizationResourcePropertyModel">
+        SELECT *
+        FROM
+        <include refid="tableName"/>
+        WHERE 1 = 1
+        <if test="resourceType != null and resourceType > 0 ">
+            AND  resource_type = #{resourceType}
+        </if>
+        <if test="resourceTypeName !=null and resourceTypeName !=''">
+            AND resource_type_name LIKE CONCAT('%', #{resourceTypeName}, '%')
+        </if>
+        <if test="propertyName !=null and propertyName !=''">
+            AND property_name LIKE CONCAT('%', #{propertyName}, '%')
+        </if>
+        <if test="propertyValue !=null and propertyValue > 0">
+            AND property_value = #{propertyValue}
+        </if>
+        <if test="parentId !=null and parentId >= 0">
+            AND parent_id = #{parentId}
+        </if>
+    </select>
+</mapper>

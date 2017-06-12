@@ -6,6 +6,8 @@ import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMap
 import com.shsnc.base.authorization.model.AuthorizationGroupRoleRelationModel;
 import com.shsnc.base.authorization.model.AuthorizationRoleRelationModel;
 import com.shsnc.base.authorization.model.AuthorizationUserRoleRelationModel;
+import com.shsnc.base.user.mapper.GroupStructureModelMapper;
+import com.shsnc.base.user.mapper.UserInfoModelMapper;
 import com.shsnc.base.util.config.BizException;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,12 @@ public class AssignService {
     private AuthorizationRoleModelMapper authorizationRoleModelMapper;
 
     @Autowired
+    private UserInfoModelMapper userInfoModelMapper;
+
+    @Autowired
+    private GroupStructureModelMapper groupStructureModelMapper;
+
+    @Autowired
     private AuthorizationUserRoleRelationModelMapper authorizationUserRoleRelationModelMapper;
 
     @Autowired
@@ -45,9 +53,9 @@ public class AssignService {
         if (userId == null) {
             throw new BizException("选择授权的用户");
         }
-        /*if (authorizationRoleModelMapper.getAuthorizationRoleModelByRoleId(roleId) == null) {
-            throw new BizException("无效角色");
-        }*/
+        if (userInfoModelMapper.selectByPrimaryKey(userId) == null) {
+            throw new BizException("无效用户");
+        }
         if (CollectionUtils.isEmpty(roleIdList)) {
             throw new BizException("选择分配的角色");
         }
@@ -80,9 +88,9 @@ public class AssignService {
         if (roleId == null) {
             throw new BizException("选择授权的角色");
         }
-        /*if (authorizationRoleModelMapper.getAuthorizationRoleModelByRoleId(roleId) == null) {
+        if (authorizationRoleModelMapper.getAuthorizationRoleModelByRoleId(roleId) == null) {
             throw new BizException("无效角色");
-        }*/
+        }
         if (CollectionUtils.isEmpty(userIdList)) {
             throw new BizException("选择分配的用户");
         }
@@ -92,10 +100,9 @@ public class AssignService {
         List<AuthorizationUserRoleRelationModel> authorizationUserRoleRelationModels = new ArrayList<>();
         for (int i = 0; i < userIdList.size(); i++) {
             Long userId = userIdList.get(i);
-            //TODO 验证用户是否存在
-           /* if (authorizationRoleModelMapper.getByRoleId(roleId) == null) {
-                throw new BizException("无效角色数据");
-            }*/
+            if (userInfoModelMapper.selectByPrimaryKey(userId) == null) {
+                throw new BizException("无效用户数据");
+            }
             AuthorizationUserRoleRelationModel authorizationUserRoleRelationModel = new AuthorizationUserRoleRelationModel();
             authorizationUserRoleRelationModel.setUserId(userId);
             authorizationUserRoleRelationModel.setRoleId(roleId);
@@ -116,10 +123,9 @@ public class AssignService {
         if (groupId == null) {
             throw new BizException("选择分配的用户组");
         }
-        //TODO 验证组是否存在
-        /*if (authorizationRoleModelMapper.getAuthorizationRoleModelByRoleId(roleId) == null) {
-            throw new BizException("无效角色");
-        }*/
+        if (groupStructureModelMapper.selectByPrimaryKey(groupId) == null) {
+            throw new BizException("无效组织架构");
+        }
         if (CollectionUtils.isEmpty(roleIdList)) {
             throw new BizException("选择分配的用户");
         }
@@ -164,10 +170,9 @@ public class AssignService {
         List<AuthorizationGroupRoleRelationModel> authorizationGroupRoleRelationModels = new ArrayList<>();
         for (int i = 0; i < groupIdList.size(); i++) {
             Long groupId = groupIdList.get(i);
-            //TODO 验证用户组是否存在
-           /* if (authorizationRoleModelMapper.getByRoleId(roleId) == null) {
-                throw new BizException("无效角色数据");
-            }*/
+            if (groupStructureModelMapper.selectByPrimaryKey(groupId) == null) {
+                throw new BizException("无效组织架构");
+            }
             AuthorizationGroupRoleRelationModel authorizationGroupRoleRelationModel = new AuthorizationGroupRoleRelationModel();
             authorizationGroupRoleRelationModel.setGroupId(groupId);
             authorizationGroupRoleRelationModel.setRoleId(roleId);
