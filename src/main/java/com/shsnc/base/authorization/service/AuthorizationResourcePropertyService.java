@@ -27,7 +27,7 @@ public class AuthorizationResourcePropertyService {
 
     private Logger LOG = LoggerFactory.getLogger(getClass());
 
-    private String Redis_List_key = RedisConstants.RESOURCE_RESOURCE_PROPERTY_LIST;
+    private String Redis_List_key = RedisConstants.RESOURCE_PROPERTY_LIST;
 
     @Autowired
     private AuthorizationResourcePropertyModelMapper authorizationResourcePropertyModelMapper;
@@ -118,17 +118,18 @@ public class AuthorizationResourcePropertyService {
      * @throws Exception
      */
     public List<AuthorizationResourcePropertyModel> getAuthorizationResourcePropertyModelRedisList() throws BizException {
-        List<AuthorizationResourcePropertyModel> list = null;
+        List<AuthorizationResourcePropertyModel> list = new ArrayList<>();
         try {
             String json = RedisUtil.getString(Redis_List_key);
             if (StringUtil.isNotEmpty(json)) {
-                list = JsonUtil.convert(json, List.class, AuthorizationResourcePropertyModel.class);
+                list = JsonUtil.jsonToObject(json,List.class,AuthorizationResourcePropertyModel.class);
             }
             if (CollectionUtils.isEmpty(list)) {
                 list = authorizationResourcePropertyModelMapper.getAuthorizationResourcePropertyModelList(null);
                 RedisUtil.saveString(Redis_List_key, JsonUtil.toJsonString(list));
             }
         } catch (Exception e) {
+            LOG.error("query ResourceProperty {}",e.getMessage());
             e.printStackTrace();
         }
         return list;
