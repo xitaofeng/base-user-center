@@ -1,6 +1,9 @@
 package com.shsnc.base.user.mapper;
 
+import com.shsnc.base.user.model.ExtendPropertyModel;
+import com.shsnc.base.user.model.UserInfoCondition;
 import com.shsnc.base.user.model.UserInfoModel;
+import com.shsnc.base.util.sql.Pagination;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
@@ -26,4 +29,10 @@ public interface UserInfoModelMapper {
     UserInfoModel existUserInfo(UserInfoModel userInfoModel);
 
     List<Long> getUserIdsByUserIds(@Param("userIds") Collection<Long> userIds);
+
+    int updateUserInfoByUserIds(@Param("userInfoModel") UserInfoModel userInfoModel, @Param("userIds") Collection<Long> userIds);
+
+    int getTotalCountByCondition(UserInfoCondition condition);
+
+    List<ExtendPropertyModel> getPageByCondition(@Param("condition") UserInfoCondition condition, @Param("pagination") Pagination pagination);
 }

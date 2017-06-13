@@ -2,18 +2,20 @@ package com.shsnc.base.user.service;
 
 import com.fasterxml.jackson.databind.deser.Deserializers;
 import com.shsnc.base.user.bean.ExtendPropertyValue;
+import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.mapper.AccountModelMapper;
 import com.shsnc.base.user.mapper.ExtendPropertyValueMapper;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;
-import com.shsnc.base.user.model.AccountModel;
-import com.shsnc.base.user.model.ExtendPropertyValueModel;
-import com.shsnc.base.user.model.UserInfoGroupRelationModel;
-import com.shsnc.base.user.model.UserInfoModel;
+import com.shsnc.base.user.model.*;
 import com.shsnc.base.user.support.Assert;
+import com.shsnc.base.util.JsonUtil;
+import com.shsnc.base.util.RedisUtil;
 import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.crypto.SHAMaker;
+import com.shsnc.base.util.sql.Pagination;
+import com.shsnc.base.util.sql.QueryData;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,27 @@ public class UserInfoService {
 
     public List<UserInfoModel> getUserInfoList(UserInfoModel userInfoModel){
         return userInfoModelMapper.findUserInfoList(userInfoModel);
+    }
+
+    public UserInfoModel getUserInfo(Long userId) throws BizException {
+        Assert.notNull(userId,"用户id不能为空！");
+        String userInfoJson = RedisUtil.getFieldValue(UserConstant.REDIS_USER_INFO_KEY, userId.toString());
+        if(userInfoJson != null){
+            return JsonUtil.jsonToObject(userInfoJson, UserInfoModel.class );
+        }
+        return userInfoModelMapper.selectByPrimaryKey(userId);
+    }
+
+    public QueryData getUserInfoPage(UserInfoCondition condition, Pagination pagination) {
+        QueryData queryData = new QueryData();
+        queryData.setPageSize(pagination.getPageSize());
+        queryData.setCurrPage(pagination.getCurrentPage());
+        int totalCount = userInfoModelMapper.getTotalCountByCondition(condition);
+        queryData.setTotalCount(totalCount);
+        queryData.build();
+        List<ExtendPropertyModel> list = userInfoModelMapper.getPageByCondition(condition, pagination);
+        queryData.setDataList(list);
+        return queryData;
     }
 
     /**
@@ -105,6 +128,7 @@ public class UserInfoService {
             }
             extendPropertyValueService.batchUpdateExtendPropertyValue(extendPropertyValues);
         }
+        RedisUtil.delMapField(UserConstant.REDIS_USER_INFO_KEY, userId.toString());
         return true;
     }
 
@@ -114,9 +138,29 @@ public class UserInfoService {
         UserInfoModel userInfoModel = new UserInfoModel();
         userInfoModel.setUserId(userId);
         userInfoModel.setIsDelete(UserConstant.USER_DELETEED_TRUE);
-        // 删除账户表记录
-        accountService.deleteAccount(userId);
-        return userInfoModelMapper.updateByPrimaryKeySelective(userInfoModel) > 0;
+        boolean result = userInfoModelMapper.updateByPrimaryKeySelective(userInfoModel) > 0;
+        if(result){
+            // 删除账户表记录
+            accountService.deleteAccount(userId);
+            RedisUtil.delMapField(UserConstant.REDIS_USER_INFO_KEY, userId.toString());
+        }
+        return result;
+    }
+
+    public boolean batchDeleteUserInfo(List<Long> userIds) throws BizException {
+        Assert.notEmpty(userIds,"用户id不能为空！");
+        // 逻辑删除账户信息
+        UserInfoModel userInfoModel = new UserInfoModel();
+        userInfoModel.setIsDelete(UserConstant.USER_DELETEED_TRUE);
+        boolean result = userInfoModelMapper.updateUserInfoByUserIds(userInfoModel, userIds) > 0;
+        if(result) {
+            // 删除账户表记录
+            accountService.batchDeleteAccount(userIds);
+            for(Long userId : userIds){
+                RedisUtil.delMapField(UserConstant.REDIS_USER_INFO_KEY, userId.toString());
+            }
+        }
+        return result;
     }
 
 

@@ -3,11 +3,18 @@ package com.shsnc.base.user.model;
 public class UserInfoCondition {
 
     private Long userId;
+
     private String username;
+
     private String alias;
+
     private String mobile;
-    private Integer internal;
+
+    private String email;
+
     private Integer status;
+
+    private Long createTime;
 
     public Long getUserId() {
         return userId;
@@ -22,7 +29,7 @@ public class UserInfoCondition {
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.username = username == null ? null : username.trim();
     }
 
     public String getAlias() {
@@ -30,7 +37,7 @@ public class UserInfoCondition {
     }
 
     public void setAlias(String alias) {
-        this.alias = alias;
+        this.alias = alias == null ? null : alias.trim();
     }
 
     public String getMobile() {
@@ -38,15 +45,15 @@ public class UserInfoCondition {
     }
 
     public void setMobile(String mobile) {
-        this.mobile = mobile;
+        this.mobile = mobile == null ? null : mobile.trim();
     }
 
-    public Integer getInternal() {
-        return internal;
+    public String getEmail() {
+        return email;
     }
 
-    public void setInternal(Integer internal) {
-        this.internal = internal;
+    public void setEmail(String email) {
+        this.email = email == null ? null : email.trim();
     }
 
     public Integer getStatus() {
@@ -55,5 +62,13 @@ public class UserInfoCondition {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
     }
 }

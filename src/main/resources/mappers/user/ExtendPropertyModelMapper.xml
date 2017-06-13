@@ -99,8 +99,10 @@
 
     <sql id="conditionSql">
         <where>
-            <if test="condition.propertyName != null and condition.propertyName != ''">
-                INSTR(property_name,#{condition.propertyName})>0
+            <if test="condition != null">
+                <if test="condition.propertyName != null and condition.propertyName != ''">
+                    INSTR(property_name,#{condition.propertyName})>0
+                </if>
             </if>
         </where>
     </sql>
