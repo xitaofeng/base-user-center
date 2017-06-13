@@ -1,6 +1,7 @@
 package com.shsnc.base.user.mapper;
 
 import com.shsnc.base.user.model.AccountModel;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -22,4 +23,6 @@ public interface AccountModelMapper {
     Long getUserIdByAccountName(String accountName);
 
     int deleteByUserId(Long userId);
+
+    int deleteByUserIds(@Param("userIds") List<Long> userIds);
 }

@@ -46,6 +46,15 @@
         WHERE
             user_id = #{userId}
     </delete>
+    <delete id="deleteByUserIds">
+        DELETE FROM
+            user_account
+        WHERE
+            user_id IN
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
+    </delete>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="accountId">
         INSERT INTO user_account (

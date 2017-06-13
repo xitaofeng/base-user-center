@@ -1,6 +1,7 @@
 package com.shsnc.base.user.handler;
 
 import com.shsnc.api.core.RequestHandler;
+import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
@@ -12,10 +13,10 @@ import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -23,6 +24,7 @@ import java.util.List;
  */
 @Component
 @RequestMapper("/user/extendProperty")
+@LoginRequired
 public class ExtendPropertyHandler implements RequestHandler {
 
     @Autowired
@@ -37,12 +39,15 @@ public class ExtendPropertyHandler implements RequestHandler {
     @RequestMapper("/getPage")
     public QueryData page(ExtendPropertyCondition condition, Pagination pagination){
         QueryData queryData = extendPropertyService.getExtendPropertyPage(condition, pagination);
-        queryData.setDataList(JsonUtil.convert(queryData.getDataList(),List.class,ExtendProperty.class));
+        if(queryData.getDataList().size() > 0){
+            queryData.setDataList(JsonUtil.convert(queryData.getDataList(),List.class,ExtendProperty.class));
+        }
         return queryData;
     }
 
     @RequestMapper("/getObject")
-    public ExtendProperty getObject(@NotEmpty Long propertyId) throws BizException {
+    @Validate
+    public ExtendProperty getObject(@NotNull Long propertyId) throws BizException {
         ExtendPropertyModel extendPropertyModel = extendPropertyService.getExtendProperty(propertyId);
         return JsonUtil.convert(extendPropertyModel, ExtendProperty.class);
     }
@@ -63,7 +68,7 @@ public class ExtendPropertyHandler implements RequestHandler {
 
     @RequestMapper("/delete")
     @Validate
-    public boolean delete(@NotEmpty Long propertyId) throws BizException {
+    public boolean delete(@NotNull Long propertyId) throws BizException {
         return extendPropertyService.deleteExtendProperty(propertyId);
     }
 
