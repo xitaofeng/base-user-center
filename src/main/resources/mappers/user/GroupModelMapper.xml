@@ -199,7 +199,7 @@
     </select>
     <select id="getNodeList" resultMap="BaseResultMap">
         SELECT ug.*,ugs.ancestor_id parent_id
-        FROM user_groups ug
+        FROM user_group ug
         JOIN (
             SELECT ancestor_id,descendant_id
             FROM user_group_structure

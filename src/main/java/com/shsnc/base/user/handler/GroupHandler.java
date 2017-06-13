@@ -36,7 +36,7 @@ public class GroupHandler implements RequestHandler {
         return queryData;
     }
 
-    @RequestMapper("/getObjet")
+    @RequestMapper("/getObject")
     @Validate
     public Group getObjet(@NotNull Long groupId) throws BizException {
         GroupModel groupModel = groupService.getGroup(groupId);
