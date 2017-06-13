@@ -239,6 +239,8 @@ public class UserInfoService {
             exist.setMobile(mobile);
             exist = existUserInfo(exist);
             Assert.isTrue(exist == null || exist.getUserId().equals (userId), "该手机号已被使用！");
+        } else{
+            userInfoModel.setMobile("");
         }
     }
 
@@ -258,6 +260,8 @@ public class UserInfoService {
             exist.setEmail(email);
             exist = existUserInfo(exist);
             Assert.isTrue(exist == null || exist.getUserId().equals (userId),"该邮箱已经被使用！");
+        } else {
+            userInfoModel.setEmail("");
         }
     }
 

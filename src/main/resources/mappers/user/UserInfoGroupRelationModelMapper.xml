@@ -26,7 +26,7 @@
 
     <delete id="deleteByUserId">
         DELETE FROM user_info_group_relation
-        WHERE relation_id = #{userId}
+        WHERE user_id = #{userId}
     </delete>
 
     <delete id="deleteByGroupId">

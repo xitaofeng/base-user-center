@@ -36,7 +36,7 @@
     </delete>
 
     <delete id="deleteGroupAndChildren">
-        DELETE FROM user_groups WHERE group_id IN (SELECT descendant_id FROM user_group_structure WHERE ancestor_id=#{groupId})
+        DELETE FROM user_group WHERE group_id IN (SELECT descendant_id FROM user_group_structure WHERE ancestor_id=#{groupId})
     </delete>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="groupId">
