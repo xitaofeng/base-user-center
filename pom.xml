@@ -17,7 +17,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <base-api-core.version>1.1.0-SNAPSHOT</base-api-core.version>
+        <base-api-core.version>1.2.0-SNAPSHOT</base-api-core.version>
     </properties>
     <dependencies>
         <!-- rf -->
@@ -210,7 +210,7 @@
                         <configuration>
                             <fromDir>target/${project.artifactId}</fromDir>
                             <url>scp://root:123456@192.168.11.60/root/project/user-center</url>
-                            <excludes>config/*, lib/*</excludes>
+                            <excludes>config/*</excludes>
                             <commands>
                                 <!-- 杀死原来的进程 -->
                                 <command>pkill -f ${project.artifactId}.jar</command>
