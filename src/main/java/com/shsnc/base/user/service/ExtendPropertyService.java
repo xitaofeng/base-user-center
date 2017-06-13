@@ -75,13 +75,22 @@ public class ExtendPropertyService {
     /**
      * 删除某个属性
      * @param propertyId 属性id
-     * @return  删除成功返回true，否则false
+     * @return  有数据更新返回ture，否则false
      */
     public boolean deleteExtendProperty(Long propertyId) throws BizException {
         Assert.notNull(propertyId, "属性id不能为空！");
         return extendPropertyModelMapper.deleteByPrimaryKey(propertyId)>0;
     }
 
+    /**
+     * 批量删除属性
+     * @param propertyIds 属性id集合
+     * @return 有数据更新返回ture，否则false
+     */
+    public boolean batchDeleteExtendProperty(List<Long> propertyIds) throws BizException {
+        Assert.notEmpty(propertyIds, "属性id不能为空！");
+        return extendPropertyModelMapper.deleteByPropertyIds(propertyIds);
+    }
     /**
      * 校验属性名称
      * @param extendPropertyModel 属性名称
@@ -97,7 +106,7 @@ public class ExtendPropertyService {
         exist.setPropertyName(propertyName);
         exist = extendPropertyModelMapper.existExtendProperty(exist);
 
-        Assert.isTrue(exist == null || exist.getPropertyId().equals(extendPropertyModel.getPropertyId()), "属性名称格式错误！");
+        Assert.isTrue(exist == null || exist.getPropertyId().equals(extendPropertyModel.getPropertyId()), "属性名称已经存在！");
 
     }
 

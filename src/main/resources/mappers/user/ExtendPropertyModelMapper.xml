@@ -23,6 +23,13 @@
         DELETE FROM user_extend_property
         WHERE property_id = #{propertyId}
     </delete>
+    <delete id="deleteByPropertyIds">
+        DELETE FROM user_extend_property
+        WHERE property_id IN
+        <foreach collection="propertyIds" item="propertyId" open="(" close=")" separator=",">
+            #{propertyId}
+        </foreach>
+    </delete>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="propertyId">
         INSERT INTO user_extend_property (property_name,description)
