@@ -36,7 +36,7 @@
         SELECT
           <include refid="BaseColumn"/>
         FROM user_info
-        WHERE user_id = #{userId}
+        WHERE user_id = #{userId} AND is_delete = 1
     </select>
 
     <delete id="deleteByPrimaryKey">
@@ -227,6 +227,7 @@
         SELECT
             <include refid="BaseColumn"/>
         FROM user_info
+        WHERE is_delete = 1
     </select>
 
     <select id="existUserInfo" resultMap="BaseResultMap">
@@ -250,7 +251,7 @@
     <select id="getUserIdsByUserIds" resultType="java.lang.Long">
         SELECT user_id
         FROM user_info
-        WHERE user_id IN
+        WHERE is_delete = 1 AND user_id IN
         <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
             #{userId}
         </foreach>
@@ -272,9 +273,10 @@
 
     <sql id="conditionSql">
         <where>
+            is_delete = 1
             <if test="condition != null">
                 <if test="condition.username != null and condition.username != ''">
-                    INSTR(username,#{condition.username})>0
+                    AND INSTR(username,#{condition.username})>0
                 </if>
                 <if test="condition.alias != null and condition.alias != ''">
                     AND INSTR(alias,#{condition.alias})>0

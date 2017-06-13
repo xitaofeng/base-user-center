@@ -7,6 +7,7 @@ import com.shsnc.base.user.model.AccountModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.support.Assert;
 import com.shsnc.base.util.config.BizException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,19 +33,19 @@ public class AccountService {
         AccountModel accountModel = new AccountModel();
         accountModel.setUserId(userInfoModel.getUserId());
         String username = userInfoModel.getUsername();
-        if(username != null){
+        if(StringUtils.isNotEmpty(username)){
             accountModel.setAccountName(username);
             accountModel.setAccountType(UserConstant.ACCOUNT_TYPE_USERNAME);
             accountModelMapper.insert(accountModel);
         }
         String mobile = userInfoModel.getMobile();
-        if(mobile != null){
+        if(StringUtils.isNotEmpty(mobile)){
             accountModel.setAccountName(mobile);
             accountModel.setAccountType(UserConstant.ACCOUNT_TYPE_MOBILE);
             accountModelMapper.insert(accountModel);
         }
         String email = userInfoModel.getEmail();
-        if(email != null){
+        if(StringUtils.isNotEmpty(email)){
             accountModel.setAccountName(email);
             accountModel.setAccountType(UserConstant.ACCOUNT_TYPE_EMAIL);
             accountModelMapper.insert(accountModel);
@@ -62,6 +63,7 @@ public class AccountService {
         }
         AccountModel accountModel = null;
         String username = userInfoModel.getUsername();
+        Long userId = userInfoModel.getUserId();
         if(username != null){
             accountModel = accountModelMap.get(UserConstant.ACCOUNT_TYPE_USERNAME);
             if(accountModel != null){
@@ -71,6 +73,7 @@ public class AccountService {
                 }
             } else {
                 accountModel = new AccountModel();
+                accountModel.setUserId(userId);
                 accountModel.setAccountName(username);
                 accountModel.setAccountType(UserConstant.ACCOUNT_TYPE_USERNAME);
                 accountModelMapper.insert(accountModel);
@@ -85,6 +88,8 @@ public class AccountService {
                     accountModelMapper.updateByPrimaryKey(accountModel);
                 }
             } else {
+                accountModel = new AccountModel();
+                accountModel.setUserId(userId);
                 accountModel.setAccountName(mobile);
                 accountModel.setAccountType(UserConstant.ACCOUNT_TYPE_MOBILE);
                 accountModelMapper.insert(accountModel);
@@ -99,6 +104,8 @@ public class AccountService {
                     accountModelMapper.updateByPrimaryKey(accountModel);
                 }
             } else {
+                accountModel = new AccountModel();
+                accountModel.setUserId(userId);
                 accountModel.setAccountName(email);
                 accountModel.setAccountType(UserConstant.ACCOUNT_TYPE_EMAIL);
                 accountModelMapper.insert(accountModel);
@@ -117,7 +124,7 @@ public class AccountService {
         Long userId = accountModelMapper.getUserIdByAccountName(account);
         Assert.notNull(userId, "账户名不存在！");
 
-        UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
+        UserInfoModel userInfoModel = userInfoModelMapper.getByUserId(userId);
         Assert.notNull(userInfoModel, "用户不存在！");
         return userInfoModel;
     }

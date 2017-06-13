@@ -8,7 +8,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public interface UserInfoModelMapper {
 
@@ -32,7 +31,8 @@ public interface UserInfoModelMapper {
 
     int updateUserInfoByUserIds(@Param("userInfoModel") UserInfoModel userInfoModel, @Param("userIds") Collection<Long> userIds);
 
-    int getTotalCountByCondition(UserInfoCondition condition);
+    int getTotalCountByCondition(@Param("condition") UserInfoCondition condition);
 
     List<ExtendPropertyModel> getPageByCondition(@Param("condition") UserInfoCondition condition, @Param("pagination") Pagination pagination);
+
 }
