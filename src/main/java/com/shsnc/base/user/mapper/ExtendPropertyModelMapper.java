@@ -32,4 +32,6 @@ public interface ExtendPropertyModelMapper {
     List<ExtendPropertyModel> getExtendPropertyList();
 
     List<Long> getPropertyIdsByPropertyIds(@Param("propertyIds") Collection<Long> propertyIds);
+
+    boolean deleteByPropertyIds(@Param("propertyIds") List<Long> propertyIds);
 }

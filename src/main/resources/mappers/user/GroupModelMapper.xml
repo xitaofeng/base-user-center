@@ -197,7 +197,7 @@
         <include refid="orderSql"/>
         <include refid="pageSql"/>
     </select>
-    <select id="getNodeList" resultMap="BaseResultMap">
+    <select id="getGroupNodeList" resultMap="BaseResultMap">
         SELECT ug.*,ugs.ancestor_id parent_id
         FROM user_group ug
         JOIN (
@@ -212,5 +212,10 @@
         </where>
 
 
+    </select>
+    <select id="getAllGroupIdsByUserId" resultType="java.lang.Long">
+        SELECT DISTINCT ugs.descendant_id
+        FROM user_info_group_relation ugr,user_group_structure ugs
+        WHERE ugr.group_id = ugs.ancestor_id AND ugr.user_id=#{userId}
     </select>
 </mapper>
