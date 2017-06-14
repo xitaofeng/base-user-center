@@ -35,5 +35,7 @@ public interface GroupModelMapper {
 
     List<ExtendPropertyModel> getPageByCondition(@Param("condition") GroupCondition condition, @Param("pagination") Pagination pagination);
 
-    List<GroupModel> getNodeList(@Param("parentId") Long parentId);
+    List<GroupModel> getGroupNodeList(@Param("parentId") Long parentId);
+
+    List<Long> getAllGroupIdsByUserId(Long userId);
 }
