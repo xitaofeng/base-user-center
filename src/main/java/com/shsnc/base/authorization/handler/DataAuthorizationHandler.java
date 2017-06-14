@@ -33,11 +33,14 @@ public class DataAuthorizationHandler implements RequestHandler {
         return dataAuthorizationService.userAuth(resourceType, userIdList, resourceIdList, propertyIdList);
     }
 
-
     @RequestMapper("/role")
     public boolean roleAuth(@NotNull Integer resourceType, @NotEmpty List<Long> roleIdList, @NotEmpty List<Long> resourceIdList, @NotEmpty List<Long> propertyIdList) throws BizException {
-        return dataAuthorizationService.roleAuth(resourceType,roleIdList,resourceIdList, propertyIdList);
+        return dataAuthorizationService.roleAuth(resourceType, roleIdList, resourceIdList, propertyIdList);
     }
 
+    @RequestMapper("/auth/value")
+    public Integer authValue(@NotNull Long userId, @NotNull Integer resourceType, @NotNull Long resourceId) throws BizException {
+        return dataAuthorizationService.getAuthValue(userId, resourceType, resourceId);
+    }
 
 }
