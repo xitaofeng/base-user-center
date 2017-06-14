@@ -54,5 +54,31 @@
         AND auth_value = #{authValue}
     </delete>
 
+    <select id="getUserDataAuthorization" resultType="com.shsnc.base.authorization.bean.UserDataAuthorization">
+        SELECT
+            b.resource_type,
+            b.resource_id,
+            SUM(p.property_value) property_value
+        FROM (
+                    SELECT
+                        resource_type,
+                        resource_id,
+                        property_id
+                    FROM authorization_resource_auth
+                    WHERE
+                    (auth_type = 1 AND auth_value = #{userId})
+                    <if test="roleIds != null and roleIds.size > 0">
+                     OR (auth_type = 2 AND auth_value IN
+                          <foreach collection="list" item="roleId" open="(" close=")">
+                             #{roleId}
+                          </foreach>
+                        )
+                    </if>
+                    GROUP BY resource_type,resource_id,property_id
+        ) b INNER JOIN
+        authorization_resource_property p ON b.property_id = p.id
+        GROUP BY resource_type,resource_id
+    </select>
+
 
 </mapper>

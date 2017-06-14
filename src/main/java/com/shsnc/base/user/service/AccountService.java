@@ -124,7 +124,7 @@ public class AccountService {
         Long userId = accountModelMapper.getUserIdByAccountName(account);
         Assert.notNull(userId, "账户名不存在！");
 
-        UserInfoModel userInfoModel = userInfoModelMapper.getByUserId(userId);
+        UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
         Assert.notNull(userInfoModel, "用户不存在！");
         return userInfoModel;
     }

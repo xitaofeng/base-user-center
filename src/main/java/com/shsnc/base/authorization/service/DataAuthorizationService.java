@@ -1,6 +1,7 @@
 package com.shsnc.base.authorization.service;
 
 import com.shsnc.base.authorization.bean.DataAuthorization;
+import com.shsnc.base.authorization.bean.UserDataAuthorization;
 import com.shsnc.base.authorization.config.BeanUtils;
 import com.shsnc.base.authorization.config.RedisConstants;
 import com.shsnc.base.authorization.config.RedisUtils;
@@ -33,6 +34,9 @@ public class DataAuthorizationService {
 
     @Autowired
     private AuthorizationResourceAuthModelMapper authorizationResourceAuthModelMapper;
+
+    @Autowired
+    private UserModuleService userModuleService;
 
     /**
      * 用户授权
@@ -86,8 +90,7 @@ public class DataAuthorizationService {
         if (CollectionUtils.isEmpty(dataAuthorizations)) {
             throw new BizException("选择授权的数据");
         }
-        for (int i = 0; i < dataAuthorizations.size(); i++) {
-            DataAuthorization dataAuthorization = dataAuthorizations.get(i);
+        for (DataAuthorization dataAuthorization : dataAuthorizations) {
             Integer resourceType = dataAuthorization.getResourceType();
             Integer authType = dataAuthorization.getAuthType(); //授权类型
             List<Long> resourceIdList = dataAuthorization.getResourceIdList();
@@ -113,7 +116,7 @@ public class DataAuthorizationService {
      */
     public Integer getAuthValue(Long userId, Integer resourceType, Long resourceId) {
         Integer authorizationValue = 0;
-        Map<String, String> dataAuthorizationMap = getDataAuthorization(resourceType, resourceId);
+        Map<String, String> dataAuthorizationMap = null;//getDataAuthorization(resourceType, resourceId);
         if (!CollectionUtils.isEmpty(dataAuthorizationMap)) {
             authorizationValue = new Integer(dataAuthorizationMap.get(userId.toString()));
         }
@@ -121,27 +124,27 @@ public class DataAuthorizationService {
     }
 
     /**
-     * 获取数据权限 数据
+     * 获取用户 所有的资源权限
      *
-     * @param resourceType
-     * @param resourceId
      * @return
      */
-    public Map<String, String> getDataAuthorization(Integer resourceType, Long resourceId) {
+    public Map<String, String> getDataAuthorization(Long userId) {
         Map<String, String> dataAuthorizationMap = new HashMap<>();
-        String resourceDataAuthorization = buildResourceDataAuthorizationKey(resourceType, resourceId);
+        String resourceDataAuthorizationKey = buildUserResourceDataAuthorizationKey(userId);
 
-        dataAuthorizationMap = RedisUtil.getMap(resourceDataAuthorization);
+        dataAuthorizationMap = RedisUtil.getMap(resourceDataAuthorizationKey);
 
         if (CollectionUtils.isEmpty(dataAuthorizationMap)) {
             //TODO 加载数据 map 数据格式 Map<userId,authorizationValue>
-            RedisUtil.saveMap(resourceDataAuthorization, dataAuthorizationMap);
+            List<Long> roleIds = userModuleService.getRoleIdsByUserId(userId);
+            List<UserDataAuthorization> userDataAuthorizations = authorizationResourceAuthModelMapper.getUserDataAuthorization(userId,roleIds);
+            RedisUtil.saveMap(resourceDataAuthorizationKey, dataAuthorizationMap);
         }
         return dataAuthorizationMap;
     }
 
     /**
-     * 构建资源数据权限key
+     * 构建资源用户权限(已资源为维度,资源有哪些用户权限)
      *
      * @param resourceType
      * @param resourceId
@@ -149,6 +152,16 @@ public class DataAuthorizationService {
      */
     private String buildResourceDataAuthorizationKey(Integer resourceType, Long resourceId) {
         return RedisUtils.buildRedisKey(RedisConstants.RESOURCE_DATA_AUTHORIZATION, resourceType.toString(), resourceId.toString());
+    }
+
+    /**
+     * 构建用户资源权限(已用户为维度,用户有哪些资源权限)
+     *
+     * @param userId
+     * @return
+     */
+    private String buildUserResourceDataAuthorizationKey(Long userId) {
+        return RedisUtils.buildRedisKey(RedisConstants.RESOURCE_DATA_AUTHORIZATION, userId.toString());
     }
 
     /**
@@ -165,25 +178,21 @@ public class DataAuthorizationService {
     private List<AuthorizationResourceAuthModel> buildAuthorizationResourceAuthModel(Integer resourceType, AuthorizationResourceAuthModel.EnumAuthType enumAuthType, List<Long> authValues, List<Long> propertyIds, List<Long> resourceIds) throws BizException {
         List<AuthorizationResourceAuthModel> authorizationResourceAuthModels = new ArrayList<>();
 
-        for (int i = 0; i < resourceIds.size(); i++) {
-            Long resourceId = resourceIds.get(i);
+        for (Long resourceId : resourceIds) {
             //清理redis 权限
             String resourceDataAuthorization = buildResourceDataAuthorizationKey(resourceType, resourceId);
             RedisUtil.remove(resourceDataAuthorization);
 
-            for (int k = 0; k < authValues.size(); k++) {
-                Long authValue = authValues.get(k);
-
+            for (Long authValue : authValues) {
                 //清理权限
                 deleteResourceDataAuthorization(enumAuthType, authValue, resourceType, resourceId);
 
-                for (int j = 0; j < propertyIds.size(); j++) {
-                    Long propertyId = propertyIds.get(j);
+                for (Long propertyId : propertyIds) {
                     //propertyId 继承权限查询
                     List<Long> ids = authorizationResourcePropertyService.getAuthorizationResourcePropertyModelPidById(propertyId);
 
-                    for (int l = 0; l < ids.size(); l++) {
-                        AuthorizationResourceAuthModel authorizationResourceAuthModel = AuthorizationResourceAuthModel.createAuthorizationResourceAuthModel(resourceType, resourceId, ids.get(l), enumAuthType, authValue);
+                    for (Long id : ids) {
+                        AuthorizationResourceAuthModel authorizationResourceAuthModel = AuthorizationResourceAuthModel.createAuthorizationResourceAuthModel(resourceType, resourceId, id, enumAuthType, authValue);
                         authorizationResourceAuthModels.add(authorizationResourceAuthModel);
                     }
                 }

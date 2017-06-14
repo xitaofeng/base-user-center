@@ -37,6 +37,9 @@ public class AuthorizationRoleRelationService {
     @Autowired
     private AuthorizationRoleModelMapper authorizationRoleModelMapper;
 
+    @Autowired
+    private UserModuleService userModuleService;
+
     /**
      * 批量插入数据返回 插入条数
      *
@@ -92,28 +95,11 @@ public class AuthorizationRoleRelationService {
         if (userId == null) {
             throw new BizException("选择用户");
         }
-        //return authorizationRoleRelationModelMapper.getAuthorizationIdByRoleId(roleId);
-        Set<Long> roleIds = new HashSet<>();//角色列表
 
-        //获取用户角色列表
-        List<Long> userRoleIds = authorizationUserRoleRelationModelMapper.getRoleIdByUserId(userId);
-        userRoleIds.forEach(roleId -> {
-            roleIds.add(roleId);
-        });
-        //TODO 根据当前用户获取所属 组
-        List<Long> groupIds = new ArrayList<>();//组列表
-
-        if (!CollectionUtils.isEmpty(groupIds)) {
-            List<Long> groupRoleIds = authorizationGroupRoleRelationModelMapper.getRoleIdByGroupIds(groupIds);
-            groupRoleIds.forEach(roleId -> {
-                roleIds.add(roleId);
-            });
-        }
+        List<Long> roleIds = userModuleService.getRoleIdsByUserId(userId);
 
         if (!CollectionUtils.isEmpty(roleIds)) {
-            List<Long> tempList = new ArrayList<Long>();
-            tempList.addAll(roleIds);
-            return authorizationRoleRelationModelMapper.getAuthorizationIdByRoleIds(tempList);
+            return authorizationRoleRelationModelMapper.getAuthorizationIdByRoleIds(roleIds);
         } else {
             return new ArrayList<>();
         }
