@@ -192,6 +192,6 @@ public class GroupService {
     }
 
     public List<GroupModel> getNodeList(Long parentId) {
-        return  groupModelMapper.getNodeList(parentId);
+        return  groupModelMapper.getGroupNodeList(parentId);
     }
 }

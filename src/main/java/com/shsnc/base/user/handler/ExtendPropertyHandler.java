@@ -13,6 +13,7 @@ import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -70,6 +71,11 @@ public class ExtendPropertyHandler implements RequestHandler {
     @Validate
     public boolean delete(@NotNull Long propertyId) throws BizException {
         return extendPropertyService.deleteExtendProperty(propertyId);
+    }
+    @RequestMapper("/batchDelete")
+    @Validate
+    public boolean batchDelete(@NotEmpty List<Long> propertyIds) throws BizException {
+        return extendPropertyService.batchDeleteExtendProperty(propertyIds);
     }
 
 }
