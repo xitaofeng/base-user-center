@@ -1,7 +1,6 @@
 package com.shsnc.base.authorization.mapper;
 
 import com.shsnc.base.authorization.model.AuthorizationInfoModel;
-import com.sun.xml.internal.txw2.annotation.XmlNamespace;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
