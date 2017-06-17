@@ -256,18 +256,16 @@
             #{userId}
         </foreach>
     </select>
+
     <sql id="pageSql">
         <if test="pagination != null" >
-            LIMIT #{pagination.start}, #{pagination.pageSize}
+            LIMIT #{pagination.start}, #{pagination.pagesize}
         </if>
     </sql>
 
     <sql id="orderSql">
-        <if test="pagination != null and pagination.orderField != null and pagination.orderField != ''">
-            ORDER BY #{pagination.orderField}
-            <if test="pagination.orderType != null and pagination.orderType!=''">
-                #{pagination.orderType}
-            </if>
+        <if test="pagination != null and pagination.sorting != null">
+            ORDER BY #{pagination.sorting}
         </if>
     </sql>
 
@@ -288,7 +286,7 @@
                     AND INSTR(email,#{condition.email})>0
                 </if>
                 <if test="condition.status != null">
-                    AND status=#{status}
+                    AND status=#{condition.status}
                 </if>
             </if>
         </where>

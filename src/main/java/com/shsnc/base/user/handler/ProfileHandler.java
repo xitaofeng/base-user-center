@@ -4,10 +4,7 @@ import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.ThreadContext;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
-import com.shsnc.base.user.bean.ExtendPropertyValue;
-import com.shsnc.base.user.bean.Group;
-import com.shsnc.base.user.bean.UserInfo;
-import com.shsnc.base.user.bean.UserInfoParam;
+import com.shsnc.base.user.bean.*;
 import com.shsnc.base.user.model.ExtendPropertyValueModel;
 import com.shsnc.base.user.model.GroupModel;
 import com.shsnc.base.user.model.UserInfoModel;
@@ -35,8 +32,8 @@ public class ProfileHandler implements RequestHandler {
     @Autowired
     private GroupService groupService;
 
-    @RequestMapper("getObject")
-    public UserInfo getObject() throws BizException {
+    @RequestMapper("getInfo")
+    public UserInfo getInfo() throws BizException {
         Long userId = ThreadContext.getUserInfo().getUserId();
         UserInfoModel userInfoModel = userInfoService.getUserInfo(userId);
         return JsonUtil.convert(userInfoModel,UserInfo.class);
@@ -80,4 +77,8 @@ public class ProfileHandler implements RequestHandler {
             throw new BizException("原登陆密码错误！");
         }
     }
+
+
+    private String[][] filedMapping = {{"userName","user_name"},{"userType","user_type"}};
+
 }

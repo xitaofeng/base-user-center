@@ -59,14 +59,11 @@ public class UserInfoService {
     }
 
     public QueryData getUserInfoPage(UserInfoCondition condition, Pagination pagination) {
-        QueryData queryData = new QueryData();
-        queryData.setPageSize(pagination.getPageSize());
-        queryData.setCurrPage(pagination.getCurrentPage());
+        QueryData queryData = new QueryData(pagination);
         int totalCount = userInfoModelMapper.getTotalCountByCondition(condition);
-        queryData.setTotalCount(totalCount);
-        queryData.build();
+        queryData.setRowCount(totalCount);
         List<ExtendPropertyModel> list = userInfoModelMapper.getPageByCondition(condition, pagination);
-        queryData.setDataList(list);
+        queryData.setRecords(list);
         return queryData;
     }
 
@@ -89,7 +86,7 @@ public class UserInfoService {
         accountService.addAccount(userInfoModel);
 
         // 关联用户组
-        if(groupIds != null){
+        if(CollectionUtils.isNotEmpty(groupIds)){
             userInfoGroupRelationService.batchAddUserInfoGroupRelation(userInfoModel.getUserId(), groupIds);
         }
 
