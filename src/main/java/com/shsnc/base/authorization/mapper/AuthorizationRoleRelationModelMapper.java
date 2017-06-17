@@ -16,7 +16,7 @@ public interface AuthorizationRoleRelationModelMapper {
      * @param authorizationRoleRelationModel
      * @return
      */
-    public Integer addAuthorizationRoleRelationModel(AuthorizationRoleRelationModel authorizationRoleRelationModel);
+    public int addAuthorizationRoleRelationModel(AuthorizationRoleRelationModel authorizationRoleRelationModel);
 
     /**
      * 批量插入数据返回 插入条数

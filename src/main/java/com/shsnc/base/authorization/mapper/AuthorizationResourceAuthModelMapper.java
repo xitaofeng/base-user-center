@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface AuthorizationResourceAuthModelMapper {
 
-    Long addAuthorizationResourceAuthModel(AuthorizationResourceAuthModel authorizationResourceAuthModel);
+    int addAuthorizationResourceAuthModel(AuthorizationResourceAuthModel authorizationResourceAuthModel);
 
     Integer addBatchAuthorizationResourceAuthModel(List<AuthorizationResourceAuthModel> authorizationResourceAuthModels);
 

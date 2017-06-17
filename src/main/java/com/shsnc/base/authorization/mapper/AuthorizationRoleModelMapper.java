@@ -16,7 +16,7 @@ public interface AuthorizationRoleModelMapper {
      * @param authorizationRoleModel
      * @return
      */
-    public Integer addAuthorizationRoleModel(AuthorizationRoleModel authorizationRoleModel);
+    public int addAuthorizationRoleModel(AuthorizationRoleModel authorizationRoleModel);
 
     /**
      * 编辑权限角色信息 返回数据编辑成功数据条数

@@ -28,7 +28,7 @@ public class AuthorizationRoleHandler implements RequestHandler {
 
     @RequestMapper("/add")
     @Validate
-    public Integer addAuthorizationRoleModel(@NotNull String roleName, String description, Integer orders) throws Exception {
+    public Long addAuthorizationRoleModel(@NotNull String roleName, String description, Integer orders) throws Exception {
         AuthorizationRoleModel authorizationRoleModel = new AuthorizationRoleModel();
         authorizationRoleModel.setRoleName(roleName);
         authorizationRoleModel.setDescription(description);

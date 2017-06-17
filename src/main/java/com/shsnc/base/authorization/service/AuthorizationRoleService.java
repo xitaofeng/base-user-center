@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import sun.rmi.runtime.Log;
 
 import java.util.Date;
 import java.util.List;
@@ -41,7 +42,7 @@ public class AuthorizationRoleService {
      * @return
      * @throws Exception
      */
-    public Integer addAuthorizationRoleModel(AuthorizationRoleModel authorizationRoleModel) throws Exception {
+    public Long addAuthorizationRoleModel(AuthorizationRoleModel authorizationRoleModel) throws Exception {
         if (isRoleName(authorizationRoleModel)) {
             throw new BizException("角色名称重复");
         }
@@ -52,9 +53,9 @@ public class AuthorizationRoleService {
             authorizationRoleModel.setOrders(1);
         }
         authorizationRoleModel.setCreateTime(System.currentTimeMillis());
-        Integer roleId = authorizationRoleModelMapper.addAuthorizationRoleModel(authorizationRoleModel);
-        if (roleId != null) {
-            return roleId;
+        int count = authorizationRoleModelMapper.addAuthorizationRoleModel(authorizationRoleModel);
+        if (count > 0) {
+            return authorizationRoleModel.getRoleId();
         } else {
             throw new BizException("角色添加失败");
         }
@@ -105,8 +106,8 @@ public class AuthorizationRoleService {
             for (int i = 0; i < roleIdList.size(); i++) {
                 Long roleId = roleIdList.get(i);
                 AuthorizationRoleModel authorizationRoleModel = authorizationRoleModelMapper.getByRoleId(roleId);
-                if(authorizationRoleModel != null){
-                    if (AuthorizationRoleModel.EnumIsBuilt.TRUE.getValue() == authorizationRoleModel.getIsBuilt()){
+                if (authorizationRoleModel != null) {
+                    if (AuthorizationRoleModel.EnumIsBuilt.TRUE.getValue() == authorizationRoleModel.getIsBuilt()) {
                         throw new BizException("内置数据不支持删除");
                     }
                     if (!CollectionUtils.isEmpty(authorizationUserRoleRelationModelMapper.getUserIdByRoleId(roleId))) {
@@ -117,7 +118,7 @@ public class AuthorizationRoleService {
                         String roleName = authorizationRoleModel.getRoleName();
                         throw new BizException("角色【" + roleName + "】存在使用的用户组");
                     }
-                }else{
+                } else {
                     throw new BizException("无效数据");
                 }
             }
