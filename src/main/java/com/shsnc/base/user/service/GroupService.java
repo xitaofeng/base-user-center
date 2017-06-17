@@ -180,14 +180,11 @@ public class GroupService {
     }
 
     public QueryData getGroupPage(GroupCondition condition, Pagination pagination) {
-        QueryData queryData = new QueryData();
-        queryData.setPageSize(pagination.getPageSize());
-        queryData.setCurrPage(pagination.getCurrentPage());
+        QueryData queryData = new QueryData(pagination);
         int totalCount = groupModelMapper.getTotalCountByCondition(condition);
-        queryData.setTotalCount(totalCount);
-        queryData.build();
+        queryData.setRowCount(totalCount);
         List<ExtendPropertyModel> list = groupModelMapper.getPageByCondition(condition, pagination);
-        queryData.setDataList(list);
+        queryData.setRecords(list);
         return queryData;
     }
 

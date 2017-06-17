@@ -29,14 +29,11 @@ public class ExtendPropertyService {
      * @return 返回分页数据
      */
     public QueryData getExtendPropertyPage(ExtendPropertyCondition condition, Pagination pagination){
-        QueryData queryData = new QueryData();
-        queryData.setPageSize(pagination.getPageSize());
-        queryData.setCurrPage(pagination.getCurrentPage());
+        QueryData queryData = new QueryData(pagination);
         int totalCount = extendPropertyModelMapper.getTotalCountByCondition(condition);
-        queryData.setTotalCount(totalCount);
-        queryData.build();
+        queryData.setRowCount(totalCount);
         List<ExtendPropertyModel> list = extendPropertyModelMapper.getPageByCondition(condition, pagination);
-        queryData.setDataList(list);
+        queryData.setRecords(list);
         return queryData;
     }
 

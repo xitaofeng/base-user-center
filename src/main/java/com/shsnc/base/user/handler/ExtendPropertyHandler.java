@@ -36,14 +36,12 @@ public class ExtendPropertyHandler implements RequestHandler {
         List<ExtendPropertyModel> extendPropertyList = extendPropertyService.getExtendPropertyList();
         return JsonUtil.convert(extendPropertyList, List.class, ExtendProperty.class) ;
     }
-
+    private  String[][] mapping = {{"propertyName","property_name"}};
     @RequestMapper("/getPage")
-    public QueryData page(ExtendPropertyCondition condition, Pagination pagination){
+    public QueryData getPage(ExtendPropertyCondition condition, Pagination pagination){
+        pagination.buildSort(mapping);
         QueryData queryData = extendPropertyService.getExtendPropertyPage(condition, pagination);
-        if(queryData.getDataList().size() > 0){
-            queryData.setDataList(JsonUtil.convert(queryData.getDataList(),List.class,ExtendProperty.class));
-        }
-        return queryData;
+        return queryData.convert(ExtendProperty.class);
     }
 
     @RequestMapper("/getObject")

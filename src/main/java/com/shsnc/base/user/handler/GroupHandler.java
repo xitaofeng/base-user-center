@@ -29,11 +29,13 @@ public class GroupHandler implements RequestHandler {
     @Autowired
     private GroupService groupService;
 
+    private String[][] fieldMapping = {{"name","name"},{"code","code"},{"status","status"}};
+
     @RequestMapper("/getPage")
     public QueryData getPage(GroupCondition condition, Pagination pagination){
+        pagination.buildSort(fieldMapping);
         QueryData queryData = groupService.getGroupPage(condition,pagination);
-        queryData.setDataList(JsonUtil.convert(queryData.getDataList(),List.class,Group.class));
-        return queryData;
+        return queryData.convert(Group.class);
     }
 
     @RequestMapper("/getObject")
