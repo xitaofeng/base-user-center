@@ -96,11 +96,8 @@
     </sql>
 
     <sql id="orderSql">
-        <if test="pagination != null and pagination.orderField != null and pagination.orderField != ''">
-            ORDER BY #{pagination.orderField}
-            <if test="pagination.orderType != null and pagination.orderType!=''">
-                #{pagination.orderType}
-            </if>
+        <if test="pagination != null and pagination.sorting != null">
+            ORDER BY #{pagination.sorting}
         </if>
     </sql>
 
