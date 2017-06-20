@@ -149,17 +149,6 @@
             user_group ug, user_info_group_relation ugr
         WHERE ug.group_id=ugr.group_id AND ug.status=1 AND ugr.user_id=#{userId}
     </select>
-    <sql id="pageSql">
-        <if test="pagination != null" >
-            LIMIT #{pagination.start}, #{pagination.pagesize}
-        </if>
-    </sql>
-
-    <sql id="orderSql">
-        <if test="pagination != null and pagination.sorting != null">
-            ORDER BY #{pagination.sorting}
-        </if>
-    </sql>
 
     <sql id="conditionSql">
         <where>
@@ -191,8 +180,8 @@
             <include refid="BaseColumn"/>
         FROM user_group
         <include refid="conditionSql"/>
-        <include refid="orderSql"/>
-        <include refid="pageSql"/>
+        <include refid="Sql.orderSql"/>
+        <include refid="Sql.pageSql"/>
     </select>
     <select id="getGroupNodeList" resultMap="BaseResultMap">
         SELECT ug.*,ugs.ancestor_id parent_id
