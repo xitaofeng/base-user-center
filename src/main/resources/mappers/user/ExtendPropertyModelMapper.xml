@@ -91,7 +91,7 @@
 
     <sql id="pageSql">
         <if test="pagination != null" >
-            LIMIT #{pagination.start}, #{pagination.pageSize}
+            LIMIT #{pagination.start}, #{pagination.pagesize}
         </if>
     </sql>
 

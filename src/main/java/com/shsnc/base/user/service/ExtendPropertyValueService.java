@@ -1,6 +1,5 @@
 package com.shsnc.base.user.service;
 
-import com.shsnc.base.user.bean.ExtendPropertyValue;
 import com.shsnc.base.user.mapper.ExtendPropertyModelMapper;
 import com.shsnc.base.user.mapper.ExtendPropertyValueMapper;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;
@@ -12,10 +11,7 @@ import com.shsnc.base.util.config.BizException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by houguangqiang on 2017/6/8.
@@ -57,7 +53,7 @@ public class ExtendPropertyValueService {
      * @return 返回新增记录id列表
      * @throws BizException 业务异常
      */
-    public List<Long> batchAddExtendPropertyValue(List<ExtendPropertyValueModel> extendPropertyValueModels) throws BizException {
+    public boolean batchAddExtendPropertyValue(List<ExtendPropertyValueModel> extendPropertyValueModels) throws BizException {
         Assert.notEmpty(extendPropertyValueModels);
         Set<Long> propertyIds = new HashSet<>();
         Set<Long> userIds = new HashSet<>();
@@ -73,14 +69,25 @@ public class ExtendPropertyValueService {
         }
         List<Long> dbUserIds = userInfoModelMapper.getUserIdsByUserIds(userIds);
         Assert.isTrue(dbUserIds.size() == userIds.size(),"含有不存在的用户id！");
+
         List<Long> dbPropertyIds = extendPropertyModelMapper.getPropertyIdsByPropertyIds(propertyIds);
         Assert.isTrue(dbPropertyIds.size() == propertyIds.size(), "含有不存在的属性id！");
-        extendPropertyValueMapper.insertExtendPropertyValueList(extendPropertyValueModels);
-        List<Long> ids = new ArrayList<>();
+
+        List<ExtendPropertyValueModel> dbExtendPropertyValueModels = extendPropertyValueMapper.getPropertyByUserIds(userIds);
+        Map<Long,ExtendPropertyValueModel> dbExtendPropertyValueModelsMap = new HashMap<>();
         for (ExtendPropertyValueModel extendPropertyValueModel : extendPropertyValueModels){
-            ids.add(extendPropertyValueModel.getPropertyValueId());
+            ExtendPropertyValueModel dbExtendPropertyValueModel = extendPropertyValueMapper.getByUserIdAndPropertyId(extendPropertyValueModel.getUserId(),extendPropertyValueModel.getPropertyId());
+            if(dbExtendPropertyValueModel != null){
+                if(!dbExtendPropertyValueModel.getPropertyValue().equals(extendPropertyValueModel.getPropertyValue())){
+                    dbExtendPropertyValueModel.setPropertyValue(extendPropertyValueModel.getPropertyValue());
+                    extendPropertyValueMapper.updateByPrimaryKeySelective(dbExtendPropertyValueModel);
+                }
+            } else {
+                extendPropertyValueMapper.insertSelective(extendPropertyValueModel);
+            }
         }
-        return ids;
+
+        return true;
     }
 
     /**

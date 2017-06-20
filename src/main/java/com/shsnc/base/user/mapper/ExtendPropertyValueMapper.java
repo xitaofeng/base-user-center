@@ -3,6 +3,7 @@ package com.shsnc.base.user.mapper;
 import com.shsnc.base.user.model.ExtendPropertyValueModel;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface ExtendPropertyValueMapper {
@@ -21,4 +22,10 @@ public interface ExtendPropertyValueMapper {
     List<ExtendPropertyValueModel> findExtendPropertyValueList(ExtendPropertyValueModel extendPropertyValueModel);
 
     int insertExtendPropertyValueList(@Param("extendPropertyValueModels") List<ExtendPropertyValueModel> extendPropertyValueModels);
+
+    List<Long> getPropertyIdByUserIds(@Param("userIds") Collection<Long> userIds);
+
+    List<ExtendPropertyValueModel> getPropertyByUserIds(@Param("userIds") Collection<Long> userIds);
+
+    ExtendPropertyValueModel getByUserIdAndPropertyId(@Param("userId") Long userId, @Param("propertyValueId") Long propertyValueId);
 }
