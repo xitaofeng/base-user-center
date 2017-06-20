@@ -38,14 +38,14 @@ public class UserInfoHandler implements RequestHandler {
     @Autowired
     private ExtendPropertyValueService extendPropertyValueService;
 
-    private String[][] filedMapping=  {{"username","username"},{"alias","alias"},{"mobile","mobile"},{"email","email"},{"status","status"}};
+    private String[][] filedMapping=  {{"userId","user_id"},{"username","username"},{"alias","alias"},{"mobile","mobile"},{"email","email"},{"status","status"}};
 
     @RequestMapper("/getPage")
     @Authentication("BASE_USER_INFO_GET_PAGE")
     public QueryData getPage(UserInfoCondition condition, Pagination pagination){
         pagination.buildSort(filedMapping);
         QueryData queryData = userInfoService.getUserInfoPage(condition, pagination);
-        return queryData.convert(UserInfo.class);
+        return queryData;
     }
 
     @RequestMapper("/getObject")
