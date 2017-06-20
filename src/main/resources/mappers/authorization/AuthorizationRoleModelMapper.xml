@@ -6,7 +6,15 @@
     <!-- 表名用变量表示 -->
     <sql id="tableName">authorization_role</sql>
 
-    <sql id="Base_Column">
+    <resultMap id="BaseResultMap" type="com.shsnc.base.authorization.model.AuthorizationRoleModel">
+        <id column="role_id" jdbcType="BIGINT" property="roleId"/>
+        <result column="role_name" jdbcType="VARCHAR" property="roleName"/>
+        <result column="is_built" jdbcType="CHAR" property="isBuilt"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="create_time" jdbcType="VARCHAR" property="createTime"/>
+    </resultMap>
+
+    <sql id="BaseColumn">
         role_id,
         role_name,
         is_built,
@@ -61,7 +69,7 @@
 
     <select id="getAuthorizationRoleModelByRoleId" resultType="com.shsnc.base.authorization.model.AuthorizationRoleModel">
         SELECT
-        <include refid="Base_Column"/>
+        <include refid="BaseColumn"/>
         FROM
         <include refid="tableName"/>
         WHERE role_id = #{roleId }
@@ -69,7 +77,7 @@
 
     <select id="getAuthorizationRoleModelList" resultType="com.shsnc.base.authorization.model.AuthorizationRoleModel">
         SELECT
-        <include refid="Base_Column"/>
+        <include refid="BaseColumn"/>
         FROM
         <include refid="tableName"/>
         WHERE 1 = 1
@@ -84,7 +92,7 @@
 
     <select id="getListByRoleName" resultType="com.shsnc.base.authorization.model.AuthorizationRoleModel">
         SELECT
-        <include refid="Base_Column"/>
+        <include refid="BaseColumn"/>
         FROM
         <include refid="tableName"/>
         WHERE role_name = #{roleName}
@@ -92,10 +100,56 @@
 
     <select id="getByRoleId" resultType="com.shsnc.base.authorization.model.AuthorizationRoleModel">
         SELECT
-        <include refid="Base_Column"/>
+        <include refid="BaseColumn"/>
         FROM
         <include refid="tableName"/>
         WHERE role_id = #{roleId}
+    </select>
+
+    <sql id="pageSql">
+        <if test="pagination != null" >
+            LIMIT #{pagination.start}, #{pagination.pagesize}
+        </if>
+    </sql>
+
+    <sql id="orderSql">
+        <if test="pagination != null and pagination.sorting != null">
+            ORDER BY #{pagination.sorting}
+        </if>
+    </sql>
+
+    <sql id="conditionSql">
+        <where>
+            <if test="condition != null">
+                <if test="condition.roleName !=null and condition.roleName !=''">
+                    AND role_name LIKE CONCAT('%', #{condition.roleName}, '%')
+                </if>
+                <if test="condition.isBuilt !=null and condition.isBuilt != 0">
+                    AND is_built = #{condition.is_built}=
+                </if>
+                <if test="condition.description !=null and condition.description !=''">
+                    AND description LIKE CONCAT('%', #{condition.description}, '%')
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <select id="getTotalCountByCondition" resultType="java.lang.Integer">
+        SELECT
+        COUNT(1)
+        FROM
+        <include refid="tableName"/>
+        <include refid="conditionSql"/>
+    </select>
+
+    <select id="getPageByCondition" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumn"/>
+        FROM
+        <include refid="tableName"/>
+        <include refid="conditionSql"/>
+        <include refid="orderSql"/>
+        <include refid="pageSql"/>
     </select>
 
 </mapper>

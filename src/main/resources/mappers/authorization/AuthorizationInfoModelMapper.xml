@@ -6,7 +6,7 @@
     <resultMap id="BaseResultMap" type="com.shsnc.base.authorization.model.AuthorizationInfoModel">
         <id column="authorization_id" jdbcType="BIGINT" property="authorizationId"/>
         <result column="authorization_name" jdbcType="VARCHAR" property="authorizationName"/>
-        <result column="authorization_code" jdbcType="CHAR" property="authorizationCode"/>
+        <result column="authorization_code" jdbcType="VARCHAR" property="authorizationCode"/>
         <result column="authorization_status" jdbcType="VARCHAR" property="authorizationStatus"/>
         <result column="description" jdbcType="VARCHAR" property="description"/>
         <result column="create_time" jdbcType="VARCHAR" property="createTime"/>

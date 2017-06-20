@@ -1,6 +1,9 @@
 package com.shsnc.base.authorization.mapper;
 
 import com.shsnc.base.authorization.model.AuthorizationRoleModel;
+import com.shsnc.base.authorization.model.condition.AuthorizationRoleCondition;
+import com.shsnc.base.util.sql.Pagination;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -64,5 +67,22 @@ public interface AuthorizationRoleModelMapper {
      * @return
      */
     public AuthorizationRoleModel getByRoleId(Long roleId);
+
+    /**
+     * 总数获取
+     *
+     * @param condition
+     * @return
+     */
+    Integer getTotalCountByCondition(@Param("condition") AuthorizationRoleCondition condition);
+
+    /**
+     * 分页查询
+     *
+     * @param condition
+     * @param pagination
+     * @return
+     */
+    List<AuthorizationRoleModel> getPageByCondition(@Param("condition") AuthorizationRoleCondition condition, @Param("pagination") Pagination pagination);
 
 }

@@ -1,5 +1,9 @@
 package com.shsnc.base.authorization.bean;
 
+import com.shsnc.api.core.validation.Validate;
+import com.shsnc.api.core.validation.ValidationType;
+
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -7,8 +11,10 @@ import java.io.Serializable;
  */
 public class AuthorizationRole implements Serializable {
 
+    @NotNull(groups = {ValidationType.Update.class})
     private Long roleId;
 
+    @NotNull(groups = {ValidationType.Add.class})
     private String roleName;
 
     private Integer isBuilt;

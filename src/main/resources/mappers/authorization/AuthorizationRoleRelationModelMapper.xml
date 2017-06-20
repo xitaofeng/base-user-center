@@ -74,10 +74,11 @@
 
     <select id="getAuthorizationCodeByRoleIds" resultType="java.lang.String">
         SELECT
-        authorization_code
+          i.authorization_code
         FROM
-        <include refid="tableName"/>
-        WHERE role_id IN
+        authorization_role_relation r INNER JOIN authorization_info i
+        ON r.authorization_id = i.authorization_id
+        WHERE r.role_id IN
         <foreach collection="list" item="roleId" index="index" separator="," open="(" close=")">
             #{roleId }
         </foreach>
