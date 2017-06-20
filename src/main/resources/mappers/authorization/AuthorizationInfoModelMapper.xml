@@ -3,6 +3,19 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.shsnc.base.authorization.mapper.AuthorizationInfoModelMapper">
 
+    <resultMap id="BaseResultMap" type="com.shsnc.base.authorization.model.AuthorizationInfoModel">
+        <id column="authorization_id" jdbcType="BIGINT" property="authorizationId"/>
+        <result column="authorization_name" jdbcType="VARCHAR" property="authorizationName"/>
+        <result column="authorization_code" jdbcType="VARCHAR" property="authorizationCode"/>
+        <result column="authorization_status" jdbcType="VARCHAR" property="authorizationStatus"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="create_time" jdbcType="VARCHAR" property="createTime"/>
+    </resultMap>
+
+    <sql id="BaseColumn">
+        authorization_id,authorization_name,authorization_code,authorization_status,description,create_time
+    </sql>
+
     <!-- 表名用变量表示 -->
     <sql id="tableName">authorization_info</sql>
 
@@ -100,6 +113,55 @@
         FROM
         <include refid="tableName"/>
         WHERE authorization_code = #{authorizationCode}
+    </select>
+
+    <sql id="pageSql">
+        <if test="pagination != null" >
+            LIMIT #{pagination.start}, #{pagination.pagesize}
+        </if>
+    </sql>
+
+    <sql id="orderSql">
+        <if test="pagination != null and pagination.sorting != null">
+            ORDER BY #{pagination.sorting}
+        </if>
+    </sql>
+
+    <sql id="conditionSql">
+        <where>
+            <if test="condition != null">
+                <if test="condition.authorizationName !=null and condition.authorizationName !=''">
+                    AND authorization_name LIKE CONCAT('%', #{condition.authorizationName}, '%')
+                </if>
+                <if test="condition.authorizationCode !=null and condition.authorizationCode !=''">
+                    AND authorization_code LIKE CONCAT('%', #{condition.authorizationCode}, '%')
+                </if>
+                <if test="condition.authorizationStatus !=null and condition.authorizationStatus !=''">
+                    AND authorization_status = #{condition.authorizationStatus}
+                </if>
+                <if test="condition.description !=null and condition.description !=''">
+                    AND description LIKE CONCAT('%', #{condition.description}, '%')
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <select id="getTotalCountByCondition" resultType="java.lang.Integer">
+        SELECT
+        COUNT(1)
+        FROM
+        <include refid="tableName"/>
+        <include refid="conditionSql"/>
+    </select>
+
+    <select id="getPageByCondition" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumn"/>
+        FROM
+        <include refid="tableName"/>
+        <include refid="conditionSql"/>
+        <include refid="orderSql"/>
+        <include refid="pageSql"/>
     </select>
 
 </mapper>

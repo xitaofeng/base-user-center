@@ -1,38 +1,19 @@
-package com.shsnc.base.authorization.bean;
+package com.shsnc.base.authorization.model.condition;
 
-import com.shsnc.api.core.validation.Validate;
-import com.shsnc.api.core.validation.ValidationType;
-
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
- * Created by Elena on 2017/6/5.
+ * 权限信息
  */
-public class AuthorizationInfo implements Serializable {
+public class AuthorizationInfoCondition implements Serializable{
 
-    @NotNull(groups = {ValidationType.Update.class})
-    private Long authorizationId;
-
-    @NotNull(groups = {ValidationType.Add.class})
     private String authorizationName;
 
-    @NotNull(groups = {ValidationType.Add.class})
     private String authorizationCode;
 
     private Integer authorizationStatus;
 
     private String description;
-
-    private Long createTime;
-
-    public Long getAuthorizationId() {
-        return authorizationId;
-    }
-
-    public void setAuthorizationId(Long authorizationId) {
-        this.authorizationId = authorizationId;
-    }
 
     public String getAuthorizationName() {
         return authorizationName;
@@ -64,13 +45,5 @@ public class AuthorizationInfo implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Long getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Long createTime) {
-        this.createTime = createTime;
     }
 }

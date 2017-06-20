@@ -3,9 +3,15 @@ package com.shsnc.base.authorization.handler;
 import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
+import com.shsnc.api.core.validation.ValidationType;
 import com.shsnc.base.authorization.bean.AuthorizationInfo;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel;
+import com.shsnc.base.authorization.model.condition.AuthorizationInfoCondition;
 import com.shsnc.base.authorization.service.AuthorizationInfoService;
+import com.shsnc.base.user.bean.UserInfo;
+import com.shsnc.base.user.model.UserInfoCondition;
+import com.shsnc.base.util.sql.Pagination;
+import com.shsnc.base.util.sql.QueryData;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,31 +29,26 @@ import java.util.List;
 @RequestMapper("/authorization/info")
 public class AuthorizationInfoHandler implements RequestHandler {
 
+
+    private String[][] filedMapping = {{"authorizationName", "authorization_name"}, {"authorizationCode", "authorization_code"}, {"authorizationStatus", "authorization_status"}, {"description", "description"}, {"createTime", "create_time"}};
+
+
     @Autowired
     private AuthorizationInfoService authorizationInfoService;
 
     @RequestMapper("/add")
-    @Validate
-    public Long addAuthorizationInfo(@NotNull String authorizationName, @NotNull String authorizationCode,
-                                     Integer authorizationStatus, String description) throws Exception {
+    @Validate(groups = ValidationType.Add.class)
+    public Long addAuthorizationInfo(AuthorizationInfo authorizationInfo) throws Exception {
         AuthorizationInfoModel authorizationInfoModel = new AuthorizationInfoModel();
-        authorizationInfoModel.setAuthorizationName(authorizationName);
-        authorizationInfoModel.setAuthorizationCode(authorizationCode);
-        authorizationInfoModel.setAuthorizationStatus(authorizationStatus);
-        authorizationInfoModel.setDescription(description);
+        BeanUtils.copyProperties(authorizationInfo, authorizationInfoModel);
         return authorizationInfoService.addAuthorizationInfo(authorizationInfoModel);
     }
 
     @RequestMapper("/edit")
-    @Validate
-    public boolean editAuthorizationInfo(@NotNull Long authorizationId, @NotNull String authorizationName, @NotNull String authorizationCode,
-                                         Integer authorizationStatus, String description) throws Exception {
+    @Validate(groups = ValidationType.Update.class)
+    public boolean editAuthorizationInfo(AuthorizationInfo authorizationInfo) throws Exception {
         AuthorizationInfoModel authorizationInfoModel = new AuthorizationInfoModel();
-        authorizationInfoModel.setAuthorizationId(authorizationId);
-        authorizationInfoModel.setAuthorizationName(authorizationName);
-        authorizationInfoModel.setAuthorizationCode(authorizationCode);
-        authorizationInfoModel.setAuthorizationStatus(authorizationStatus);
-        authorizationInfoModel.setDescription(description);
+        BeanUtils.copyProperties(authorizationInfo, authorizationInfoModel);
         return authorizationInfoService.editAuthorizationInfo(authorizationInfoModel);
     }
 
@@ -79,15 +80,10 @@ public class AuthorizationInfoHandler implements RequestHandler {
 
     @RequestMapper("/list")
     @Validate
-    public List<AuthorizationInfo> getAuthorizationList(String authorizationName, String authorizationCode, Integer authorizationStatus, String description) throws Exception {
-        AuthorizationInfo authorizationInfo = new AuthorizationInfo();
-        authorizationInfo.setAuthorizationName(authorizationName);
-        authorizationInfo.setAuthorizationCode(authorizationCode);
-        authorizationInfo.setAuthorizationStatus(authorizationStatus);
-        authorizationInfo.setDescription(description);
+    public List<AuthorizationInfo> getAuthorizationList(AuthorizationInfoCondition condition) throws Exception {
 
         AuthorizationInfoModel authorizationInfoModel = new AuthorizationInfoModel();
-        BeanUtils.copyProperties(authorizationInfo, authorizationInfoModel);
+        BeanUtils.copyProperties(condition, authorizationInfoModel);
 
         List<AuthorizationInfoModel> list = authorizationInfoService.getAuthorizationList(authorizationInfoModel);
         List<AuthorizationInfo> result = new ArrayList<>();
@@ -99,6 +95,13 @@ public class AuthorizationInfoHandler implements RequestHandler {
             });
         }
         return result;
+    }
+
+    @RequestMapper("/page/list")
+    public QueryData getPageList(AuthorizationInfoCondition condition, Pagination pagination) {
+        pagination.buildSort(filedMapping);
+        QueryData queryData = authorizationInfoService.getAuthorizationPageList(condition, pagination);
+        return queryData.convert(AuthorizationInfo.class);
     }
 
     @RequestMapper("/one")

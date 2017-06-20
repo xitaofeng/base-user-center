@@ -6,8 +6,11 @@ import com.shsnc.base.authorization.mapper.AuthorizationGroupRoleRelationModelMa
 import com.shsnc.base.authorization.mapper.AuthorizationRoleModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationRoleModel;
+import com.shsnc.base.authorization.model.condition.AuthorizationRoleCondition;
 import com.shsnc.base.util.StringUtil;
 import com.shsnc.base.util.config.BizException;
+import com.shsnc.base.util.sql.Pagination;
+import com.shsnc.base.util.sql.QueryData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -133,6 +136,15 @@ public class AuthorizationRoleService {
      */
     public List<AuthorizationRoleModel> getAuthorizationRoleModelList(AuthorizationRoleModel authorizationRoleModel) throws Exception {
         return authorizationRoleModelMapper.getAuthorizationRoleModelList(authorizationRoleModel);
+    }
+
+    public QueryData getPageList(AuthorizationRoleCondition condition, Pagination pagination){
+        QueryData queryData = new QueryData(pagination);
+        int totalCount = authorizationRoleModelMapper.getTotalCountByCondition(condition);
+        queryData.setRowCount(totalCount);
+        List<AuthorizationRoleModel> list = authorizationRoleModelMapper.getPageByCondition(condition, pagination);
+        queryData.setRecords(list);
+        return queryData;
     }
 
     /**
