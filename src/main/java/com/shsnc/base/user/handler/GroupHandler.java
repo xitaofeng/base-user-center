@@ -1,6 +1,7 @@
 package com.shsnc.base.user.handler;
 
 import com.shsnc.api.core.RequestHandler;
+import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
@@ -32,6 +33,7 @@ public class GroupHandler implements RequestHandler {
     private String[][] fieldMapping = {{"name","name"},{"code","code"},{"status","status"}};
 
     @RequestMapper("/getPage")
+    @Authentication("BASE_USER_GROUP_GET_PAGE")
     public QueryData getPage(GroupCondition condition, Pagination pagination){
         pagination.buildSort(fieldMapping);
         QueryData queryData = groupService.getGroupPage(condition,pagination);
@@ -40,12 +42,14 @@ public class GroupHandler implements RequestHandler {
 
     @RequestMapper("/getObject")
     @Validate
+    @Authentication("BASE_USER_GROUP_GET_OBJECT")
     public Group getObjet(@NotNull Long groupId) throws BizException {
         GroupModel groupModel = groupService.getGroup(groupId);
         return JsonUtil.convert(groupModel, Group.class);
     }
 
     @RequestMapper("/getNodeList")
+    @Authentication("BASE_USER_GROUP_GET_NODE_LIST")
     public List<Group> getNodeList(Long parentId){
         List<GroupModel> groupModels = groupService.getNodeList(parentId);
         return JsonUtil.convert(groupModels, List.class, Group.class);
@@ -53,6 +57,7 @@ public class GroupHandler implements RequestHandler {
 
 
     @RequestMapper("/add")
+    @Authentication("BASE_USER_GROUP_ADD")
     @Validate(groups = ValidationType.Add.class)
     public Long add(GroupParam group) throws BizException {
         GroupModel groupModel = JsonUtil.convert(group, GroupModel.class);
@@ -60,6 +65,7 @@ public class GroupHandler implements RequestHandler {
     }
 
     @RequestMapper("/update")
+    @Authentication("BASE_USER_GROUP_UPDATE")
     @Validate(groups = ValidationType.Update.class)
     public boolean update(GroupParam group) throws BizException {
         GroupModel groupModel = JsonUtil.convert(group, GroupModel.class);
@@ -67,11 +73,13 @@ public class GroupHandler implements RequestHandler {
     }
 
     @RequestMapper("/delete")
+    @Authentication("BASE_USER_GROUP_DELETE")
     public boolean delete(@NotNull Long groupId) throws BizException {
         return groupService.deleteGroup(groupId);
     }
 
     @RequestMapper("/deleteTree")
+    @Authentication("BASE_USER_GROUP_DELETE_TREE")
     public boolean deleteTree(@NotNull Long groupId) throws BizException {
         return groupService.deleteGroupTree(groupId);
     }

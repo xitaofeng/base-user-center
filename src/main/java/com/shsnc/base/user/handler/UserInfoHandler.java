@@ -1,6 +1,7 @@
 package com.shsnc.base.user.handler;
 
 import com.shsnc.api.core.RequestHandler;
+import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
@@ -40,6 +41,7 @@ public class UserInfoHandler implements RequestHandler {
     private String[][] filedMapping=  {{"username","username"},{"alias","alias"},{"mobile","mobile"},{"email","email"},{"status","status"}};
 
     @RequestMapper("/getPage")
+    @Authentication("BASE_USER_INFO_GET_PAGE")
     public QueryData getPage(UserInfoCondition condition, Pagination pagination){
         pagination.buildSort(filedMapping);
         QueryData queryData = userInfoService.getUserInfoPage(condition, pagination);
@@ -48,12 +50,14 @@ public class UserInfoHandler implements RequestHandler {
 
     @RequestMapper("/getObject")
     @Validate
+    @Authentication("BASE_USER_INFO_GET_OBJECT")
     public UserInfo getObject(@NotNull Long userId) throws BizException {
         UserInfoModel userInfoModel = userInfoService.getUserInfo(userId);
         return JsonUtil.convert(userInfoModel,UserInfo.class);
     }
 
     @RequestMapper("/getList")
+    @Authentication("BASE_USER_INFO_GET_LIST")
     public List<UserInfo> getList(UserInfoParam userInfo){
         UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
         List<UserInfoModel> userInfoList = userInfoService.getUserInfoList(userInfoModel);
@@ -61,6 +65,7 @@ public class UserInfoHandler implements RequestHandler {
     }
 
     @RequestMapper("/add")
+    @Authentication("BASE_USER_INFO_ADD")
     @Validate(groups = ValidationType.Add.class)
     public Long add(UserInfoParam userInfo) throws BizException {
         UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
@@ -74,6 +79,7 @@ public class UserInfoHandler implements RequestHandler {
 
     @RequestMapper("/update")
     @Validate(groups = ValidationType.Update.class)
+    @Authentication("BASE_USER_INFO_UPDATE")
     public boolean update(UserInfoParam userInfo) throws BizException {
         UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
         List<ExtendPropertyValue> extendPropertyValues = userInfo.getExtendPropertyValues();
@@ -86,18 +92,21 @@ public class UserInfoHandler implements RequestHandler {
 
     @RequestMapper("/delete")
     @Validate
+    @Authentication("BASE_USER_INFO_DELETE")
     public boolean delete(@NotNull Long userId) throws BizException {
         return userInfoService.deleteUserInfo(userId);
     }
 
     @RequestMapper("/batchDelete")
     @Validate
+    @Authentication("BASE_USER_INFO_BATCH_DELETE")
     public boolean batchDelete(@NotEmpty List<Long> userIds) throws BizException {
         return userInfoService.batchDeleteUserInfo(userIds);
     }
 
     @RequestMapper("/getExtendPropertyValues")
     @Validate
+    @Authentication("BASE_USER_INFO_GET_EXTEND_PROPERTY_VALUES")
     public List<ExtendPropertyValue> getExtendPropertyValues(@NotNull Long userId){
         List<ExtendPropertyValueModel> extendPropertyValueModelList = extendPropertyValueService.getExtendPropertyValueByUserId(userId);
         return JsonUtil.convert(extendPropertyValueModelList, List.class, ExtendPropertyValue.class);
