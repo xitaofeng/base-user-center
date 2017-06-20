@@ -82,10 +82,7 @@ public class AuthorizationInfoHandler implements RequestHandler {
     @Validate
     public List<AuthorizationInfo> getAuthorizationList(AuthorizationInfoCondition condition) throws Exception {
 
-        AuthorizationInfoModel authorizationInfoModel = new AuthorizationInfoModel();
-        BeanUtils.copyProperties(condition, authorizationInfoModel);
-
-        List<AuthorizationInfoModel> list = authorizationInfoService.getAuthorizationList(authorizationInfoModel);
+        List<AuthorizationInfoModel> list = authorizationInfoService.getAuthorizationList(condition);
         List<AuthorizationInfo> result = new ArrayList<>();
         if (!CollectionUtils.isEmpty(list)) {
             list.forEach(item -> {

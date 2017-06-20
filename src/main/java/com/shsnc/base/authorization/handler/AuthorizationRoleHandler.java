@@ -63,9 +63,7 @@ public class AuthorizationRoleHandler implements RequestHandler {
 
     @RequestMapper("/list")
     public List<AuthorizationRoleModel> getAuthorizationRoleModelList(AuthorizationRoleCondition condition) throws Exception {
-        AuthorizationRoleModel authorizationRoleModel = new AuthorizationRoleModel();
-        BeanUtils.copyProperties(condition, authorizationRoleModel);
-        return authorizationRoleService.getAuthorizationRoleModelList(authorizationRoleModel);
+        return authorizationRoleService.getAuthorizationRoleModelList(condition);
     }
 
     @RequestMapper("/page/list")

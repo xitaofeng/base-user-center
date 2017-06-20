@@ -130,12 +130,12 @@ public class AuthorizationRoleService {
     /**
      * 查询列表
      *
-     * @param authorizationRoleModel
+     * @param condition
      * @return
      * @throws Exception
      */
-    public List<AuthorizationRoleModel> getAuthorizationRoleModelList(AuthorizationRoleModel authorizationRoleModel) throws Exception {
-        return authorizationRoleModelMapper.getAuthorizationRoleModelList(authorizationRoleModel);
+    public List<AuthorizationRoleModel> getAuthorizationRoleModelList(AuthorizationRoleCondition condition) throws Exception {
+        return authorizationRoleModelMapper.getAuthorizationRoleModelList(condition);
     }
 
     public QueryData getPageList(AuthorizationRoleCondition condition, Pagination pagination){
