@@ -1,6 +1,7 @@
 package com.shsnc.base.user.handler;
 
 import com.shsnc.api.core.RequestHandler;
+import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
@@ -28,6 +29,7 @@ public class ExtendPropertyValueHandler implements RequestHandler {
 
     @RequestMapper("/add")
     @Validate(groups = ValidationType.Add.class)
+    @Authentication("BASE_USER_EXTEND_PROPERTY_VALUE_PROPERTY_ADD")
     public Long add(ExtendPropertyValueParam extendPropertyValue) throws BizException {
         ExtendPropertyValueModel extendPropertyValueModel = JsonUtil.convert(extendPropertyValue, ExtendPropertyValueModel.class);
         return extendPropertyValueService.addExtendPropertyValue(extendPropertyValueModel);
@@ -35,6 +37,7 @@ public class ExtendPropertyValueHandler implements RequestHandler {
 
     @RequestMapper("/update")
     @Validate(groups = ValidationType.Update.class)
+    @Authentication("BASE_USER_EXTEND_PROPERTY_VALUE_PROPERTY_UPDATE")
     public boolean update(ExtendPropertyValueParam extendPropertyValue) throws BizException {
         ExtendPropertyValueModel extendPropertyValueModel = JsonUtil.convert(extendPropertyValue, ExtendPropertyValueModel.class);
         return extendPropertyValueService.updateExtendPropertyValue(extendPropertyValueModel);
@@ -42,6 +45,7 @@ public class ExtendPropertyValueHandler implements RequestHandler {
 
     @RequestMapper("/delete")
     @Validate
+    @Authentication("BASE_USER_EXTEND_PROPERTY_VALUE_PROPERTY_DELETE")
     public boolean delete(@NotNull Long propertyValueId) throws BizException {
         return extendPropertyValueService.deleteExtendPropertyValue(propertyValueId);
     }
