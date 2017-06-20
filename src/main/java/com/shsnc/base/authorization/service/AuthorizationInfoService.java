@@ -1,12 +1,10 @@
 package com.shsnc.base.authorization.service;
 
 
-import com.shsnc.base.authorization.config.AuthorizationConstant;
 import com.shsnc.base.authorization.mapper.AuthorizationInfoModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel.EnumAuthorizationStatus;
-import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.StringUtil;
 import com.shsnc.base.util.config.BizException;
 import org.springframework.beans.BeanUtils;

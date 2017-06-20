@@ -3,10 +3,8 @@
 package com.shsnc.base.authorization.service;
 
 import com.shsnc.base.authorization.mapper.AuthorizationGroupRoleRelationModelMapper;
-import com.shsnc.base.authorization.mapper.AuthorizationInfoModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationRoleModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
-import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.shsnc.base.authorization.model.AuthorizationRoleModel;
 import com.shsnc.base.util.StringUtil;
 import com.shsnc.base.util.config.BizException;
@@ -15,9 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import sun.rmi.runtime.Log;
 
-import java.util.Date;
 import java.util.List;
 
 /**

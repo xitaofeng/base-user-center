@@ -1,20 +1,15 @@
 package com.shsnc.base.authorization.service;
 
-import com.shsnc.base.authorization.bean.AuthorizationRole;
 import com.shsnc.base.authorization.mapper.*;
 import com.shsnc.base.authorization.model.AuthorizationRoleRelationModel;
-import com.shsnc.base.authorization.model.AuthorizationUserRoleRelationModel;
 import com.shsnc.base.util.config.BizException;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Elena on 2017/6/7.

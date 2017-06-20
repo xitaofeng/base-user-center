@@ -4,7 +4,6 @@ import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.base.authorization.bean.AuthorizationRole;
-import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.shsnc.base.authorization.model.AuthorizationRoleModel;
 import com.shsnc.base.authorization.service.AuthorizationRoleService;
 import org.hibernate.validator.constraints.NotEmpty;

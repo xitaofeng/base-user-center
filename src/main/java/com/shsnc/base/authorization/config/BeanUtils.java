@@ -1,9 +1,11 @@
 package com.shsnc.base.authorization.config;
 
 import com.shsnc.base.authorization.model.AuthorizationResourceAuthModel;
-import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Elena on 2017/6/13.

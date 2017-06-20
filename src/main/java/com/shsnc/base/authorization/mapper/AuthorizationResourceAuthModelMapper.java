@@ -1,7 +1,6 @@
 package com.shsnc.base.authorization.mapper;
 
 import com.shsnc.base.authorization.bean.UserDataAuthorization;
-import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.shsnc.base.authorization.model.AuthorizationResourceAuthModel;
 import org.apache.ibatis.annotations.Param;
 

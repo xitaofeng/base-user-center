@@ -1,7 +1,6 @@
 package com.shsnc.base.authorization.mapper;
 
 import com.shsnc.base.authorization.model.AuthorizationResourcePropertyModel;
-import com.shsnc.base.authorization.model.AuthorizationRoleModel;
 
 import java.util.List;
 
