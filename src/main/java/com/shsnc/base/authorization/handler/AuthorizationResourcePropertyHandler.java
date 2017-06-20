@@ -4,9 +4,14 @@ import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
+import com.shsnc.api.core.validation.ValidationType;
 import com.shsnc.base.authorization.bean.AuthorizationResourceProperty;
 import com.shsnc.base.authorization.model.AuthorizationResourcePropertyModel;
+import com.shsnc.base.authorization.model.condition.AuthorizationResourcePropertyCondition;
+import com.shsnc.base.authorization.model.condition.AuthorizationRoleCondition;
 import com.shsnc.base.authorization.service.AuthorizationResourcePropertyService;
+import com.shsnc.base.util.sql.Pagination;
+import com.shsnc.base.util.sql.QueryData;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,34 +30,24 @@ import java.util.List;
 @RequestMapper("/authorization/resource/property")
 public class AuthorizationResourcePropertyHandler implements RequestHandler {
 
+    private String[][] filedMapping = {{"propertyName", "property_name"}, {"resourceType", "resource_type"}, {"resourceTypeName", "resource_type_name"}};
+
     @Autowired
     private AuthorizationResourcePropertyService authorizationResourcePropertyService;
 
     @RequestMapper("/add")
-    @Validate
-    @Authentication("")
-    public Long addAuthorizationResourceProperty(@NotNull Integer resourceType, @NotNull String resourceTypeName,
-                                                 @NotNull String propertyName, @NotNull Integer propertyValue, Long parentId) throws Exception {
+    @Validate(groups = ValidationType.Add.class)
+    public Long addAuthorizationResourceProperty(AuthorizationResourceProperty authorizationResourceProperty) throws Exception {
         AuthorizationResourcePropertyModel authorizationResourcePropertyModel = new AuthorizationResourcePropertyModel();
-        authorizationResourcePropertyModel.setResourceType(resourceType);
-        authorizationResourcePropertyModel.setResourceTypeName(resourceTypeName);
-        authorizationResourcePropertyModel.setPropertyName(propertyName);
-        authorizationResourcePropertyModel.setPropertyValue(propertyValue);
-        authorizationResourcePropertyModel.setParentId(parentId);
+        BeanUtils.copyProperties(authorizationResourceProperty, authorizationResourcePropertyModel);
         return authorizationResourcePropertyService.addAuthorizationResourcePropertyModel(authorizationResourcePropertyModel);
     }
 
     @RequestMapper("/edit")
-    @Validate
-    public boolean editAuthorizationResourceProperty(@NotNull Long id, @NotNull Integer resourceType, @NotNull String resourceTypeName,
-                                                     @NotNull String propertyName, @NotNull Integer propertyValue, Long parentId) throws Exception {
+    @Validate(groups = ValidationType.Update.class)
+    public boolean editAuthorizationResourceProperty(AuthorizationResourceProperty authorizationResourceProperty) throws Exception {
         AuthorizationResourcePropertyModel authorizationResourcePropertyModel = new AuthorizationResourcePropertyModel();
-        authorizationResourcePropertyModel.setId(id);
-        authorizationResourcePropertyModel.setResourceType(resourceType);
-        authorizationResourcePropertyModel.setResourceTypeName(resourceTypeName);
-        authorizationResourcePropertyModel.setPropertyName(propertyName);
-        authorizationResourcePropertyModel.setPropertyValue(propertyValue);
-        authorizationResourcePropertyModel.setParentId(parentId);
+        BeanUtils.copyProperties(authorizationResourceProperty, authorizationResourcePropertyModel);
         return authorizationResourcePropertyService.editAuthorizationResourcePropertyModel(authorizationResourcePropertyModel);
     }
 
@@ -72,19 +67,8 @@ public class AuthorizationResourcePropertyHandler implements RequestHandler {
 
     @RequestMapper("/list")
     @Validate
-    public List<AuthorizationResourceProperty> getAuthorizationList(Integer resourceType, String resourceTypeName,
-                                                                    String propertyName, Integer propertyValue, Long parentId) throws Exception {
-        AuthorizationResourceProperty authorizationResourceProperty = new AuthorizationResourceProperty();
-        authorizationResourceProperty.setResourceType(resourceType);
-        authorizationResourceProperty.setResourceTypeName(resourceTypeName);
-        authorizationResourceProperty.setPropertyName(propertyName);
-        authorizationResourceProperty.setPropertyValue(propertyValue);
-        authorizationResourceProperty.setParentId(parentId);
-
-        AuthorizationResourcePropertyModel authorizationResourcePropertyModel = new AuthorizationResourcePropertyModel();
-        BeanUtils.copyProperties(authorizationResourceProperty, authorizationResourcePropertyModel);
-
-        List<AuthorizationResourcePropertyModel> list = authorizationResourcePropertyService.getAuthorizationResourcePropertyModelList(authorizationResourcePropertyModel);
+    public List<AuthorizationResourceProperty> getAuthorizationList(AuthorizationResourcePropertyCondition condition) throws Exception {
+        List<AuthorizationResourcePropertyModel> list = authorizationResourcePropertyService.getAuthorizationResourcePropertyModelList(condition);
         List<AuthorizationResourceProperty> result = new ArrayList<>();
         if (!CollectionUtils.isEmpty(list)) {
             list.forEach(item -> {
@@ -94,6 +78,13 @@ public class AuthorizationResourcePropertyHandler implements RequestHandler {
             });
         }
         return result;
+    }
+
+    @RequestMapper("/page/list")
+    public QueryData getPageList(AuthorizationResourcePropertyCondition condition, Pagination pagination) {
+        pagination.buildSort(filedMapping);
+        QueryData queryData = authorizationResourcePropertyService.getAuthorizationPageList(condition, pagination);
+        return queryData.convert(AuthorizationResourceProperty.class);
     }
 
     @RequestMapper("/one")

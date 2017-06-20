@@ -85,18 +85,7 @@
         FROM
         <include refid="tableName"/>
         WHERE 1 = 1
-        <if test="authorizationName !=null and authorizationName !=''">
-            AND authorization_name LIKE CONCAT('%', #{authorizationName}, '%')
-        </if>
-        <if test="authorizationCode !=null and authorizationCode !=''">
-            AND authorization_code LIKE CONCAT('%', #{authorizationCode}, '%')
-        </if>
-        <if test="authorizationStatus !=null and authorizationStatus !=''">
-            AND authorization_status = #{authorizationStatus}
-        </if>
-        <if test="description !=null and description !=''">
-            AND description LIKE CONCAT('%', #{description}, '%')
-        </if>
+        <include refid="conditionSql"/>
     </select>
 
     <select id="getListByAuthorizationName" resultType="com.shsnc.base.authorization.model.AuthorizationInfoModel">

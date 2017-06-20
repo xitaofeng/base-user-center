@@ -47,10 +47,10 @@ public interface AuthorizationRoleModelMapper {
     /**
      * 获取列表数据
      *
-     * @param authorizationRoleModel
+     * @param condition
      * @return
      */
-    public List<AuthorizationRoleModel> getAuthorizationRoleModelList(AuthorizationRoleModel authorizationRoleModel);
+    public List<AuthorizationRoleModel> getAuthorizationRoleModelList(AuthorizationRoleCondition condition);
 
     /**
      * 根据角色名称获取列表

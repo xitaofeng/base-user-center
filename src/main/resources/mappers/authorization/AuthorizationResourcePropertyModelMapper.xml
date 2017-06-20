@@ -6,6 +6,19 @@
     <!-- 表名用变量表示 -->
     <sql id="tableName">authorization_resource_property</sql>
 
+    <resultMap id="BaseResultMap" type="com.shsnc.base.authorization.model.AuthorizationResourcePropertyModel">
+        <id column="property_id" jdbcType="BIGINT" property="propertyId"/>
+        <result column="resource_type" jdbcType="VARCHAR" property="resourceType"/>
+        <result column="resource_type_name" jdbcType="CHAR" property="resourceTypeName"/>
+        <result column="property_name" jdbcType="VARCHAR" property="propertyName"/>
+        <result column="property_value" jdbcType="VARCHAR" property="propertyValue"/>
+        <result column="parent_id" jdbcType="VARCHAR" property="parentId"/>
+    </resultMap>
+
+    <sql id="BaseColumn">
+        property_id,resource_type,resource_type_name,property_name,property_value,parent_id
+    </sql>
+
     <!-- SQL语句格式美化，关键字用大写字母 -->
     <insert id="addAuthorizationResourcePropertyModel" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO
@@ -41,22 +54,22 @@
         <if test="propertyValue !=null and propertyValue !=''">
             ,property_value = #{propertyValue}
         </if>
-        WHERE id = #{id }
+        WHERE property_id = #{propertyId }
     </update>
 
     <delete id="batchDeleteAuthorizationResourceProperty">
         DELETE FROM
         <include refid="tableName"/>
-        WHERE id in
-        <foreach item="id" collection="list" open="(" separator="," close=")">
-            #{id}
+        WHERE property_id in
+        <foreach item="propertyId" collection="list" open="(" separator="," close=")">
+            #{propertyId}
         </foreach>
     </delete>
 
     <select id="getAuthorizationResourcePropertyModelById" resultType="com.shsnc.base.authorization.model.AuthorizationResourcePropertyModel">
         SELECT * FROM
         <include refid="tableName"/>
-        WHERE id = #{id}
+        WHERE property_id = #{propertyId }
     </select>
 
     <select id="getAuthorizationResourcePropertyModelList" resultType="com.shsnc.base.authorization.model.AuthorizationResourcePropertyModel">
@@ -64,20 +77,58 @@
         FROM
         <include refid="tableName"/>
         WHERE 1 = 1
-        <if test="resourceType != null and resourceType > 0 ">
-            AND  resource_type = #{resourceType}
+        <include refid="conditionSql"/>
+    </select>
+
+    <sql id="pageSql">
+        <if test="pagination != null" >
+            LIMIT #{pagination.start}, #{pagination.pagesize}
         </if>
-        <if test="resourceTypeName !=null and resourceTypeName !=''">
-            AND resource_type_name LIKE CONCAT('%', #{resourceTypeName}, '%')
+    </sql>
+
+    <sql id="orderSql">
+        <if test="pagination != null and pagination.sorting != null">
+            ORDER BY #{pagination.sorting}
         </if>
-        <if test="propertyName !=null and propertyName !=''">
-            AND property_name LIKE CONCAT('%', #{propertyName}, '%')
-        </if>
-        <if test="propertyValue !=null and propertyValue > 0">
-            AND property_value = #{propertyValue}
-        </if>
-        <if test="parentId !=null and parentId >= 0">
-            AND parent_id = #{parentId}
-        </if>
+    </sql>
+
+    <sql id="conditionSql">
+        <where>
+            <if test="condition != null">
+                <if test="condition.resourceType != null and condition.resourceType > 0 ">
+                    AND  resource_type = #{condition.resourceType}
+                </if>
+                <if test="condition.resourceTypeName !=null and condition.resourceTypeName !=''">
+                    AND resource_type_name LIKE CONCAT('%', #{condition.resourceTypeName}, '%')
+                </if>
+                <if test="condition.propertyName !=null and condition.propertyName !=''">
+                    AND property_name LIKE CONCAT('%', #{condition.propertyName}, '%')
+                </if>
+                <if test="condition.propertyValue !=null and condition.propertyValue > 0">
+                    AND property_value = #{condition.propertyValue}
+                </if>
+                <if test="condition.parentId !=null and condition.parentId >= 0">
+                    AND parent_id = #{condition.parentId}
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <select id="getTotalCountByCondition" resultType="java.lang.Integer">
+        SELECT
+        COUNT(1)
+        FROM
+        <include refid="tableName"/>
+        <include refid="conditionSql"/>
+    </select>
+
+    <select id="getPageByCondition" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumn"/>
+        FROM
+        <include refid="tableName"/>
+        <include refid="conditionSql"/>
+        <include refid="orderSql"/>
+        <include refid="pageSql"/>
     </select>
 </mapper>

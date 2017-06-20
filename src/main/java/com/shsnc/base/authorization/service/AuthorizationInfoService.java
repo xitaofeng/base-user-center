@@ -144,12 +144,12 @@ public class AuthorizationInfoService {
     /**
      * 查询列表
      *
-     * @param authorizationInfoModel
+     * @param condition
      * @return
      * @throws Exception
      */
-    public List<AuthorizationInfoModel> getAuthorizationList(AuthorizationInfoModel authorizationInfoModel) throws Exception {
-        return authorizationInfoModelMapper.getAuthorizationList(authorizationInfoModel);
+    public List<AuthorizationInfoModel> getAuthorizationList(AuthorizationInfoCondition condition) throws Exception {
+        return authorizationInfoModelMapper.getAuthorizationList(condition);
     }
 
     /**

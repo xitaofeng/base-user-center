@@ -1,14 +1,9 @@
-package com.shsnc.base.authorization.model;
-
-import java.io.Serializable;
+package com.shsnc.base.authorization.model.condition;
 
 /**
- * 资源授权属性
- * Created by Elena on 2017/6/9.
+ * Created by Elena on 2017/6/20.
  */
-public class AuthorizationResourcePropertyModel implements Serializable {
-
-    private Long propertyId;
+public class AuthorizationResourcePropertyCondition {
 
     private String propertyName;
 
@@ -19,14 +14,6 @@ public class AuthorizationResourcePropertyModel implements Serializable {
     private String resourceTypeName;
 
     private Long parentId;
-
-    public Long getPropertyId() {
-        return propertyId;
-    }
-
-    public void setPropertyId(Long propertyId) {
-        this.propertyId = propertyId;
-    }
 
     public String getPropertyName() {
         return propertyName;

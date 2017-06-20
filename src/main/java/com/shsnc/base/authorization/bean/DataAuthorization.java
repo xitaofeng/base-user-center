@@ -11,9 +11,9 @@ public class DataAuthorization implements Serializable {
 
     private Integer resourceType;
 
-    private Integer authType;
+    private List<Long> authRoleList;
 
-    private List<Long> authValueList;
+    private List<Long> authUserList;
 
     private List<Long> resourceIdList;
 
@@ -25,22 +25,6 @@ public class DataAuthorization implements Serializable {
 
     public void setResourceType(Integer resourceType) {
         this.resourceType = resourceType;
-    }
-
-    public Integer getAuthType() {
-        return authType;
-    }
-
-    public void setAuthType(Integer authType) {
-        this.authType = authType;
-    }
-
-    public List<Long> getAuthValueList() {
-        return authValueList;
-    }
-
-    public void setAuthValueList(List<Long> authValueList) {
-        this.authValueList = authValueList;
     }
 
     public List<Long> getResourceIdList() {
@@ -57,5 +41,21 @@ public class DataAuthorization implements Serializable {
 
     public void setPropertyIdList(List<Long> propertyIdList) {
         this.propertyIdList = propertyIdList;
+    }
+
+    public List<Long> getAuthRoleList() {
+        return authRoleList;
+    }
+
+    public void setAuthRoleList(List<Long> authRoleList) {
+        this.authRoleList = authRoleList;
+    }
+
+    public List<Long> getAuthUserList() {
+        return authUserList;
+    }
+
+    public void setAuthUserList(List<Long> authUserList) {
+        this.authUserList = authUserList;
     }
 }

@@ -58,10 +58,10 @@ public interface AuthorizationInfoModelMapper {
     /**
      * 获取列表数据
      *
-     * @param authorizationInfoModel
+     * @param condition
      * @return
      */
-    public List<AuthorizationInfoModel> getAuthorizationList(AuthorizationInfoModel authorizationInfoModel);
+    public List<AuthorizationInfoModel> getAuthorizationList(AuthorizationInfoCondition condition);
 
     /**
      * 根据权限名称获取列表

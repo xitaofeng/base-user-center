@@ -1,6 +1,9 @@
 package com.shsnc.base.authorization.mapper;
 
 import com.shsnc.base.authorization.model.AuthorizationResourcePropertyModel;
+import com.shsnc.base.authorization.model.condition.AuthorizationResourcePropertyCondition;
+import com.shsnc.base.util.sql.Pagination;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -15,8 +18,23 @@ public interface AuthorizationResourcePropertyModelMapper {
 
     public Integer batchDeleteAuthorizationResourceProperty(List<Long> idList);
 
-    public AuthorizationResourcePropertyModel getAuthorizationResourcePropertyModelById(Long id);
+    public AuthorizationResourcePropertyModel getAuthorizationResourcePropertyModelById(Long propertyId);
 
-    public List<AuthorizationResourcePropertyModel> getAuthorizationResourcePropertyModelList(AuthorizationResourcePropertyModel authorizationResourcePropertyModel);
+    public List<AuthorizationResourcePropertyModel> getAuthorizationResourcePropertyModelList(@Param("condition") AuthorizationResourcePropertyCondition condition);
+
+    /**
+     * 总数获取
+     * @param condition
+     * @return
+     */
+    Integer getTotalCountByCondition(@Param("condition") AuthorizationResourcePropertyCondition condition);
+
+    /**
+     * 分页查询
+     * @param condition
+     * @param pagination
+     * @return
+     */
+    List<AuthorizationResourcePropertyModel> getPageByCondition(@Param("condition") AuthorizationResourcePropertyCondition condition, @Param("pagination") Pagination pagination);
 
 }

@@ -21,8 +21,8 @@ import java.util.List;
 public class DataAuthorizationHandler implements RequestHandler {
 
     @RequestMapper("")
-    public boolean auth(@NotEmpty List<DataAuthorization> dataAuthorizations) throws BizException {
-        return dataAuthorizationService.auth(dataAuthorizations);
+    public boolean auth(@NotEmpty DataAuthorization dataAuthorization) throws BizException {
+        return dataAuthorizationService.auth(dataAuthorization);
     }
 
     @Autowired

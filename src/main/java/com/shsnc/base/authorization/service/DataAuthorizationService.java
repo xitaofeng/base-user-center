@@ -81,27 +81,27 @@ public class DataAuthorizationService {
     /**
      * 数据授权
      *
-     * @param dataAuthorizations
+     * @param dataAuthorization
      * @return
      */
     @Transactional
-    public boolean auth(List<DataAuthorization> dataAuthorizations) throws BizException {
-        if (CollectionUtils.isEmpty(dataAuthorizations)) {
+    public boolean auth(DataAuthorization dataAuthorization) throws BizException {
+        if (dataAuthorization == null) {
             throw new BizException("选择授权的数据");
         }
-        for (DataAuthorization dataAuthorization : dataAuthorizations) {
-            Integer resourceType = dataAuthorization.getResourceType();
-            Integer authType = dataAuthorization.getAuthType(); //授权类型
-            List<Long> resourceIdList = dataAuthorization.getResourceIdList();
-            List<Long> propertyIdList = dataAuthorization.getPropertyIdList();
 
-            if (AuthorizationResourceAuthModel.EnumAuthType.USER.getValue() == authType) {
-                userAuth(resourceType, dataAuthorization.getAuthValueList(), resourceIdList, propertyIdList);
-            } else if (AuthorizationResourceAuthModel.EnumAuthType.ROLE.getValue() == authType) {
-                roleAuth(resourceType, dataAuthorization.getAuthValueList(), resourceIdList, propertyIdList);
-            }
+        Integer resourceType = dataAuthorization.getResourceType();
+        List<Long> resourceIdList = dataAuthorization.getResourceIdList();
+        List<Long> propertyIdList = dataAuthorization.getPropertyIdList();
 
+        if(!CollectionUtils.isEmpty(dataAuthorization.getAuthUserList())){
+            userAuth(resourceType, dataAuthorization.getAuthUserList(), resourceIdList, propertyIdList);
         }
+
+        if(!CollectionUtils.isEmpty(dataAuthorization.getAuthRoleList())){
+            userAuth(resourceType, dataAuthorization.getAuthRoleList(), resourceIdList, propertyIdList);
+        }
+
         return true;
     }
 
