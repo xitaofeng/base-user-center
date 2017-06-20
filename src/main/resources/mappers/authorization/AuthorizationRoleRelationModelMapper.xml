@@ -72,4 +72,16 @@
         </foreach>
     </select>
 
+    <select id="getAuthorizationCodeByRoleIds" resultType="java.lang.String">
+        SELECT
+        authorization_code
+        FROM
+        <include refid="tableName"/>
+        WHERE role_id IN
+        <foreach collection="list" item="roleId" index="index" separator="," open="(" close=")">
+            #{roleId }
+        </foreach>
+    </select>
+
+
 </mapper>

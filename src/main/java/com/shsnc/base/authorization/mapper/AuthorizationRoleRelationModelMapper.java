@@ -47,6 +47,13 @@ public interface AuthorizationRoleRelationModelMapper {
     public List<Long> getAuthorizationIdByRoleIds(List<Long> roleIds);
 
     /**
+     * 根据角色ID 获取 角色所有权限
+     * @param roleIds
+     * @return
+     */
+    public List<String> getAuthorizationCodeByRoleIds(List<Long> roleIds);
+
+    /**
      * 根据角色ID 删除角色和权限关系
      * @param roleId
      * @return

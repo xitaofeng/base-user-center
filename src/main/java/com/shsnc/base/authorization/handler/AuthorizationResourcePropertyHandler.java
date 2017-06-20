@@ -1,6 +1,7 @@
 package com.shsnc.base.authorization.handler;
 
 import com.shsnc.api.core.RequestHandler;
+import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.base.authorization.bean.AuthorizationResourceProperty;
@@ -29,6 +30,7 @@ public class AuthorizationResourcePropertyHandler implements RequestHandler {
 
     @RequestMapper("/add")
     @Validate
+    @Authentication("")
     public Long addAuthorizationResourceProperty(@NotNull Integer resourceType, @NotNull String resourceTypeName,
                                                  @NotNull String propertyName, @NotNull Integer propertyValue, Long parentId) throws Exception {
         AuthorizationResourcePropertyModel authorizationResourcePropertyModel = new AuthorizationResourcePropertyModel();

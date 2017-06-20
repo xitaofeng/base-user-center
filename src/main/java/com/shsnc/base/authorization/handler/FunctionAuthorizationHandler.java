@@ -46,8 +46,8 @@ public class FunctionAuthorizationHandler implements RequestHandler {
      * @return
      */
     @RequestMapper("/user/have/list")
-    public List<Long> userHaveAuthorizationList(@NotNull Long userId) throws BizException {
-        return authorizationRoleRelationService.getAuthorizationIdByUserId(userId);
+    public List<String> userHaveAuthorizationList(@NotNull Long userId) throws BizException {
+        return authorizationRoleRelationService.getAuthorizationCodeByUserId(userId);
     }
 
     /**
@@ -56,8 +56,8 @@ public class FunctionAuthorizationHandler implements RequestHandler {
      * @return
      */
     @RequestMapper("/user/have")
-    public boolean userHaveAuthorization(@NotNull Long userId, @NotNull Long authorizationId) throws BizException {
-        return authorizationRoleRelationService.userHaveAuthorization(userId, authorizationId);
+    public boolean userHaveAuthorization(@NotNull Long userId, @NotNull String authorizationCode) throws BizException {
+        return authorizationRoleRelationService.userHaveAuthorization(userId, authorizationCode);
     }
 
 

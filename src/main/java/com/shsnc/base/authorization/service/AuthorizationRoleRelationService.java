@@ -91,7 +91,7 @@ public class AuthorizationRoleRelationService {
      * @param userId
      * @return
      */
-    public List<Long> getAuthorizationIdByUserId(Long userId) throws BizException {
+    public List<String> getAuthorizationCodeByUserId(Long userId) throws BizException {
         if (userId == null) {
             throw new BizException("选择用户");
         }
@@ -99,24 +99,24 @@ public class AuthorizationRoleRelationService {
         List<Long> roleIds = userModuleService.getRoleIdsByUserId(userId);
 
         if (!CollectionUtils.isEmpty(roleIds)) {
-            return authorizationRoleRelationModelMapper.getAuthorizationIdByRoleIds(roleIds);
+            return authorizationRoleRelationModelMapper.getAuthorizationCodeByRoleIds(roleIds);
         } else {
             return new ArrayList<>();
         }
     }
 
     /**
-     * 验证用户是否拥有该权限
+     * 验证用户是否拥有该权限编码
      *
      * @param userId
-     * @param authorizationId
+     * @param authorizationCode
      * @return
      */
-    public boolean userHaveAuthorization(Long userId, Long authorizationId) throws BizException {
-        if (authorizationId == null) {
+    public boolean userHaveAuthorization(Long userId, String authorizationCode) throws BizException {
+        if (authorizationCode == null) {
             throw new BizException("选择权限");
         }
-        List<Long> authorizationIdList = getAuthorizationIdByUserId(userId);
-        return authorizationIdList.contains(authorizationId);
+        List<String> authorizationCodeList = getAuthorizationCodeByUserId(userId);
+        return authorizationCodeList.contains(authorizationCode);
     }
 }
