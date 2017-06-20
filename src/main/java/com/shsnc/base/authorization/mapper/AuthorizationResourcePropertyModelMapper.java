@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface AuthorizationResourcePropertyModelMapper {
 
-    public Long addAuthorizationResourcePropertyModel(AuthorizationResourcePropertyModel authorizationResourcePropertyModel);
+    public int addAuthorizationResourcePropertyModel(AuthorizationResourcePropertyModel authorizationResourcePropertyModel);
 
     public Integer editAuthorizationResourcePropertyModel(AuthorizationResourcePropertyModel authorizationResourcePropertyModel);
 

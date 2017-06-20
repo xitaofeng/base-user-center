@@ -18,7 +18,7 @@ public interface AuthorizationInfoModelMapper {
      * @param authorizationInfoModel
      * @return
      */
-    public Long addAuthorizationInfo(AuthorizationInfoModel authorizationInfoModel);
+    public int addAuthorizationInfo(AuthorizationInfoModel authorizationInfoModel);
 
     /**
      * 编辑权限信息 返回数据编辑成功数据条数

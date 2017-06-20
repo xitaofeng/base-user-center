@@ -16,7 +16,7 @@ public interface AuthorizationRoleRelationModelMapper {
      * @param authorizationRoleRelationModel
      * @return
      */
-    public Integer addAuthorizationRoleRelationModel(AuthorizationRoleRelationModel authorizationRoleRelationModel);
+    public int addAuthorizationRoleRelationModel(AuthorizationRoleRelationModel authorizationRoleRelationModel);
 
     /**
      * 批量插入数据返回 插入条数
@@ -45,6 +45,13 @@ public interface AuthorizationRoleRelationModelMapper {
      * @return
      */
     public List<Long> getAuthorizationIdByRoleIds(List<Long> roleIds);
+
+    /**
+     * 根据角色ID 获取 角色所有权限
+     * @param roleIds
+     * @return
+     */
+    public List<String> getAuthorizationCodeByRoleIds(List<Long> roleIds);
 
     /**
      * 根据角色ID 删除角色和权限关系

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 数据授权
+ * 数据授权对象
  * Created by Elena on 2017/6/12.
  */
 public class DataAuthorization implements Serializable {

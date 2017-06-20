@@ -1,6 +1,7 @@
 package com.shsnc.base.authorization.config;
 
 import com.shsnc.base.authorization.model.AuthorizationResourceAuthModel;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
@@ -10,23 +11,18 @@ import java.util.*;
 public final class BeanUtils {
 
     /**
-     * 去重
+     * 权限数据去重
      *
      * @param list
      * @return
      */
     public static List<AuthorizationResourceAuthModel> removeDuplicate(List<AuthorizationResourceAuthModel> list) {
+        Map<String, AuthorizationResourceAuthModel> map = new HashMap<>();
         List<String> setKey = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
-            AuthorizationResourceAuthModel item = list.get(i);
-            String key = item.getAuthType() + "-" + item.getAuthValue() + "-" + item.getResourceType() + "-" + item.getResourceId();
-            if (setKey.contains(key)) {
-                list.remove(i--);
-            } else {
-                setKey.add(key);
-            }
+        for (AuthorizationResourceAuthModel item : list) {
+            String key = item.getResourceType() + "-" + item.getResourceId() + "-" + item.getPropertyId() + "-" + item.getAuthType() + "-" + item.getAuthValue();
+            map.put(key, item);
         }
-
-        return list;
+        return (List<AuthorizationResourceAuthModel>) map.values();
     }
 }

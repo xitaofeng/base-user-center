@@ -37,6 +37,9 @@ public class AuthorizationRoleRelationService {
     @Autowired
     private AuthorizationRoleModelMapper authorizationRoleModelMapper;
 
+    @Autowired
+    private UserModuleService userModuleService;
+
     /**
      * 批量插入数据返回 插入条数
      *
@@ -88,49 +91,32 @@ public class AuthorizationRoleRelationService {
      * @param userId
      * @return
      */
-    public List<Long> getAuthorizationIdByUserId(Long userId) throws BizException {
+    public List<String> getAuthorizationCodeByUserId(Long userId) throws BizException {
         if (userId == null) {
             throw new BizException("选择用户");
         }
-        //return authorizationRoleRelationModelMapper.getAuthorizationIdByRoleId(roleId);
-        Set<Long> roleIds = new HashSet<>();//角色列表
 
-        //获取用户角色列表
-        List<Long> userRoleIds = authorizationUserRoleRelationModelMapper.getRoleIdByUserId(userId);
-        userRoleIds.forEach(roleId -> {
-            roleIds.add(roleId);
-        });
-        //TODO 根据当前用户获取所属 组
-        List<Long> groupIds = new ArrayList<>();//组列表
-
-        if (!CollectionUtils.isEmpty(groupIds)) {
-            List<Long> groupRoleIds = authorizationGroupRoleRelationModelMapper.getRoleIdByGroupIds(groupIds);
-            groupRoleIds.forEach(roleId -> {
-                roleIds.add(roleId);
-            });
-        }
+        List<Long> roleIds = userModuleService.getRoleIdsByUserId(userId);
 
         if (!CollectionUtils.isEmpty(roleIds)) {
-            List<Long> tempList = new ArrayList<Long>();
-            tempList.addAll(roleIds);
-            return authorizationRoleRelationModelMapper.getAuthorizationIdByRoleIds(tempList);
+            return authorizationRoleRelationModelMapper.getAuthorizationCodeByRoleIds(roleIds);
         } else {
             return new ArrayList<>();
         }
     }
 
     /**
-     * 验证用户是否拥有该权限
+     * 验证用户是否拥有该权限编码
      *
      * @param userId
-     * @param authorizationId
+     * @param authorizationCode
      * @return
      */
-    public boolean userHaveAuthorization(Long userId, Long authorizationId) throws BizException {
-        if (authorizationId == null) {
+    public boolean userHaveAuthorization(Long userId, String authorizationCode) throws BizException {
+        if (authorizationCode == null) {
             throw new BizException("选择权限");
         }
-        List<Long> authorizationIdList = getAuthorizationIdByUserId(userId);
-        return authorizationIdList.contains(authorizationId);
+        List<String> authorizationCodeList = getAuthorizationCodeByUserId(userId);
+        return authorizationCodeList.contains(authorizationCode);
     }
 }

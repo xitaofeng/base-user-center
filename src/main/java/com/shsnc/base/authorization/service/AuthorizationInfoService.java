@@ -48,9 +48,9 @@ public class AuthorizationInfoService {
         if (authorizationInfoModel.getAuthorizationStatus() == null) {
             authorizationInfoModel.setAuthorizationStatus(EnumAuthorizationStatus.ENABLED.getAuthorizationStatus());
         }
-        Long authorizationId = authorizationInfoModelMapper.addAuthorizationInfo(authorizationInfoModel);
-        if (authorizationId != null) {
-            return authorizationId;
+        int count = authorizationInfoModelMapper.addAuthorizationInfo(authorizationInfoModel);
+        if (count > 0) {
+            return authorizationInfoModel.getAuthorizationId();
         } else {
             throw new BizException("权限添加失败");
         }
