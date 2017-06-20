@@ -11,13 +11,11 @@ import com.shsnc.base.authorization.model.AuthorizationResourceAuthModel.EnumAut
 import com.shsnc.base.util.RedisUtil;
 import com.shsnc.base.util.StringUtil;
 import com.shsnc.base.util.config.BizException;
-import jdk.nashorn.internal.ir.ReturnNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

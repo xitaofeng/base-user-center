@@ -3,7 +3,6 @@ package com.shsnc.base.authorization.handler;
 import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
-import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.shsnc.base.authorization.service.AssignService;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;

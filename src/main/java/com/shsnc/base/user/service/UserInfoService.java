@@ -1,13 +1,11 @@
 package com.shsnc.base.user.service;
 
-import com.fasterxml.jackson.databind.deser.Deserializers;
-import com.shsnc.base.user.bean.ExtendPropertyValue;
-import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.config.UserConstant;
-import com.shsnc.base.user.mapper.AccountModelMapper;
-import com.shsnc.base.user.mapper.ExtendPropertyValueMapper;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;
-import com.shsnc.base.user.model.*;
+import com.shsnc.base.user.model.ExtendPropertyModel;
+import com.shsnc.base.user.model.ExtendPropertyValueModel;
+import com.shsnc.base.user.model.UserInfoCondition;
+import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.support.Assert;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.RedisUtil;
@@ -17,12 +15,10 @@ import com.shsnc.base.util.crypto.SHAMaker;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 

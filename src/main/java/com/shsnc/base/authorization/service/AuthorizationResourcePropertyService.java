@@ -3,7 +3,6 @@ package com.shsnc.base.authorization.service;
 import com.shsnc.base.authorization.config.RedisConstants;
 import com.shsnc.base.authorization.mapper.AuthorizationResourcePropertyModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationResourcePropertyModel;
-import com.shsnc.base.authorization.model.AuthorizationRoleModel;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.RedisUtil;
 import com.shsnc.base.util.StringUtil;

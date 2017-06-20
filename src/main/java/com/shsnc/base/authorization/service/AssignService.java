@@ -4,7 +4,6 @@ import com.shsnc.base.authorization.mapper.AuthorizationGroupRoleRelationModelMa
 import com.shsnc.base.authorization.mapper.AuthorizationRoleModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationGroupRoleRelationModel;
-import com.shsnc.base.authorization.model.AuthorizationRoleRelationModel;
 import com.shsnc.base.authorization.model.AuthorizationUserRoleRelationModel;
 import com.shsnc.base.user.mapper.GroupStructureModelMapper;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;

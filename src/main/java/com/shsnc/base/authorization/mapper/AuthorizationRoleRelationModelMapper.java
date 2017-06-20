@@ -4,7 +4,6 @@ import com.shsnc.base.authorization.model.AuthorizationRoleRelationModel;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Elena on 2017/6/7.

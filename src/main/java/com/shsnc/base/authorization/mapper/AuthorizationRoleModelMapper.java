@@ -1,7 +1,6 @@
 package com.shsnc.base.authorization.mapper;
 
 import com.shsnc.base.authorization.model.AuthorizationRoleModel;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 

@@ -1,9 +1,5 @@
 package com.shsnc.base.user.bean;
 
-import com.shsnc.api.core.validation.ValidationType;
-
-import javax.validation.constraints.NotNull;
-
 /**
  *
  */

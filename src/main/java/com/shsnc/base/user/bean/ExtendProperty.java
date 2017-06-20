@@ -1,8 +1,6 @@
 package com.shsnc.base.user.bean;
 
-import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 

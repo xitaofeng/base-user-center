@@ -1,6 +1,5 @@
 package com.shsnc.base.authorization.mapper;
 
-import com.shsnc.base.authorization.model.AuthorizationGroupRoleRelationModel;
 import com.shsnc.base.authorization.model.AuthorizationUserRoleRelationModel;
 import org.apache.ibatis.annotations.Param;
 

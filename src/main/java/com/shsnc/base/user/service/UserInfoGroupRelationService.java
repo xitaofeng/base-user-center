@@ -6,15 +6,13 @@ import com.shsnc.base.user.mapper.UserInfoModelMapper;
 import com.shsnc.base.user.model.UserInfoGroupRelationModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.support.Assert;
-import com.shsnc.base.user.support.accessor.PropertyGetter;
-import com.shsnc.base.user.support.helper.BeanHelper;
 import com.shsnc.base.util.config.BizException;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by houguangqiang on 2017/6/8.
