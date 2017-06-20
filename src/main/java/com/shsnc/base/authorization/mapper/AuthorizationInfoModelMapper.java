@@ -1,6 +1,8 @@
 package com.shsnc.base.authorization.mapper;
 
 import com.shsnc.base.authorization.model.AuthorizationInfoModel;
+import com.shsnc.base.authorization.model.condition.AuthorizationInfoCondition;
+import com.shsnc.base.util.sql.Pagination;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -77,4 +79,19 @@ public interface AuthorizationInfoModelMapper {
      * @return
      */
     public List<AuthorizationInfoModel> getListByAuthorizationCode(String authorizationCode);
+
+    /**
+     * 总数获取
+     * @param condition
+     * @return
+     */
+    Integer getTotalCountByCondition(@Param("condition") AuthorizationInfoCondition condition);
+
+    /**
+     * 分页查询
+     * @param condition
+     * @param pagination
+     * @return
+     */
+    List<AuthorizationInfoModel> getPageByCondition(@Param("condition") AuthorizationInfoCondition condition, @Param("pagination") Pagination pagination);
 }

@@ -5,8 +5,13 @@ import com.shsnc.base.authorization.mapper.AuthorizationInfoModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel.EnumAuthorizationStatus;
+import com.shsnc.base.authorization.model.condition.AuthorizationInfoCondition;
+import com.shsnc.base.user.model.ExtendPropertyModel;
+import com.shsnc.base.user.model.UserInfoCondition;
 import com.shsnc.base.util.StringUtil;
 import com.shsnc.base.util.config.BizException;
+import com.shsnc.base.util.sql.Pagination;
+import com.shsnc.base.util.sql.QueryData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -145,6 +150,21 @@ public class AuthorizationInfoService {
      */
     public List<AuthorizationInfoModel> getAuthorizationList(AuthorizationInfoModel authorizationInfoModel) throws Exception {
         return authorizationInfoModelMapper.getAuthorizationList(authorizationInfoModel);
+    }
+
+    /**
+     * 分页查询
+     * @param condition
+     * @param pagination
+     * @return
+     */
+    public QueryData getAuthorizationPageList(AuthorizationInfoCondition condition, Pagination pagination) {
+        QueryData queryData = new QueryData(pagination);
+        int totalCount = authorizationInfoModelMapper.getTotalCountByCondition(condition);
+        queryData.setRowCount(totalCount);
+        List<AuthorizationInfoModel> list = authorizationInfoModelMapper.getPageByCondition(condition, pagination);
+        queryData.setRecords(list);
+        return queryData;
     }
 
     /**
