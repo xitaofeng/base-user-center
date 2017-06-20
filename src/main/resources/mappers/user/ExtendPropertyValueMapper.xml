@@ -101,6 +101,29 @@
             </if>
         </where>
     </select>
+    <select id="getPropertyIdByUserIds" resultType="java.lang.Long">
+        SELECT property_id
+        FROM user_extend_property_value
+        WHERE user_id IN
+        <foreach collection="userIds" item="userId" separator="," open="(" close=")">
+            #{userId}
+        </foreach>
+    </select>
+    <select id="getPropertyByUserIds" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_extend_property_value
+        WHERE user_id IN
+        <foreach collection="userIds" item="userId" separator="," open="(" close=")">
+            #{userId}
+        </foreach>
+    </select>
+    <select id="getByUserIdAndPropertyId"  resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_extend_property_value
+        WHERE user_id=#{userId} AND property_id = #{propertyValueId}
+    </select>
 
     <insert id="insertExtendPropertyValueList" useGeneratedKeys="true" keyProperty="propertyValueId">
         INSERT INTO user_extend_property_value (

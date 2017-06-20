@@ -1,12 +1,9 @@
 package com.shsnc.base.user.service;
 
 import com.shsnc.base.user.BaseUserTest;
-import com.shsnc.base.user.bean.ExtendProperty;
-import com.shsnc.base.user.mapper.ExtendPropertyModelMapper;
 import com.shsnc.base.user.model.ExtendPropertyCondition;
 import com.shsnc.base.user.model.ExtendPropertyModel;
 import com.shsnc.base.util.JsonUtil;
-import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
 import org.junit.Test;
@@ -16,7 +13,7 @@ import org.springframework.test.annotation.Rollback;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by houguangqiang on 2017/6/7.
@@ -33,8 +30,6 @@ public class ExtendPropertyServiceTest extends BaseUserTest {
         ExtendPropertyCondition condition = new ExtendPropertyCondition();
         condition.setPropertyName("年");
         Pagination pagination = new Pagination();
-        pagination.setOrderField("property_name");
-        pagination.setOrderType("desc");
         QueryData queryData = extendPropertyService.getExtendPropertyPage(condition, pagination);
         System.out.println(JsonUtil.toJsonString(queryData));
     }

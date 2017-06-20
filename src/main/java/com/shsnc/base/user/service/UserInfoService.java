@@ -205,6 +205,8 @@ public class UserInfoService {
         String username = userInfoModel.getUsername();
         if(username != null && !username.equals(dbUserInfoModel.getUsername())){
             checkUsername(userInfoModel);
+        } else {
+            userInfoModel.setUsername(dbUserInfoModel.getUsername());
         }
 
         String mobile = userInfoModel.getMobile();
@@ -216,6 +218,7 @@ public class UserInfoService {
         if(email != null && !email.equals(dbUserInfoModel.getEmail())){
             checkEmail(userInfoModel);
         }
+        checkPassword(userInfoModel);
         userInfoModel.setCreateTime(null);
         userInfoModel.setInternal(null);
         userInfoModel.setIsDelete(null);
@@ -275,6 +278,7 @@ public class UserInfoService {
         }
         if(password != null){
             Assert.isTrue(password.length()>4, "密码长度不能小于5！");
+            userInfoModel.setPassword(SHAMaker.sha256String(password));
         }
     }
 
