@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class AuthorizationResourceProperty implements Serializable {
 
     @NotNull(groups = {ValidationType.Update.class})
-    private Long id;
+    private Long propertyId;
 
     @NotNull(groups = {ValidationType.Add.class})
     private String propertyName;
@@ -28,12 +28,12 @@ public class AuthorizationResourceProperty implements Serializable {
 
     private Long parentId;
 
-    public Long getId() {
-        return id;
+    public Long getPropertyId() {
+        return propertyId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setPropertyId(Long propertyId) {
+        this.propertyId = propertyId;
     }
 
     public String getPropertyName() {
