@@ -2,10 +2,7 @@ package com.shsnc.base.authorization.config;
 
 import com.shsnc.base.authorization.model.AuthorizationResourceAuthModel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Elena on 2017/6/13.
@@ -25,6 +22,7 @@ public final class BeanUtils {
             String key = item.getResourceType() + "-" + item.getResourceId() + "-" + item.getPropertyId() + "-" + item.getAuthType() + "-" + item.getAuthValue();
             map.put(key, item);
         }
-        return (List<AuthorizationResourceAuthModel>) map.values();
+        Collection<AuthorizationResourceAuthModel> collection = map.values();
+        return new ArrayList<>(collection);
     }
 }

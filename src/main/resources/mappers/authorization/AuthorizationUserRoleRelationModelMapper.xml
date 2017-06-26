@@ -41,6 +41,17 @@
         WHERE role_id = #{roleId }
     </select>
 
+    <select id="getUserIdByRoleIds" resultType="java.lang.Long">
+        SELECT
+        user_id
+        FROM
+        <include refid="tableName"/>
+        WHERE role_id IN
+        <foreach collection="list" open="(" close=")" separator="," item="roleId">
+            #{roleId}
+        </foreach>
+    </select>
+
     <delete id="deleteAuthorizationUserRoleRelationModelByUserId">
         DELETE FROM
         <include refid="tableName"/>

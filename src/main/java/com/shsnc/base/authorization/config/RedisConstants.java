@@ -1,5 +1,9 @@
 package com.shsnc.base.authorization.config;
 
+import com.shsnc.base.util.RedisUtil;
+
+import java.util.List;
+
 /**
  * Created by Elena on 2017/6/12.
  */
@@ -39,5 +43,17 @@ public class RedisConstants {
      */
     public static String resourceDataAuthorizationKey(Integer resourceType, Long resourceId) {
         return RedisUtils.buildRedisKey(RedisConstants.RESOURCE_DATA_AUTHORIZATION, resourceType.toString(), resourceId.toString());
+    }
+
+    /**
+     * 清理用户-资源类型下的权限数据权限
+     * @param userIdList
+     */
+    public static void romverUserDataAuthorization(List<Long> userIdList, Integer resourceType) {
+        for (Long userId : userIdList) {
+            //清理redis 权限
+            String resourceDataAuthorization = RedisUtils.buildRedisKey(RedisConstants.userResourceDataAuthorizationKey(userId), resourceType.toString());
+            RedisUtil.remove(resourceDataAuthorization);
+        }
     }
 }

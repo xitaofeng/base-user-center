@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Elena on 2017/6/7.
@@ -41,6 +42,12 @@ public class DataAuthorizationHandler implements RequestHandler {
     @RequestMapper("/auth/value")
     public Integer authValue(@NotNull Long userId, @NotNull Integer resourceType, @NotNull Long resourceId) throws BizException {
         return dataAuthorizationService.getAuthValue(userId, resourceType, resourceId);
+    }
+
+
+    @RequestMapper("/auth/resource/type/value")
+    public Map<String, Integer> getUserResourceTypeAutValuehList(@NotNull Long userId, @NotNull Integer resourceType) throws BizException {
+        return dataAuthorizationService.getUserResourceTypeAutValuehList(userId, resourceType);
     }
 
 }
