@@ -69,14 +69,14 @@
                     (auth_type = 1 AND auth_value = #{userId})
                     <if test="roleIds != null and roleIds.size > 0">
                      OR (auth_type = 2 AND auth_value IN
-                          <foreach collection="list" item="roleId" open="(" close=")">
+                          <foreach collection="roleIds" item="roleId" open="(" close=")" separator=",">
                              #{roleId}
                           </foreach>
                         )
                     </if>
                     GROUP BY resource_type,resource_id,property_id
         ) b INNER JOIN
-        authorization_resource_property p ON b.property_id = p.id
+        authorization_resource_property p ON b.property_id = p.parent_id
         GROUP BY resource_type,resource_id
     </select>
 

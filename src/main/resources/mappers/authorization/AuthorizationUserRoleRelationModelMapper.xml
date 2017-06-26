@@ -41,6 +41,17 @@
         WHERE role_id = #{roleId }
     </select>
 
+    <select id="getUserIdByRoleIds" resultType="java.lang.Long">
+        SELECT
+        user_id
+        FROM
+        <include refid="tableName"/>
+        WHERE role_id IN
+        <foreach collection="list" open="(" close=")" separator="," item="roleId">
+            #{roleId}
+        </foreach>
+    </select>
+
     <delete id="deleteAuthorizationUserRoleRelationModelByUserId">
         DELETE FROM
         <include refid="tableName"/>
@@ -52,5 +63,14 @@
         <include refid="tableName"/>
         WHERE role_id = #{roleId }
     </delete>
+
+    <select id="getCountByUserIdAndRoleCode" parameterType="java.lang.Integer">
+        SELECT
+          COUNT(*)
+        FROM authorization_role e
+        INNER JOIN authorization_user_role_relation r ON e.role_id = r.role_id
+        WHERE r.user_id = #{userId}
+        AND e.role_code = #{roleCode}
+    </select>
 
 </mapper>

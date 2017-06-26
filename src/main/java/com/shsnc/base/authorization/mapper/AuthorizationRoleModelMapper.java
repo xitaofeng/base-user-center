@@ -61,6 +61,14 @@ public interface AuthorizationRoleModelMapper {
     public List<AuthorizationRoleModel> getListByRoleName(String roleName);
 
     /**
+     * 角色编码
+     *
+     * @param roleCode
+     * @return
+     */
+    public List<AuthorizationRoleModel> getListByRoleCode(String roleCode);
+
+    /**
      * 根据roleId获取对象
      *
      * @param roleId

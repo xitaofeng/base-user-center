@@ -2,6 +2,7 @@
 
 package com.shsnc.base.authorization.service;
 
+import com.shsnc.base.authorization.config.AuthorizationConstant;
 import com.shsnc.base.authorization.mapper.AuthorizationGroupRoleRelationModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationRoleModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
@@ -45,6 +46,9 @@ public class AuthorizationRoleService {
         if (isRoleName(authorizationRoleModel)) {
             throw new BizException("角色名称重复");
         }
+        if (isRoleCode(authorizationRoleModel)) {
+            throw new BizException("角色编码重复");
+        }
         if (authorizationRoleModel.getIsBuilt() == null) {
             authorizationRoleModel.setIsBuilt(AuthorizationRoleModel.EnumIsBuilt.FALSE.getValue());
         }
@@ -72,8 +76,11 @@ public class AuthorizationRoleService {
             AuthorizationRoleModel editAuthorizationRoleModel = authorizationRoleModelMapper.getAuthorizationRoleModelByRoleId(authorizationRoleModel.getRoleId());
             if (editAuthorizationRoleModel != null) {
                 BeanUtils.copyProperties(authorizationRoleModel, editAuthorizationRoleModel);
-                if (isRoleName(authorizationRoleModel)) {
+                if (isRoleName(editAuthorizationRoleModel)) {
                     throw new BizException("角色名称重复");
+                }
+                if (isRoleCode(editAuthorizationRoleModel)) {
+                    throw new BizException("角色编码重复");
                 }
                 if (authorizationRoleModel.getIsBuilt() == null) {
                     authorizationRoleModel.setIsBuilt(AuthorizationRoleModel.EnumIsBuilt.FALSE.getValue());
@@ -138,7 +145,7 @@ public class AuthorizationRoleService {
         return authorizationRoleModelMapper.getAuthorizationRoleModelList(condition);
     }
 
-    public QueryData getPageList(AuthorizationRoleCondition condition, Pagination pagination){
+    public QueryData getPageList(AuthorizationRoleCondition condition, Pagination pagination) {
         QueryData queryData = new QueryData(pagination);
         int totalCount = authorizationRoleModelMapper.getTotalCountByCondition(condition);
         queryData.setRowCount(totalCount);
@@ -162,6 +169,22 @@ public class AuthorizationRoleService {
         return authorizationRoleModel;
     }
 
+
+    /**
+     * 是否为管理员
+     *
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    public boolean isAdmin(Long userId) throws Exception {
+        if (userId == null) {
+            throw new BizException("无效数据");
+        }
+        String roleCode = AuthorizationConstant.ROLE_CODE_ADMIN;
+        return authorizationUserRoleRelationModelMapper.getCountByUserIdAndRoleCode(userId, roleCode) > 0;
+    }
+
     /**
      * 角色名称是否重复(true重复,false不重复)
      *
@@ -180,6 +203,26 @@ public class AuthorizationRoleService {
             return checkDataRepetition(roleId, list);
         } else {
             throw new BizException("权限名称不能为空");
+        }
+    }
+
+    /**
+     * 角色编码是否重复(true重复,false不重复)
+     *
+     * @param authorizationRoleModel
+     * @return
+     */
+    public boolean isRoleCode(AuthorizationRoleModel authorizationRoleModel) throws BizException {
+        Long roleId = authorizationRoleModel.getRoleId();
+        String roleCode = authorizationRoleModel.getRoleCode();
+        if (StringUtil.isNotEmpty(roleCode)) {
+            List<AuthorizationRoleModel> list = authorizationRoleModelMapper.getListByRoleName(roleCode);
+            if (CollectionUtils.isEmpty(list)) {
+                return false;
+            }
+            return checkDataRepetition(roleId, list);
+        } else {
+            throw new BizException("权限编码不能为空");
         }
     }
 

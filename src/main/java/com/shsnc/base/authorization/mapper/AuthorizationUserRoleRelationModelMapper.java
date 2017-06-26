@@ -32,6 +32,13 @@ public interface AuthorizationUserRoleRelationModelMapper {
      */
     public List<Long> getUserIdByRoleId(@Param("roleId") Long roleId);
 
+    /**
+     * 根据角色id获取用户ID
+     * @param roleIds
+     * @return
+     */
+    public List<Long> getUserIdByRoleIds(List<Long> roleIds);
+
 
     /**
      * 根据用户id 删除分组和角色关系
@@ -47,4 +54,12 @@ public interface AuthorizationUserRoleRelationModelMapper {
      * @return
      */
     public Long deleteAuthorizationUserRoleRelationModelByRoleId(@Param("roleId") Long roleId);
+
+    /**
+     *
+     * @param userId
+     * @param code
+     * @return
+     */
+    public Integer getCountByUserIdAndRoleCode(@Param("userId") Long userId,@Param("roleCode") String code);
 }

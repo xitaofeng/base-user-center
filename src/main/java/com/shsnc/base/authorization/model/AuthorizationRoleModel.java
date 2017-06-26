@@ -11,6 +11,8 @@ public class AuthorizationRoleModel implements Serializable {
 
     private String roleName;
 
+    private String roleCode;
+
     private Integer isBuilt;
 
     private String description;
@@ -18,6 +20,14 @@ public class AuthorizationRoleModel implements Serializable {
     private Long createTime;
 
     private Integer orders;
+
+    public String getRoleCode() {
+        return roleCode;
+    }
+
+    public void setRoleCode(String roleCode) {
+        this.roleCode = roleCode;
+    }
 
     /**
      * 是否内置
