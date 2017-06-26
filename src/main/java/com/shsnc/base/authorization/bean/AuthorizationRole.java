@@ -17,6 +17,9 @@ public class AuthorizationRole implements Serializable {
     @NotNull(groups = {ValidationType.Add.class})
     private String roleName;
 
+    @NotNull(groups = {ValidationType.Add.class})
+    private String roleCode;
+
     private Integer isBuilt;
 
     private String description;
@@ -24,6 +27,14 @@ public class AuthorizationRole implements Serializable {
     private Long createTime;
 
     private Integer orders;
+
+    public String getRoleCode() {
+        return roleCode;
+    }
+
+    public void setRoleCode(String roleCode) {
+        this.roleCode = roleCode;
+    }
 
     public Long getRoleId() {
         return roleId;

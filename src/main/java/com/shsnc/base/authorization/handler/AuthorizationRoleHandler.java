@@ -79,6 +79,12 @@ public class AuthorizationRoleHandler implements RequestHandler {
         return authorizationRoleService.getAuthorizationRoleByRoleId(roleId);
     }
 
+    @RequestMapper("/is/admin")
+    @Validate
+    public boolean isAdmin(@NotNull Long userId) throws Exception {
+        return authorizationRoleService.isAdmin(userId);
+    }
+
     /**
      * 用户分配角色
      *

@@ -2,6 +2,7 @@ package com.shsnc.base.authorization.handler;
 
 import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.annotation.RequestMapper;
+import com.shsnc.api.core.validation.Validate;
 import com.shsnc.base.authorization.bean.DataAuthorization;
 import com.shsnc.base.authorization.service.DataAuthorizationService;
 import com.shsnc.base.util.config.BizException;
@@ -22,6 +23,7 @@ import java.util.Map;
 public class DataAuthorizationHandler implements RequestHandler {
 
     @RequestMapper("")
+    @Validate
     public boolean auth(@NotEmpty DataAuthorization dataAuthorization) throws BizException {
         return dataAuthorizationService.auth(dataAuthorization);
     }
@@ -30,24 +32,38 @@ public class DataAuthorizationHandler implements RequestHandler {
     private DataAuthorizationService dataAuthorizationService;
 
     @RequestMapper("/user")
+    @Validate
     public boolean userAuth(@NotNull Integer resourceType, @NotEmpty List<Long> userIdList, @NotEmpty List<Long> resourceIdList, @NotEmpty List<Long> propertyIdList) throws Exception {
         return dataAuthorizationService.userAuth(resourceType, userIdList, resourceIdList, propertyIdList);
     }
 
     @RequestMapper("/role")
+    @Validate
     public boolean roleAuth(@NotNull Integer resourceType, @NotEmpty List<Long> roleIdList, @NotEmpty List<Long> resourceIdList, @NotEmpty List<Long> propertyIdList) throws BizException {
         return dataAuthorizationService.roleAuth(resourceType, roleIdList, resourceIdList, propertyIdList);
     }
 
     @RequestMapper("/auth/value")
+    @Validate
     public Integer authValue(@NotNull Long userId, @NotNull Integer resourceType, @NotNull Long resourceId) throws BizException {
         return dataAuthorizationService.getAuthValue(userId, resourceType, resourceId);
     }
 
 
-    @RequestMapper("/auth/resource/type/value")
-    public Map<String, Integer> getUserResourceTypeAutValuehList(@NotNull Long userId, @NotNull Integer resourceType) throws BizException {
-        return dataAuthorizationService.getUserResourceTypeAutValuehList(userId, resourceType);
+    /**
+     *
+     * @param userId  用户id
+     * @param resourceType 资源类型
+     * @param authorizationPropertyValue 权限属性值
+     * @return
+     * @throws BizException
+     */
+    @RequestMapper("/authorization/value")
+    @Validate
+    public Map<String, Integer> getUserResourceTypeAutValuehList(@NotNull Long userId, @NotNull Integer resourceType,Integer authorizationPropertyValue) throws BizException {
+        return dataAuthorizationService.getUserResourceTypeAutValuehList(userId, resourceType,authorizationPropertyValue);
     }
+
+
 
 }

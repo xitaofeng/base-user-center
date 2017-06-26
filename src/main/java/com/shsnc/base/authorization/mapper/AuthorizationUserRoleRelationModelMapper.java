@@ -54,4 +54,12 @@ public interface AuthorizationUserRoleRelationModelMapper {
      * @return
      */
     public Long deleteAuthorizationUserRoleRelationModelByRoleId(@Param("roleId") Long roleId);
+
+    /**
+     *
+     * @param userId
+     * @param code
+     * @return
+     */
+    public Integer getCountByUserIdAndRoleCode(@Param("userId") Long userId,@Param("roleCode") String code);
 }

@@ -5,6 +5,8 @@ package com.shsnc.base.authorization.config;
  */
 public final class AuthorizationConstant {
 
+    public static String ROLE_CODE_ADMIN = "admin";
+
     /**
      * 基本操作
      */

@@ -13,6 +13,7 @@ import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.RedisUtil;
 import com.shsnc.base.util.StringUtil;
 import com.shsnc.base.util.config.BizException;
+import com.shsnc.base.utils.DataAuthorizationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,13 +120,15 @@ public class DataAuthorizationService {
 
     /**
      * 根据用户id和资源类型获取 资源类型下所有有权限的资源数据及权限值
+     *
      * @param userId
      * @param resourceType
+     * @param authorizationPropertyValue 权限属性值
      * @return
      */
-    public Map<String, Integer> getUserResourceTypeAutValuehList(Long userId, Integer resourceType) {
-        String key = RedisUtils.buildRedisKey(RedisConstants.userResourceDataAuthorizationKey(userId), resourceType.toString());
-        String value = RedisUtil.getString(key);
+    public Map<String, Integer> getUserResourceTypeAutValuehList(Long userId, Integer resourceType, Integer authorizationPropertyValue) {
+        String redisKey = RedisUtils.buildRedisKey(RedisConstants.userResourceDataAuthorizationKey(userId), resourceType.toString());
+        String value = RedisUtil.getString(redisKey);
 
         Map<String, Integer> map = new HashMap<>();
         if (StringUtil.isNotEmpty(value)) {
@@ -141,6 +144,17 @@ public class DataAuthorizationService {
                 }
             }
         }
+
+        //根据权限属性过滤
+        if (authorizationPropertyValue != null && authorizationPropertyValue != 0) {
+            for (String key : map.keySet()) {
+                List<DataAuthorizationUtils.EnumDataAuthorization> list = DataAuthorizationUtils.analysisAuthorizationValue(map.get(key));
+                if (!list.contains(authorizationPropertyValue)){
+                    map.remove(key);
+                }
+            }
+        }
+
         return map;
     }
 
