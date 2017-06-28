@@ -1,6 +1,7 @@
 package com.shsnc.base.authorization.handler;
 
 import com.shsnc.api.core.RequestHandler;
+import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
@@ -33,6 +34,7 @@ public class AuthorizationRoleHandler implements RequestHandler {
 
     @RequestMapper("/add")
     @Validate(groups = ValidationType.Add.class)
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ROLE_ADD")
     public Long addAuthorizationRoleModel(AuthorizationRole authorizationRole) throws Exception {
         AuthorizationRoleModel authorizationRoleModel = new AuthorizationRoleModel();
         BeanUtils.copyProperties(authorizationRole, authorizationRoleModel);
@@ -41,6 +43,7 @@ public class AuthorizationRoleHandler implements RequestHandler {
 
     @RequestMapper("/edit")
     @Validate(groups = ValidationType.Update.class)
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ROLE_UPDATE")
     public boolean editAuthorizationInfo(AuthorizationRole authorizationRole) throws Exception {
         AuthorizationRoleModel authorizationRoleModel = new AuthorizationRoleModel();
         BeanUtils.copyProperties(authorizationRole, authorizationRoleModel);
@@ -49,6 +52,7 @@ public class AuthorizationRoleHandler implements RequestHandler {
 
     @RequestMapper("/delete")
     @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ROLE_DELETE")
     public boolean deleteAuthorizationRole(@NotNull Long roleId) throws Exception {
         List<Long> roleIdList = new ArrayList<>();
         roleIdList.add(roleId);
@@ -57,16 +61,19 @@ public class AuthorizationRoleHandler implements RequestHandler {
 
     @RequestMapper("/batch/delete")
     @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ROLE_DELETE_BATCH")
     public boolean batchDeleteAuthorizationRole(@NotEmpty List<Long> roleIdList) throws Exception {
         return authorizationRoleService.batchDeleteAuthorizationRole(roleIdList);
     }
 
     @RequestMapper("/list")
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ROLE_GET_LIST")
     public List<AuthorizationRoleModel> getAuthorizationRoleModelList(AuthorizationRoleCondition condition) throws Exception {
         return authorizationRoleService.getAuthorizationRoleModelList(condition);
     }
 
     @RequestMapper("/page/list")
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ROLE_GET_PAGE_LIST")
     public QueryData getPageList(AuthorizationRoleCondition condition, Pagination pagination) {
         pagination.buildSort(filedMapping);
         QueryData queryData = authorizationRoleService.getPageList(condition, pagination);
@@ -75,28 +82,16 @@ public class AuthorizationRoleHandler implements RequestHandler {
 
     @RequestMapper("/one")
     @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ROLE_GET_ONE")
     public AuthorizationRoleModel getAuthorizationRoleByRoleId(@NotNull Long roleId) throws Exception {
         return authorizationRoleService.getAuthorizationRoleByRoleId(roleId);
     }
 
     @RequestMapper("/is/admin")
     @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ROLE_IS_ADMIN")
     public boolean isAdmin(@NotNull Long userId) throws Exception {
         return authorizationRoleService.isAdmin(userId);
-    }
-
-    /**
-     * 用户分配角色
-     *
-     * @param userId
-     * @param roleIdList
-     * @return
-     * @throws Exception
-     */
-    @RequestMapper("/user/assign")
-    @Validate
-    public boolean userAssignRole(@NotNull Long userId, @NotEmpty List<Long> roleIdList) throws Exception {
-        return authorizationRoleService.batchDeleteAuthorizationRole(roleIdList);
     }
 
 }

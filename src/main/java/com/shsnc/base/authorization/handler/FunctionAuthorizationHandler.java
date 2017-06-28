@@ -1,6 +1,7 @@
 package com.shsnc.base.authorization.handler;
 
 import com.shsnc.api.core.RequestHandler;
+import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.base.authorization.service.AuthorizationRoleRelationService;
 import com.shsnc.base.util.config.BizException;
@@ -23,6 +24,7 @@ public class FunctionAuthorizationHandler implements RequestHandler {
     private AuthorizationRoleRelationService authorizationRoleRelationService;
 
     @RequestMapper("")
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_FUNCTION")
     public boolean roleBatchAuthorization(@NotNull Long roleId, @NotEmpty List<Long> authorizationIdList) throws BizException {
         return authorizationRoleRelationService.roleBatchAuthorization(roleId, authorizationIdList);
     }
@@ -35,6 +37,7 @@ public class FunctionAuthorizationHandler implements RequestHandler {
      * @return
      */
     @RequestMapper("/role/have")
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_FUNCTION_ROLE_HAVE")
     public List<Integer> roleHaveAuthorizationList(@NotNull Long roleId) {
         return authorizationRoleRelationService.getAuthorizationIdByRoleId(roleId);
     }
@@ -46,6 +49,7 @@ public class FunctionAuthorizationHandler implements RequestHandler {
      * @return
      */
     @RequestMapper("/user/have/list")
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_FUNCTION_USER_HAVE_LIST")
     public List<String> userHaveAuthorizationList(@NotNull Long userId) throws BizException {
         return authorizationRoleRelationService.getAuthorizationCodeByUserId(userId);
     }
@@ -56,6 +60,7 @@ public class FunctionAuthorizationHandler implements RequestHandler {
      * @return
      */
     @RequestMapper("/user/have")
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_FUNCTION_USER_HAVE")
     public boolean userHaveAuthorization(@NotNull Long userId, @NotNull String authorizationCode) throws BizException {
         return authorizationRoleRelationService.userHaveAuthorization(userId, authorizationCode);
     }

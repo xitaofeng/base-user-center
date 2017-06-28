@@ -1,6 +1,7 @@
 package com.shsnc.base.authorization.handler;
 
 import com.shsnc.api.core.RequestHandler;
+import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
@@ -38,6 +39,7 @@ public class AuthorizationInfoHandler implements RequestHandler {
 
     @RequestMapper("/add")
     @Validate(groups = ValidationType.Add.class)
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_INFO_ADD")
     public Long addAuthorizationInfo(AuthorizationInfo authorizationInfo) throws Exception {
         AuthorizationInfoModel authorizationInfoModel = new AuthorizationInfoModel();
         BeanUtils.copyProperties(authorizationInfo, authorizationInfoModel);
@@ -46,6 +48,7 @@ public class AuthorizationInfoHandler implements RequestHandler {
 
     @RequestMapper("/edit")
     @Validate(groups = ValidationType.Update.class)
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_INFO_UPDATE")
     public boolean editAuthorizationInfo(AuthorizationInfo authorizationInfo) throws Exception {
         AuthorizationInfoModel authorizationInfoModel = new AuthorizationInfoModel();
         BeanUtils.copyProperties(authorizationInfo, authorizationInfoModel);
@@ -54,18 +57,21 @@ public class AuthorizationInfoHandler implements RequestHandler {
 
     @RequestMapper("/enabled")
     @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_INFO_UPDATE_ENABLED")
     public boolean enabledAuthorizationInfo(@NotNull Long authorizationId) throws Exception {
         return authorizationInfoService.editAuthorizationInfoModelStatus(authorizationId, AuthorizationInfoModel.EnumAuthorizationStatus.ENABLED);
     }
 
     @RequestMapper("/disabled")
     @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_INFO_UPDATE_DISABLED")
     public boolean disabledAuthorizationInfo(@NotNull Long authorizationId) throws Exception {
         return authorizationInfoService.editAuthorizationInfoModelStatus(authorizationId, AuthorizationInfoModel.EnumAuthorizationStatus.DISABLED);
     }
 
     @RequestMapper("/delete")
     @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_INFO_DELETE")
     public boolean deleteAuthorizationInfo(@NotNull Long authorizationId) throws Exception {
         List<Long> authorizationIdList = new ArrayList<>();
         authorizationIdList.add(authorizationId);
@@ -74,12 +80,14 @@ public class AuthorizationInfoHandler implements RequestHandler {
 
     @RequestMapper("/batch/delete")
     @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_INFO_DELETE_BATCH")
     public boolean batchDeleteAuthorizationInfo(@NotEmpty List<Long> authorizationIdList) throws Exception {
         return authorizationInfoService.batchDeleteAuthorizationInfo(authorizationIdList);
     }
 
     @RequestMapper("/list")
     @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_INFO_GET_LIST")
     public List<AuthorizationInfo> getAuthorizationList(AuthorizationInfoCondition condition) throws Exception {
 
         List<AuthorizationInfoModel> list = authorizationInfoService.getAuthorizationList(condition);
@@ -95,6 +103,7 @@ public class AuthorizationInfoHandler implements RequestHandler {
     }
 
     @RequestMapper("/page/list")
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_INFO_GET_PAGE_LIST")
     public QueryData getPageList(AuthorizationInfoCondition condition, Pagination pagination) {
         pagination.buildSort(filedMapping);
         QueryData queryData = authorizationInfoService.getAuthorizationPageList(condition, pagination);
@@ -103,6 +112,7 @@ public class AuthorizationInfoHandler implements RequestHandler {
 
     @RequestMapper("/one")
     @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_INFO_GET_ONE")
     public AuthorizationInfo getAuthorizationByAuthorizationId(@NotNull Long authorizationId) throws Exception {
         AuthorizationInfo authorizationInfo = new AuthorizationInfo();
         AuthorizationInfoModel authorizationInfoModel = authorizationInfoService.getAuthorizationByAuthorizationId(authorizationId);
