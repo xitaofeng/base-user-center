@@ -37,6 +37,7 @@ public class AuthorizationResourcePropertyHandler implements RequestHandler {
 
     @RequestMapper("/add")
     @Validate(groups = ValidationType.Add.class)
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_PROPERTY_ADD")
     public Long addAuthorizationResourceProperty(AuthorizationResourceProperty authorizationResourceProperty) throws Exception {
         AuthorizationResourcePropertyModel authorizationResourcePropertyModel = new AuthorizationResourcePropertyModel();
         BeanUtils.copyProperties(authorizationResourceProperty, authorizationResourcePropertyModel);
@@ -45,6 +46,7 @@ public class AuthorizationResourcePropertyHandler implements RequestHandler {
 
     @RequestMapper("/edit")
     @Validate(groups = ValidationType.Update.class)
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_PROPERTY_UPDATE")
     public boolean editAuthorizationResourceProperty(AuthorizationResourceProperty authorizationResourceProperty) throws Exception {
         AuthorizationResourcePropertyModel authorizationResourcePropertyModel = new AuthorizationResourcePropertyModel();
         BeanUtils.copyProperties(authorizationResourceProperty, authorizationResourcePropertyModel);
@@ -53,6 +55,7 @@ public class AuthorizationResourcePropertyHandler implements RequestHandler {
 
     @RequestMapper("/delete")
     @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_PROPERTY_DELETE")
     public boolean deleteAuthorizationResourceProperty(@NotNull Long id) throws Exception {
         List<Long> idList = new ArrayList<>();
         idList.add(id);
@@ -61,12 +64,14 @@ public class AuthorizationResourcePropertyHandler implements RequestHandler {
 
     @RequestMapper("/batch/delete")
     @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_PROPERTY_DELETE_BATCH")
     public boolean batchDeleteAuthorizationResourceProperty(@NotEmpty List<Long> idList) throws Exception {
         return authorizationResourcePropertyService.batchDeleteAuthorizationRole(idList);
     }
 
     @RequestMapper("/list")
     @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_PROPERTY_GET_LIST")
     public List<AuthorizationResourceProperty> getAuthorizationList(AuthorizationResourcePropertyCondition condition) throws Exception {
         List<AuthorizationResourcePropertyModel> list = authorizationResourcePropertyService.getAuthorizationResourcePropertyModelList(condition);
         List<AuthorizationResourceProperty> result = new ArrayList<>();
@@ -81,6 +86,7 @@ public class AuthorizationResourcePropertyHandler implements RequestHandler {
     }
 
     @RequestMapper("/page/list")
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_PROPERTY_GET_PAGE_LIST")
     public QueryData getPageList(AuthorizationResourcePropertyCondition condition, Pagination pagination) {
         pagination.buildSort(filedMapping);
         QueryData queryData = authorizationResourcePropertyService.getAuthorizationPageList(condition, pagination);
@@ -89,6 +95,7 @@ public class AuthorizationResourcePropertyHandler implements RequestHandler {
 
     @RequestMapper("/one")
     @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_PROPERTY_GET_ONE")
     public AuthorizationResourceProperty getAuthorizationByAuthorizationId(@NotNull Long id) throws Exception {
         AuthorizationResourceProperty authorizationInfo = new AuthorizationResourceProperty();
         AuthorizationResourcePropertyModel authorizationResourcePropertyModel = authorizationResourcePropertyService.getAuthorizationResourcePropertyModelById(id);
