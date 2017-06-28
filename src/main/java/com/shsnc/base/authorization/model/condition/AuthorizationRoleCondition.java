@@ -12,6 +12,16 @@ public class AuthorizationRoleCondition {
 
     private String description;
 
+    private String roleCode;
+
+    public String getRoleCode() {
+        return roleCode;
+    }
+
+    public void setRoleCode(String roleCode) {
+        this.roleCode = roleCode;
+    }
+
     public String getRoleName() {
         return roleName;
     }
