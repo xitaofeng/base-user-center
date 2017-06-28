@@ -6,10 +6,15 @@ import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
 import com.shsnc.base.authorization.bean.AuthorizationResourceProperty;
+import com.shsnc.base.authorization.bean.AuthorizationResourcePropertyParam;
+import com.shsnc.base.authorization.config.DictionaryConstant;
 import com.shsnc.base.authorization.model.AuthorizationResourcePropertyModel;
 import com.shsnc.base.authorization.model.condition.AuthorizationResourcePropertyCondition;
 import com.shsnc.base.authorization.model.condition.AuthorizationRoleCondition;
 import com.shsnc.base.authorization.service.AuthorizationResourcePropertyService;
+import com.shsnc.base.module.base.dictionary.DictionaryInfo;
+import com.shsnc.base.module.base.dictionary.DictionaryMapInfo;
+import com.shsnc.base.module.config.DictionaryService;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -38,18 +43,20 @@ public class AuthorizationResourcePropertyHandler implements RequestHandler {
     @RequestMapper("/add")
     @Validate(groups = ValidationType.Add.class)
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_PROPERTY_ADD")
-    public Long addAuthorizationResourceProperty(AuthorizationResourceProperty authorizationResourceProperty) throws Exception {
-        AuthorizationResourcePropertyModel authorizationResourcePropertyModel = new AuthorizationResourcePropertyModel();
-        BeanUtils.copyProperties(authorizationResourceProperty, authorizationResourcePropertyModel);
+    public Long addAuthorizationResourceProperty(AuthorizationResourcePropertyParam authorizationResourceProperty) throws Exception {
+
+        AuthorizationResourcePropertyModel authorizationResourcePropertyModel = getAuthorizationResourcePropertyModel(authorizationResourceProperty);
+
         return authorizationResourcePropertyService.addAuthorizationResourcePropertyModel(authorizationResourcePropertyModel);
     }
 
     @RequestMapper("/edit")
     @Validate(groups = ValidationType.Update.class)
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_PROPERTY_UPDATE")
-    public boolean editAuthorizationResourceProperty(AuthorizationResourceProperty authorizationResourceProperty) throws Exception {
-        AuthorizationResourcePropertyModel authorizationResourcePropertyModel = new AuthorizationResourcePropertyModel();
-        BeanUtils.copyProperties(authorizationResourceProperty, authorizationResourcePropertyModel);
+    public boolean editAuthorizationResourceProperty(AuthorizationResourcePropertyParam authorizationResourceProperty) throws Exception {
+
+        AuthorizationResourcePropertyModel authorizationResourcePropertyModel = getAuthorizationResourcePropertyModel(authorizationResourceProperty);
+
         return authorizationResourcePropertyService.editAuthorizationResourcePropertyModel(authorizationResourcePropertyModel);
     }
 
@@ -103,5 +110,39 @@ public class AuthorizationResourcePropertyHandler implements RequestHandler {
             BeanUtils.copyProperties(authorizationResourcePropertyModel, authorizationInfo);
         }
         return authorizationInfo;
+    }
+
+
+    /**
+     * 添加编辑的时候构建 权限资源属性
+     * @param authorizationResourceProperty
+     * @return
+     */
+    private AuthorizationResourcePropertyModel getAuthorizationResourcePropertyModel(AuthorizationResourcePropertyParam authorizationResourceProperty) {
+        AuthorizationResourcePropertyModel authorizationResourcePropertyModel = new AuthorizationResourcePropertyModel();
+        BeanUtils.copyProperties(authorizationResourceProperty, authorizationResourcePropertyModel);
+
+
+        Integer resourceType = null;
+        String resourceTypeName = "";
+        DictionaryMapInfo typeDictionaryMapInfo = DictionaryService.getDictionaryMap(DictionaryConstant.ATM_CODE, DictionaryConstant.DATA_AUTHORIZATION_RESOURCE_TYPE, authorizationResourceProperty.getResourceTypeCode());
+        if (typeDictionaryMapInfo != null) {
+            resourceType = Integer.parseInt(typeDictionaryMapInfo.getMapValue());
+            resourceTypeName = typeDictionaryMapInfo.getMapDesc();
+        }
+        authorizationResourcePropertyModel.setResourceType(resourceType);
+        authorizationResourcePropertyModel.setResourceTypeName(resourceTypeName);
+
+        String propertyName = "";
+        Integer propertyValue = null;
+        DictionaryMapInfo dictionaryMapInfo = DictionaryService.getDictionaryMap(DictionaryConstant.ATM_CODE, DictionaryConstant.DATA_AUTHORIZATION, authorizationResourceProperty.getResourcePropertyCode());
+        if (dictionaryMapInfo != null) {
+            propertyValue = Integer.parseInt(dictionaryMapInfo.getMapValue());
+            propertyName = dictionaryMapInfo.getMapDesc();
+        }
+
+        authorizationResourcePropertyModel.setPropertyName(propertyName);
+        authorizationResourcePropertyModel.setPropertyValue(propertyValue);
+        return authorizationResourcePropertyModel;
     }
 }
