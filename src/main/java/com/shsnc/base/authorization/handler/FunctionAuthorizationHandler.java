@@ -36,9 +36,9 @@ public class FunctionAuthorizationHandler implements RequestHandler {
      * @param roleId
      * @return
      */
-    @RequestMapper("/role/have")
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_FUNCTION_ROLE_HAVE")
-    public List<Integer> roleHaveAuthorizationList(@NotNull Long roleId) {
+    @RequestMapper("/role/have/list")
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_FUNCTION_ROLE_HAVE_LIST")
+    public List<String> roleHaveAuthorizationList(@NotNull Long roleId) {
         return authorizationRoleRelationService.getAuthorizationIdByRoleId(roleId);
     }
 
@@ -50,7 +50,7 @@ public class FunctionAuthorizationHandler implements RequestHandler {
      */
     @RequestMapper("/user/have/list")
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_FUNCTION_USER_HAVE_LIST")
-    public List<String> userHaveAuthorizationList(@NotNull Long userId) throws BizException {
+    public List<String> userHaveAuthorizationList(Long userId) throws BizException {
         return authorizationRoleRelationService.getAuthorizationCodeByUserId(userId);
     }
 

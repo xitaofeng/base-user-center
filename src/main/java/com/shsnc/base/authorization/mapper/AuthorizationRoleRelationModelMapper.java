@@ -8,54 +8,54 @@ import java.util.List;
 /**
  * Created by Elena on 2017/6/7.
  */
-public interface AuthorizationRoleRelationModelMapper {
+interface AuthorizationRoleRelationModelMapper {
 
     /**
      * 插入单条数据 返回主键ID
      * @param authorizationRoleRelationModel
      * @return
      */
-    public int addAuthorizationRoleRelationModel(AuthorizationRoleRelationModel authorizationRoleRelationModel);
+    int addAuthorizationRoleRelationModel(AuthorizationRoleRelationModel authorizationRoleRelationModel);
 
     /**
      * 批量插入数据返回 插入条数
      * @param authorizationRoleRelationModels
      * @return
      */
-    public Integer batchAddAuthorizationRoleRelationModel(List<AuthorizationRoleRelationModel> authorizationRoleRelationModels);
+    Integer batchAddAuthorizationRoleRelationModel(List<AuthorizationRoleRelationModel> authorizationRoleRelationModels);
 
     /**
      * 根据角色ID 获取 角色所有权限
      * @param roleId
      * @return
      */
-    public List<Integer> getAuthorizationIdByRoleId(@Param("roleId") Long roleId);
+    List<String> getAuthorizationIdByRoleId(@Param("roleId") Long roleId);
 
     /**
      * 根据权限ID 获取所有角色
      * @param authorizationId
      * @return
      */
-    public List<Integer> getRoleIdByAuthorizationId(@Param("authorizationId") Long authorizationId);
+    List<Integer> getRoleIdByAuthorizationId(@Param("authorizationId") Long authorizationId);
 
     /**
      * 根据角色ID 获取 角色所有权限
      * @param roleIds
      * @return
      */
-    public List<Long> getAuthorizationIdByRoleIds(List<Long> roleIds);
+    List<Long> getAuthorizationIdByRoleIds(List<Long> roleIds);
 
     /**
      * 根据角色ID 获取 角色所有权限
      * @param roleIds
      * @return
      */
-    public List<String> getAuthorizationCodeByRoleIds(List<Long> roleIds);
+    List<String> getAuthorizationCodeByRoleIds(List<Long> roleIds);
 
     /**
      * 根据角色ID 删除角色和权限关系
      * @param roleId
      * @return
      */
-    public Integer deleteAuthorizationRoleRelationModelByRoleId(@Param("roleId") Long roleId);
+    Integer deleteAuthorizationRoleRelationModelByRoleId(@Param("roleId") Long roleId);
 }
