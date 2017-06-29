@@ -1,12 +1,8 @@
 package com.shsnc.base.module.config;
 
-import com.shsnc.api.core.ThreadContext;
-import com.shsnc.api.core.UserInfo;
-import com.shsnc.base.module.base.dictionary.DictionaryInfo;
 import com.shsnc.base.module.base.dictionary.DictionaryMapInfo;
 import com.shsnc.base.util.api.ApiClient;
 import com.shsnc.base.util.api.ApiResult;
-import com.shsnc.base.util.api.BooleanResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,14 +19,14 @@ public class DictionaryService {
 
     /**
      * 根据字典id 和 mapkey 获取 对象
-     * @param projectCode
+     * @param moduleCode
      * @param dictCode
      * @param mapKey
      * @return
      */
-    public static DictionaryMapInfo getDictionaryMap(String projectCode,String dictCode, String mapKey) {
+    public static DictionaryMapInfo getDictionaryMap(String moduleCode,String dictCode, String mapKey) {
         Map<String, String> params = new HashMap();
-        params.put("projectCode", projectCode);
+        params.put("moduleCode", moduleCode);
         params.put("dictCode", dictCode);
         params.put("mapKey", mapKey);
 
