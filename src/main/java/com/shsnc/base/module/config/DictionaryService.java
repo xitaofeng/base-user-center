@@ -1,12 +1,8 @@
 package com.shsnc.base.module.config;
 
-import com.shsnc.api.core.ThreadContext;
-import com.shsnc.api.core.UserInfo;
-import com.shsnc.base.module.base.dictionary.DictionaryInfo;
 import com.shsnc.base.module.base.dictionary.DictionaryMapInfo;
 import com.shsnc.base.util.api.ApiClient;
 import com.shsnc.base.util.api.ApiResult;
-import com.shsnc.base.util.api.BooleanResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
