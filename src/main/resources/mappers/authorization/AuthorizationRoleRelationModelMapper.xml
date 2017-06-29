@@ -39,12 +39,13 @@
         </foreach>
     </insert>
 
-    <select id="getAuthorizationIdByRoleId" resultType="java.lang.Integer">
+    <select id="getAuthorizationIdByRoleId" resultType="java.lang.String">
         SELECT
-        authorization_id
+        i.authorization_code
         FROM
-        <include refid="tableName"/>
-        WHERE role_id = #{roleId }
+        authorization_role_relation r INNER JOIN authorization_info i
+        ON r.authorization_id = i.authorization_id
+        WHERE r.role_id = #{roleId }
     </select>
 
     <select id="getRoleIdByAuthorizationId" resultType="java.lang.Integer">

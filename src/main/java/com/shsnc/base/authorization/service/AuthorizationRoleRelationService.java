@@ -1,5 +1,7 @@
 package com.shsnc.base.authorization.service;
 
+import com.shsnc.api.core.ThreadContext;
+import com.shsnc.api.core.UserInfo;
 import com.shsnc.base.authorization.mapper.*;
 import com.shsnc.base.authorization.model.AuthorizationRoleRelationModel;
 import com.shsnc.base.util.config.BizException;
@@ -76,19 +78,25 @@ public class AuthorizationRoleRelationService {
      * @param roleId
      * @return
      */
-    public List<Integer> getAuthorizationIdByRoleId(Long roleId) {
+    public List<String> getAuthorizationIdByRoleId(Long roleId) {
         return authorizationRoleRelationModelMapper.getAuthorizationIdByRoleId(roleId);
     }
 
     /**
      * 根据用户ID 获取 用户拥有的所有权限
+     * userId 为空取当前登录用户
      *
      * @param userId
      * @return
      */
     public List<String> getAuthorizationCodeByUserId(Long userId) throws BizException {
         if (userId == null) {
-            throw new BizException("选择用户");
+            UserInfo userInfo = ThreadContext.getUserInfo();
+            if (userInfo != null) {
+                userId = userInfo.getUserId();
+            } else {
+                throw new BizException("用户超时,请先登录");
+            }
         }
 
         List<Long> roleIds = userModuleService.getRoleIdsByUserId(userId);

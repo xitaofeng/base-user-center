@@ -54,6 +54,9 @@
         <if test="propertyValue !=null and propertyValue !=''">
             ,property_value = #{propertyValue}
         </if>
+        <if test="parentId !=null and parentId !=''">
+            ,parent_id = #{parentId}
+        </if>
         WHERE property_id = #{propertyId }
     </update>
 
@@ -78,6 +81,13 @@
         <include refid="tableName"/>
         WHERE 1 = 1
         <include refid="conditionSql"/>
+    </select>
+
+
+    <select id="getCountByResourceTypeAndPropertyValue" resultMap="BaseResultMap">
+        SELECT * FROM
+        <include refid="tableName"/>
+        WHERE resource_type = #{resourceType } AND property_value = #{propertyValue }
     </select>
 
     <sql id="pageSql">

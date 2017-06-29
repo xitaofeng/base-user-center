@@ -41,7 +41,11 @@ public class AuthorizationResourcePropertyService {
             if (authorizationResourcePropertyModel.getParentId() == null)
                 authorizationResourcePropertyModel.setParentId(new Long(0));
 
-            //TODO 校验同资源下面 属性名称不能重复
+            //验证资源属性是否存在
+            if(!CollectionUtils.isEmpty(authorizationResourcePropertyModelMapper.getCountByResourceTypeAndPropertyValue(authorizationResourcePropertyModel.getResourceType(),authorizationResourcePropertyModel.getPropertyValue()))){
+               throw new  BizException(String.format("资源类型[%s]下属性[%s]已经存在",authorizationResourcePropertyModel.getResourceTypeName(),authorizationResourcePropertyModel.getPropertyName()));
+            }
+
             int count = authorizationResourcePropertyModelMapper.addAuthorizationResourcePropertyModel(authorizationResourcePropertyModel);
             if (count > 0) {
                 RedisUtil.remove(Redis_List_key);
@@ -59,7 +63,11 @@ public class AuthorizationResourcePropertyService {
         if (authorizationResourcePropertyModel != null && authorizationResourcePropertyModel.getPropertyId() != null) {
             AuthorizationResourcePropertyModel editAuthorizationRoleModel = authorizationResourcePropertyModelMapper.getAuthorizationResourcePropertyModelById(authorizationResourcePropertyModel.getPropertyId());
             if (editAuthorizationRoleModel != null) {
+
+                checkDataExist(authorizationResourcePropertyModel,editAuthorizationRoleModel);
+
                 BeanUtils.copyProperties(authorizationResourcePropertyModel, editAuthorizationRoleModel);
+
                 Integer count = authorizationResourcePropertyModelMapper.editAuthorizationResourcePropertyModel(editAuthorizationRoleModel);
                 if (count != null && count > 0) {
                     RedisUtil.remove(Redis_List_key);
@@ -72,6 +80,21 @@ public class AuthorizationResourcePropertyService {
             }
         } else {
             throw new BizException("选择编辑数据");
+        }
+    }
+
+    /**
+     * resourceType，propertyValue 不能重复
+     * @param authorizationResourcePropertyModel
+     * @param editAuthorizationRoleModel
+     */
+    private void checkDataExist(AuthorizationResourcePropertyModel authorizationResourcePropertyModel,AuthorizationResourcePropertyModel editAuthorizationRoleModel) throws BizException {
+        //如果
+        if(!(editAuthorizationRoleModel.getResourceType() == authorizationResourcePropertyModel.getResourceType() && editAuthorizationRoleModel.getPropertyValue() == authorizationResourcePropertyModel.getPropertyValue())){
+            List<AuthorizationResourcePropertyModel> list = authorizationResourcePropertyModelMapper.getCountByResourceTypeAndPropertyValue(authorizationResourcePropertyModel.getResourceType(),authorizationResourcePropertyModel.getPropertyValue());
+            if(!CollectionUtils.isEmpty(list)){
+                throw new  BizException(String.format("资源类型[%s]下属性[%s]已经存在",authorizationResourcePropertyModel.getResourceTypeName(),authorizationResourcePropertyModel.getPropertyName()));
+            }
         }
     }
 

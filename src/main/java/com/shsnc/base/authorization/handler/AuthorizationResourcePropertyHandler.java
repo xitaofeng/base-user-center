@@ -15,6 +15,7 @@ import com.shsnc.base.authorization.service.AuthorizationResourcePropertyService
 import com.shsnc.base.module.base.dictionary.DictionaryInfo;
 import com.shsnc.base.module.base.dictionary.DictionaryMapInfo;
 import com.shsnc.base.module.config.DictionaryService;
+import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -118,7 +119,7 @@ public class AuthorizationResourcePropertyHandler implements RequestHandler {
      * @param authorizationResourceProperty
      * @return
      */
-    private AuthorizationResourcePropertyModel getAuthorizationResourcePropertyModel(AuthorizationResourcePropertyParam authorizationResourceProperty) {
+    private AuthorizationResourcePropertyModel getAuthorizationResourcePropertyModel(AuthorizationResourcePropertyParam authorizationResourceProperty) throws BizException {
         AuthorizationResourcePropertyModel authorizationResourcePropertyModel = new AuthorizationResourcePropertyModel();
         BeanUtils.copyProperties(authorizationResourceProperty, authorizationResourcePropertyModel);
 
