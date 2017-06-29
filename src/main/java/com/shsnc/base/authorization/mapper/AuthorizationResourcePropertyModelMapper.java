@@ -12,18 +12,21 @@ import java.util.List;
  */
 public interface AuthorizationResourcePropertyModelMapper {
 
-    public int addAuthorizationResourcePropertyModel(AuthorizationResourcePropertyModel authorizationResourcePropertyModel);
+    int addAuthorizationResourcePropertyModel(AuthorizationResourcePropertyModel authorizationResourcePropertyModel);
 
-    public Integer editAuthorizationResourcePropertyModel(AuthorizationResourcePropertyModel authorizationResourcePropertyModel);
+    Integer editAuthorizationResourcePropertyModel(AuthorizationResourcePropertyModel authorizationResourcePropertyModel);
 
-    public Integer batchDeleteAuthorizationResourceProperty(List<Long> idList);
+    Integer batchDeleteAuthorizationResourceProperty(List<Long> idList);
 
-    public AuthorizationResourcePropertyModel getAuthorizationResourcePropertyModelById(Long propertyId);
+    AuthorizationResourcePropertyModel getAuthorizationResourcePropertyModelById(Long propertyId);
 
-    public List<AuthorizationResourcePropertyModel> getAuthorizationResourcePropertyModelList(@Param("condition") AuthorizationResourcePropertyCondition condition);
+    List<AuthorizationResourcePropertyModel> getAuthorizationResourcePropertyModelList(@Param("condition") AuthorizationResourcePropertyCondition condition);
+
+    List<AuthorizationResourcePropertyModel> getCountByResourceTypeAndPropertyValue(@Param("resourceType") Integer resourceType, @Param("propertyValue") Integer propertyValue);
 
     /**
      * 总数获取
+     *
      * @param condition
      * @return
      */
@@ -31,6 +34,7 @@ public interface AuthorizationResourcePropertyModelMapper {
 
     /**
      * 分页查询
+     *
      * @param condition
      * @param pagination
      * @return
