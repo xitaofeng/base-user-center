@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by Elena on 2017/6/7.
  */
-interface AuthorizationRoleRelationModelMapper {
+public interface AuthorizationRoleRelationModelMapper {
 
     /**
      * 插入单条数据 返回主键ID
