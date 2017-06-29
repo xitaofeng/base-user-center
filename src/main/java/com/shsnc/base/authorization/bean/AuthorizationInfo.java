@@ -3,6 +3,7 @@ package com.shsnc.base.authorization.bean;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
@@ -15,13 +16,16 @@ public class AuthorizationInfo implements Serializable {
     private Long authorizationId;
 
     @NotNull(groups = {ValidationType.Add.class})
+    @Max(50)
     private String authorizationName;
 
     @NotNull(groups = {ValidationType.Add.class})
+    @Max(100)
     private String authorizationCode;
 
     private Integer authorizationStatus;
 
+    @Max(200)
     private String description;
 
     private Long createTime;
