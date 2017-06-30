@@ -28,6 +28,10 @@
         </dependency>
         <!-- commons -->
         <dependency>
+            <groupId>base-common</groupId>
+            <artifactId>base-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
         </dependency>
