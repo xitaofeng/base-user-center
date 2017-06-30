@@ -24,16 +24,13 @@ public class AuthorizationRoleRelationService {
     private AuthorizationRoleRelationModelMapper authorizationRoleRelationModelMapper;
 
     @Autowired
-    private AuthorizationUserRoleRelationModelMapper authorizationUserRoleRelationModelMapper;
-
-    @Autowired
-    private AuthorizationGroupRoleRelationModelMapper authorizationGroupRoleRelationModelMapper;
-
-    @Autowired
     private AuthorizationInfoModelMapper authorizationInfoModelMapper;
 
     @Autowired
     private AuthorizationRoleModelMapper authorizationRoleModelMapper;
+
+    @Autowired
+    private AuthorizationRoleService authorizationRoleService;
 
     @Autowired
     private UserModuleService userModuleService;
@@ -98,7 +95,7 @@ public class AuthorizationRoleRelationService {
         for (String authorizationCode : authorizationCodeList) {
             AuthorizationInfoModel authorizationInfoModel = authorizationInfoModelMapper.getAuthorizationByAuthorizationCode(authorizationCode);
             if (authorizationInfoModel == null) {
-                throw new BizException("权限码【"+authorizationCode+"】数据无效");
+                throw new BizException("权限码【" + authorizationCode + "】数据无效");
             }
             AuthorizationRoleRelationModel authorizationRoleRelationModel = new AuthorizationRoleRelationModel();
             authorizationRoleRelationModel.setAuthorizationId(authorizationInfoModel.getAuthorizationId());
@@ -135,13 +132,17 @@ public class AuthorizationRoleRelationService {
             }
         }
 
-        List<Long> roleIds = userModuleService.getRoleIdsByUserId(userId);
-
-        if (!CollectionUtils.isEmpty(roleIds)) {
-            return authorizationRoleRelationModelMapper.getAuthorizationCodeByRoleIds(roleIds);
+        if (authorizationRoleService.isSuperAdmin(userId)) {
+            return authorizationInfoModelMapper.getAuthorizationCodeList();
         } else {
-            return new ArrayList<>();
+
+            List<Long> roleIds = userModuleService.getRoleIdsByUserId(userId);
+
+            if (!CollectionUtils.isEmpty(roleIds)) {
+                return authorizationRoleRelationModelMapper.getAuthorizationCodeByRoleIds(roleIds);
+            }
         }
+        return new ArrayList<>();
     }
 
     /**

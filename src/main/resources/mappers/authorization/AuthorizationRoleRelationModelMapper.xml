@@ -64,10 +64,11 @@
 
     <select id="getAuthorizationIdByRoleIds" resultType="java.lang.Long">
         SELECT
-        authorization_id
+        i.authorization_id
         FROM
-        <include refid="tableName"/>
-        WHERE role_id IN
+        authorization_role_relation r INNER JOIN authorization_info i
+        ON r.authorization_id = i.authorization_id
+        WHERE i.authorization_status = 1 AND  r.role_id IN
         <foreach collection="list" item="roleId" index="index" separator="," open="(" close=")">
             #{roleId }
         </foreach>
@@ -79,7 +80,8 @@
         FROM
         authorization_role_relation r INNER JOIN authorization_info i
         ON r.authorization_id = i.authorization_id
-        WHERE r.role_id IN
+        WHERE i.authorization_status = 1 AND
+        r.role_id IN
         <foreach collection="list" item="roleId" index="index" separator="," open="(" close=")">
             #{roleId }
         </foreach>
