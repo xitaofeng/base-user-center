@@ -2,18 +2,8 @@ package com.shsnc.base.authorization.handler;
 
 import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.annotation.RequestMapper;
-import com.shsnc.api.core.validation.Validate;
-import com.shsnc.base.authorization.bean.AuthorizationInfo;
 import com.shsnc.base.authorization.service.AuthorizationRoleRelationService;
 import com.shsnc.base.authorization.service.AuthorizationRoleService;
-import com.shsnc.base.user.bean.UserInfo;
-import com.shsnc.base.user.config.ServerConfig;
-import com.shsnc.base.user.config.UserConstant;
-import com.shsnc.base.user.model.UserInfoModel;
-import com.shsnc.base.user.service.UserInfoService;
-import com.shsnc.base.user.support.token.SimpleTokenProvider;
-import com.shsnc.base.util.JsonUtil;
-import com.shsnc.base.util.RedisUtil;
 import com.shsnc.base.util.config.BizException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
