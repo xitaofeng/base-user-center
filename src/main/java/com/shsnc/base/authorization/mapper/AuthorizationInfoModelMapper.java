@@ -20,7 +20,7 @@ public interface AuthorizationInfoModelMapper {
      * @param authorizationInfoModel
      * @return
      */
-    public int addAuthorizationInfo(AuthorizationInfoModel authorizationInfoModel);
+    int addAuthorizationInfo(AuthorizationInfoModel authorizationInfoModel);
 
     /**
      * 编辑权限信息 返回数据编辑成功数据条数
@@ -28,7 +28,7 @@ public interface AuthorizationInfoModelMapper {
      * @param authorizationInfoModel
      * @return
      */
-    public Integer editAuthorizationInfo(AuthorizationInfoModel authorizationInfoModel);
+    Integer editAuthorizationInfo(AuthorizationInfoModel authorizationInfoModel);
 
     /**
      * 编辑权限信息 返回数据编辑成功数据条数
@@ -37,7 +37,7 @@ public interface AuthorizationInfoModelMapper {
      * @param authorizationStatus 权限状态
      * @return
      */
-    public Integer editAuthorizationStatus(@Param("authorizationId") Long authorizationId, @Param("authorizationStatus") Integer authorizationStatus);
+    Integer editAuthorizationStatus(@Param("authorizationId") Long authorizationId, @Param("authorizationStatus") Integer authorizationStatus);
 
     /**
      * 批量删除
@@ -45,7 +45,7 @@ public interface AuthorizationInfoModelMapper {
      * @param authorizationIdList
      * @return
      */
-    public Integer batchDeleteAuthorization(List<Long> authorizationIdList);
+    Integer batchDeleteAuthorization(List<Long> authorizationIdList);
 
     /**
      * 获取单一对象数据
@@ -53,7 +53,15 @@ public interface AuthorizationInfoModelMapper {
      * @param authorizationId
      * @return
      */
-    public AuthorizationInfoModel getAuthorizationByAuthorizationId(Long authorizationId);
+    AuthorizationInfoModel getAuthorizationByAuthorizationId(Long authorizationId);
+
+    /**
+     * 获取单一对象数据
+     *
+     * @param authorizationCode
+     * @return
+     */
+    AuthorizationInfoModel getAuthorizationByAuthorizationCode(@Param("authorizationCode") String authorizationCode);
 
     /**
      * 获取列表数据
@@ -61,7 +69,7 @@ public interface AuthorizationInfoModelMapper {
      * @param condition
      * @return
      */
-    public List<AuthorizationInfoModel> getAuthorizationList(AuthorizationInfoCondition condition);
+    List<AuthorizationInfoModel> getAuthorizationList(AuthorizationInfoCondition condition);
 
     /**
      * 根据权限名称获取列表
@@ -69,7 +77,7 @@ public interface AuthorizationInfoModelMapper {
      * @param authorizationName
      * @return
      */
-    public List<AuthorizationInfoModel> getListByAuthorizationName(String authorizationName);
+    List<AuthorizationInfoModel> getListByAuthorizationName(String authorizationName);
 
 
     /**
@@ -78,7 +86,7 @@ public interface AuthorizationInfoModelMapper {
      * @param authorizationCode
      * @return
      */
-    public List<AuthorizationInfoModel> getListByAuthorizationCode(String authorizationCode);
+    List<AuthorizationInfoModel> getListByAuthorizationCode(String authorizationCode);
 
     /**
      * 总数获取

@@ -7,6 +7,8 @@ public final class AuthorizationConstant {
 
     public static String ROLE_CODE_ADMIN = "admin";
 
+    public static String ROLE_CODE_SUPER_ADMIN = "super_admin";
+
     /**
      * 基本操作
      */

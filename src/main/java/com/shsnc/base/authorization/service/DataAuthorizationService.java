@@ -132,9 +132,7 @@ public class DataAuthorizationService {
 
         Map<String, Integer> map = new HashMap<>();
         if (StringUtil.isNotEmpty(value)) {
-            if (StringUtil.isNotEmpty(value)) {
-                map = JsonUtil.jsonToObject(value, Map.class, String.class, Integer.class);
-            }
+            map = JsonUtil.jsonToObject(value, Map.class, String.class, Integer.class);
         } else {
             Map<String, String> dataAuthorizationMap = getDataAuthorization(userId);
             if (!CollectionUtils.isEmpty(dataAuthorizationMap)) {
@@ -149,13 +147,52 @@ public class DataAuthorizationService {
         if (authorizationPropertyValue != null && authorizationPropertyValue != 0) {
             for (String key : map.keySet()) {
                 List<DataAuthorizationUtils.EnumDataAuthorization> list = DataAuthorizationUtils.analysisAuthorizationValue(map.get(key));
-                if (!list.contains(authorizationPropertyValue)){
+                if (!list.contains(authorizationPropertyValue)) {
                     map.remove(key);
                 }
             }
         }
 
         return map;
+    }
+
+    public static void main(String[] args) {
+
+   /*     List<Integer> list = DataAuthorizationService.x(8);
+
+        System.out.println(JsonUtil.toJsonString(list));*/
+
+        int bit = 7;
+        System.out.println(Integer.toBinaryString(bit)); // 十进制转二进制
+
+        Integer it = Integer.valueOf("111", 2);
+        System.out.println(it);// 转换为10进制结果
+
+    }
+
+    public static List<Integer> x(Integer value) {
+        List<Integer> list = new ArrayList<>();
+        int a = 1;
+        int b = 2;
+        int c = 4;
+        int d = 8;
+        int e = 16;
+        int f = 32;
+        List<Integer> initList = new ArrayList<>();
+        initList.add(a);
+        initList.add(b);
+        initList.add(c);
+        initList.add(d);
+        initList.add(e);
+        initList.add(f);
+
+        if (initList.contains(value)) {
+            list.add(value);
+            return list;
+        }
+
+
+        return list;
     }
 
     /**

@@ -3,6 +3,7 @@ package com.shsnc.base.authorization.service;
 import com.shsnc.api.core.ThreadContext;
 import com.shsnc.api.core.UserInfo;
 import com.shsnc.base.authorization.mapper.*;
+import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.shsnc.base.authorization.model.AuthorizationRoleRelationModel;
 import com.shsnc.base.util.config.BizException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,41 @@ public class AuthorizationRoleRelationService {
             }
             AuthorizationRoleRelationModel authorizationRoleRelationModel = new AuthorizationRoleRelationModel();
             authorizationRoleRelationModel.setAuthorizationId(authorizationId);
+            authorizationRoleRelationModel.setRoleId(roleId);
+            authorizationRoleRelationModels.add(authorizationRoleRelationModel);
+        }
+        return authorizationRoleRelationModelMapper.batchAddAuthorizationRoleRelationModel(authorizationRoleRelationModels) > 0;
+    }
+
+    /**
+     * 批量插入数据返回 插入条数
+     *
+     * @param roleId
+     * @param authorizationCodeList
+     * @return
+     */
+    @Transactional
+    public boolean roleBatchAuthorizationCode(Long roleId, List<String> authorizationCodeList) throws BizException {
+        if (roleId == null) {
+            throw new BizException("选择授权的角色");
+        }
+        if (authorizationRoleModelMapper.getAuthorizationRoleModelByRoleId(roleId) == null) {
+            throw new BizException("无效角色");
+        }
+        if (CollectionUtils.isEmpty(authorizationCodeList)) {
+            throw new BizException("选择授权的权限码");
+        }
+        //删除该角色的所有权限 ，然后重新添加该角色的权限
+        authorizationRoleRelationModelMapper.deleteAuthorizationRoleRelationModelByRoleId(roleId);
+
+        List<AuthorizationRoleRelationModel> authorizationRoleRelationModels = new ArrayList<>();
+        for (String authorizationCode : authorizationCodeList) {
+            AuthorizationInfoModel authorizationInfoModel = authorizationInfoModelMapper.getAuthorizationByAuthorizationCode(authorizationCode);
+            if (authorizationInfoModel == null) {
+                throw new BizException("权限码【"+authorizationCode+"】数据无效");
+            }
+            AuthorizationRoleRelationModel authorizationRoleRelationModel = new AuthorizationRoleRelationModel();
+            authorizationRoleRelationModel.setAuthorizationId(authorizationInfoModel.getAuthorizationId());
             authorizationRoleRelationModel.setRoleId(roleId);
             authorizationRoleRelationModels.add(authorizationRoleRelationModel);
         }

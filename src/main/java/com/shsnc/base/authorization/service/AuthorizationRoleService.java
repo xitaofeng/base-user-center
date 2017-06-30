@@ -177,11 +177,25 @@ public class AuthorizationRoleService {
      * @return
      * @throws Exception
      */
-    public boolean isAdmin(Long userId) throws Exception {
+    public boolean isAdmin(Long userId) throws BizException {
         if (userId == null) {
             throw new BizException("无效数据");
         }
         String roleCode = AuthorizationConstant.ROLE_CODE_ADMIN;
+        return authorizationUserRoleRelationModelMapper.getCountByUserIdAndRoleCode(userId, roleCode) > 0;
+    }
+
+    /**
+     * 是否为超级管理员
+     * @param userId
+     * @return
+     * @throws BizException
+     */
+    public boolean isSuperAdmin(Long userId) throws BizException {
+        if (userId == null) {
+            throw new BizException("无效数据");
+        }
+        String roleCode = AuthorizationConstant.ROLE_CODE_SUPER_ADMIN;
         return authorizationUserRoleRelationModelMapper.getCountByUserIdAndRoleCode(userId, roleCode) > 0;
     }
 
