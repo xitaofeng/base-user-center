@@ -214,7 +214,7 @@ public class UserInfoService {
         if(email != null && !email.equals(dbUserInfoModel.getEmail())){
             checkEmail(userInfoModel);
         }
-        checkPassword(userInfoModel);
+        userInfoModel.setPassword(null);
         userInfoModel.setCreateTime(null);
         userInfoModel.setInternal(null);
         userInfoModel.setIsDelete(null);
@@ -299,4 +299,16 @@ public class UserInfoService {
         }
     }
 
+    public boolean updatePassword(Long userId, String newPassword) throws BizException {
+        Assert.notNull(userId,"用户id不能为空！");
+        UserInfoModel dbUserInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
+        Assert.notNull(dbUserInfoModel,"用户id不存在！");
+        Assert.isTrue(dbUserInfoModel.getInternal() == UserConstant.USER_INTERNAL_FALSE, "不能更新内部用户！");
+
+        UserInfoModel userInfoModel = new UserInfoModel();
+        userInfoModel.setUserId(userId);
+        userInfoModel.setPassword(newPassword);
+        checkPassword(userInfoModel);
+        return userInfoModelMapper.updateByPrimaryKeySelective(userInfoModel)>0;
+    }
 }

@@ -4,7 +4,6 @@ import com.shsnc.base.authorization.config.RedisConstants;
 import com.shsnc.base.authorization.mapper.AuthorizationResourcePropertyModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationResourcePropertyModel;
 import com.shsnc.base.authorization.model.condition.AuthorizationResourcePropertyCondition;
-import com.shsnc.base.authorization.model.condition.AuthorizationRoleCondition;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.RedisUtil;
 import com.shsnc.base.util.StringUtil;
