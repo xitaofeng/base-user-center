@@ -20,7 +20,7 @@ public class Run
                 .configPath("classpath:beans.xml")
                 .loginServer("http://192.168.11.60/user/internal/authenticate")
                 .authServer("http://192.168.11.60/authorization/internal/user/have")
-                .testMode(true)
+                .testMode(false)
                 .build();
         server.start();
     }
