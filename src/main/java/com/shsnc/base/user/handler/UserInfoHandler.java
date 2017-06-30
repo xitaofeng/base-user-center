@@ -45,7 +45,7 @@ public class UserInfoHandler implements RequestHandler {
     public QueryData getPage(UserInfoCondition condition, Pagination pagination){
         pagination.buildSort(filedMapping);
         QueryData queryData = userInfoService.getUserInfoPage(condition, pagination);
-        return queryData;
+        return queryData.convert(UserInfo.class);
     }
 
     @RequestMapper("/getObject")
@@ -110,5 +110,12 @@ public class UserInfoHandler implements RequestHandler {
     public List<ExtendPropertyValue> getExtendPropertyValues(@NotNull Long userId){
         List<ExtendPropertyValueModel> extendPropertyValueModelList = extendPropertyValueService.getExtendPropertyValueByUserId(userId);
         return JsonUtil.convert(extendPropertyValueModelList, List.class, ExtendPropertyValue.class);
+    }
+
+    @RequestMapper("/resetPassword")
+    @Validate
+    @Authentication("BASE_USER_INFO_RESET_PASSWORD")
+    public boolean resetPassword(@NotNull Long userId, @NotNull String newPassword) throws BizException {
+        return userInfoService.updatePassword(userId,newPassword);
     }
 }
