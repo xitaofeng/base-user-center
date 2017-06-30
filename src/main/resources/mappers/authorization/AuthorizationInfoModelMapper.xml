@@ -20,7 +20,8 @@
     <sql id="tableName">authorization_info</sql>
 
     <!-- SQL语句格式美化，关键字用大写字母 -->
-    <insert id="addAuthorizationInfo" useGeneratedKeys="true" keyProperty="authorizationId" keyColumn="authorization_id">
+    <insert id="addAuthorizationInfo" useGeneratedKeys="true" keyProperty="authorizationId"
+            keyColumn="authorization_id">
         INSERT INTO
         <include refid="tableName"/>
         (
@@ -71,12 +72,20 @@
         </foreach>
     </delete>
 
-    <select id="getAuthorizationByAuthorizationId" resultType="com.shsnc.base.authorization.model.AuthorizationInfoModel">
+    <select id="getAuthorizationByAuthorizationId" resultMap="BaseResultMap">
         SELECT
         *
         FROM
         <include refid="tableName"/>
         WHERE authorization_id = #{authorizationId }
+    </select>
+
+    <select id="getAuthorizationByAuthorizationCode" resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM
+        <include refid="tableName"/>
+        WHERE authorization_code = #{authorizationCode }
     </select>
 
     <select id="getAuthorizationList" resultType="com.shsnc.base.authorization.model.AuthorizationInfoModel">
@@ -105,7 +114,7 @@
     </select>
 
     <sql id="pageSql">
-        <if test="pagination != null" >
+        <if test="pagination != null">
             LIMIT #{pagination.start}, #{pagination.pagesize}
         </if>
     </sql>

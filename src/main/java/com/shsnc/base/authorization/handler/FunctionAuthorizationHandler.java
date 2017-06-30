@@ -29,6 +29,12 @@ public class FunctionAuthorizationHandler implements RequestHandler {
         return authorizationRoleRelationService.roleBatchAuthorization(roleId, authorizationIdList);
     }
 
+    @RequestMapper("/code")
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_FUNCTION_CODE")
+    public boolean roleBatchAuthorizationCode(@NotNull Long roleId, @NotEmpty List<String> authorizationCodeList) throws BizException {
+        return authorizationRoleRelationService.roleBatchAuthorizationCode(roleId, authorizationCodeList);
+    }
+
 
     /**
      * 获取角色已有功能权限
@@ -53,17 +59,5 @@ public class FunctionAuthorizationHandler implements RequestHandler {
     public List<String> userHaveAuthorizationList(Long userId) throws BizException {
         return authorizationRoleRelationService.getAuthorizationCodeByUserId(userId);
     }
-
-    /**
-     * 判断权限是否拥有该用户
-     * @param userId
-     * @return
-     */
-    @RequestMapper("/user/have")
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_FUNCTION_USER_HAVE")
-    public boolean userHaveAuthorization(@NotNull Long userId, @NotNull String authorizationCode) throws BizException {
-        return authorizationRoleRelationService.userHaveAuthorization(userId, authorizationCode);
-    }
-
 
 }
