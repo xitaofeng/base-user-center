@@ -87,7 +87,6 @@
         <include refid="BaseColumn"/>
         FROM
         <include refid="tableName"/>
-        WHERE 1 = 1
         <include refid="conditionSql"/>
         ORDER BY orders DESC
     </select>
