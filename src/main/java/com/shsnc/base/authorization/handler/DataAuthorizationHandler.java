@@ -4,6 +4,7 @@ import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
+import com.shsnc.api.core.validation.ValidationType;
 import com.shsnc.base.authorization.bean.DataAuthorization;
 import com.shsnc.base.authorization.service.DataAuthorizationService;
 import com.shsnc.base.util.config.BizException;
@@ -27,9 +28,9 @@ public class DataAuthorizationHandler implements RequestHandler {
     private DataAuthorizationService dataAuthorizationService;
 
     @RequestMapper("")
-    @Validate
+    @Validate(groups = ValidationType.Add.class)
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA")
-    public boolean auth(@NotEmpty DataAuthorization dataAuthorization) throws BizException {
+    public boolean auth(DataAuthorization dataAuthorization) throws BizException {
         return dataAuthorizationService.auth(dataAuthorization);
     }
 
