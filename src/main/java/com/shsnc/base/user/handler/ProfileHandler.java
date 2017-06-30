@@ -35,21 +35,21 @@ public class ProfileHandler implements RequestHandler {
     @Autowired
     private GroupService groupService;
 
-    @RequestMapper("getInfo")
+    @RequestMapper("/getInfo")
     public UserInfo getInfo() throws BizException {
         Long userId = ThreadContext.getUserInfo().getUserId();
         UserInfoModel userInfoModel = userInfoService.getUserInfo(userId);
         return JsonUtil.convert(userInfoModel,UserInfo.class);
     }
 
-    @RequestMapper("getGroups")
-    public Group getGroups() throws BizException {
+    @RequestMapper("/getGroups")
+    public List<Group> getGroups() throws BizException {
         Long userId = ThreadContext.getUserInfo().getUserId();
         List<GroupModel> groupModels = groupService.getGroupsByUserId(userId);
-        return JsonUtil.convert(groupModels, Group.class);
+        return JsonUtil.convert(groupModels,List.class, Group.class);
     }
 
-    @RequestMapper("modifyInfo")
+    @RequestMapper("/modifyInfo")
     public boolean modifyInfo(UserInfoParam userInfo) throws BizException {
         Long userId = ThreadContext.getUserInfo().getUserId();
         UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
@@ -65,7 +65,7 @@ public class ProfileHandler implements RequestHandler {
         return userInfoService.updateUserInfo(userInfoModel, null, extendPropertyValueModels);
     }
 
-    @RequestMapper("modifyPassword")
+    @RequestMapper("/modifyPassword")
     public void modifyPassword(@NotNull String oldPassword, @NotNull String newPassword) throws BizException {
         Long userId = ThreadContext.getUserInfo().getUserId();
         UserInfoModel userInfoModel = userInfoService.getUserInfo(userId);
