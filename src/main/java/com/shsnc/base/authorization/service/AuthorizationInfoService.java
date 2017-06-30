@@ -121,7 +121,6 @@ public class AuthorizationInfoService {
      * @return
      * @throws Exception
      */
-    @Transactional
     public boolean batchDeleteAuthorizationInfo(List<Long> authorizationIdList) throws Exception {
         if (!CollectionUtils.isEmpty(authorizationIdList)) {
             for (int i = 0; i < authorizationIdList.size(); i++) {

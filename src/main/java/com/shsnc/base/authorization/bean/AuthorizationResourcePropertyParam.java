@@ -1,7 +1,6 @@
 package com.shsnc.base.authorization.bean;
 
 import com.shsnc.api.core.validation.ValidationType;
-import sun.rmi.runtime.Log;
 
 import javax.validation.constraints.NotNull;
 
@@ -13,10 +12,10 @@ public class AuthorizationResourcePropertyParam {
     @NotNull(groups = {ValidationType.Update.class})
     private Long propertyId;
 
-    @NotNull(groups = {ValidationType.Add.class,ValidationType.Update.class})
+    @NotNull(groups = {ValidationType.Add.class, ValidationType.Update.class})
     private String resourceTypeCode;
 
-    @NotNull(groups = {ValidationType.Add.class,ValidationType.Update.class})
+    @NotNull(groups = {ValidationType.Add.class, ValidationType.Update.class})
     private String resourcePropertyCode;
 
     private Long parentId;
