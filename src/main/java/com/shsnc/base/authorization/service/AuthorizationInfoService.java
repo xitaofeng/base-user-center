@@ -6,8 +6,6 @@ import com.shsnc.base.authorization.mapper.AuthorizationRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel.EnumAuthorizationStatus;
 import com.shsnc.base.authorization.model.condition.AuthorizationInfoCondition;
-import com.shsnc.base.user.model.ExtendPropertyModel;
-import com.shsnc.base.user.model.UserInfoCondition;
 import com.shsnc.base.util.StringUtil;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
@@ -15,7 +13,6 @@ import com.shsnc.base.util.sql.QueryData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Date;

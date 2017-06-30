@@ -9,8 +9,6 @@ import com.shsnc.base.authorization.bean.AuthorizationInfo;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.shsnc.base.authorization.model.condition.AuthorizationInfoCondition;
 import com.shsnc.base.authorization.service.AuthorizationInfoService;
-import com.shsnc.base.user.bean.UserInfo;
-import com.shsnc.base.user.model.UserInfoCondition;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
 import org.hibernate.validator.constraints.NotEmpty;
