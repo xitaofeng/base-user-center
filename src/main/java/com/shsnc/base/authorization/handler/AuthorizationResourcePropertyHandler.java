@@ -133,10 +133,10 @@ public class AuthorizationResourcePropertyHandler implements RequestHandler {
         authorizationResourcePropertyModel.setResourceTypeName(resourceTypeName);
 
         String propertyName = "";
-        Integer propertyValue = null;
+        String propertyValue = "";
         DictionaryMapInfo dictionaryMapInfo = DictionaryService.getDictionaryMap(DictionaryConstant.ATM_CODE, DictionaryConstant.DATA_AUTHORIZATION, authorizationResourceProperty.getResourcePropertyCode());
         if (dictionaryMapInfo != null) {
-            propertyValue = Integer.parseInt(dictionaryMapInfo.getMapValue());
+            propertyValue = dictionaryMapInfo.getMapValue();
             propertyName = dictionaryMapInfo.getMapDesc();
         }
 

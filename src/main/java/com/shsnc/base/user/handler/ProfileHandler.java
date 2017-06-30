@@ -26,7 +26,7 @@ import java.util.List;
  * Created by houguangqiang on 2017/6/8.
  */
 @Component
-@RequestMapper("/user/profile")
+@RequestMapper("/user/profile/")
 @LoginRequired
 public class ProfileHandler implements RequestHandler {
 
@@ -39,14 +39,14 @@ public class ProfileHandler implements RequestHandler {
     public UserInfo getInfo() throws BizException {
         Long userId = ThreadContext.getUserInfo().getUserId();
         UserInfoModel userInfoModel = userInfoService.getUserInfo(userId);
-        return JsonUtil.convert(userInfoModel,UserInfo.class);
+        return JsonUtil.convert(userInfoModel, UserInfo.class);
     }
 
     @RequestMapper("getGroups")
-    public Group getGroups() throws BizException {
+    public List<Group> getGroups() throws BizException {
         Long userId = ThreadContext.getUserInfo().getUserId();
         List<GroupModel> groupModels = groupService.getGroupsByUserId(userId);
-        return JsonUtil.convert(groupModels, Group.class);
+        return JsonUtil.convert(groupModels, List.class, Group.class);
     }
 
     @RequestMapper("modifyInfo")
@@ -59,7 +59,7 @@ public class ProfileHandler implements RequestHandler {
         userInfoModel.setStatus(null);
         List<ExtendPropertyValue> extendPropertyValues = userInfo.getExtendPropertyValues();
         List<ExtendPropertyValueModel> extendPropertyValueModels = null;
-        if(extendPropertyValues != null){
+        if (extendPropertyValues != null) {
             extendPropertyValueModels = JsonUtil.convert(extendPropertyValues, List.class, ExtendPropertyValueModel.class);
         }
         return userInfoService.updateUserInfo(userInfoModel, null, extendPropertyValueModels);
@@ -70,7 +70,7 @@ public class ProfileHandler implements RequestHandler {
         Long userId = ThreadContext.getUserInfo().getUserId();
         UserInfoModel userInfoModel = userInfoService.getUserInfo(userId);
         oldPassword = SHAMaker.sha256String(oldPassword);
-        if(userInfoModel.getPassword().equals(oldPassword)){
+        if (userInfoModel.getPassword().equals(oldPassword)) {
             UserInfoModel passwordModel = new UserInfoModel();
             passwordModel.setUserId(userId);
             passwordModel.setPassword(SHAMaker.sha256String(newPassword));
@@ -82,6 +82,6 @@ public class ProfileHandler implements RequestHandler {
     }
 
 
-    private String[][] filedMapping = {{"userName","user_name"},{"userType","user_type"}};
+    private String[][] filedMapping = {{"userName", "user_name"}, {"userType", "user_type"}};
 
 }

@@ -50,7 +50,7 @@ public interface AuthorizationRoleModelMapper {
      * @param condition
      * @return
      */
-    public List<AuthorizationRoleModel> getAuthorizationRoleModelList(AuthorizationRoleCondition condition);
+    public List<AuthorizationRoleModel> getAuthorizationRoleModelList(@Param("condition")AuthorizationRoleCondition condition);
 
     /**
      * 根据角色名称获取列表

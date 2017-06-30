@@ -144,7 +144,11 @@
 
     <select id="getGroupsByUserId" resultMap="BaseResultMap">
         SELECT
-            <include refid="BaseColumn"/>
+            ug.group_id,
+            NAME,
+            CODE,
+            description,
+            STATUS
         FROM
             user_group ug, user_info_group_relation ugr
         WHERE ug.group_id=ugr.group_id AND ug.status=1 AND ugr.user_id=#{userId}
