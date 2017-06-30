@@ -17,9 +17,9 @@ import javax.validation.constraints.NotNull;
  */
 @Component
 @RequestMapper("/authorization/internal")
-public class InternalHandler implements RequestHandler {
+public class AuthorizationInternalHandler implements RequestHandler {
 
-    private Logger logger = LoggerFactory.getLogger(InternalHandler.class);
+    private Logger logger = LoggerFactory.getLogger(AuthorizationInternalHandler.class);
 
     @Autowired
     private AuthorizationRoleRelationService authorizationRoleRelationService;

@@ -15,7 +15,6 @@ import com.shsnc.base.util.sql.QueryData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -106,11 +105,9 @@ public class AuthorizationRoleService {
      * @return
      * @throws Exception
      */
-    @Transactional
     public boolean batchDeleteAuthorizationRole(List<Long> roleIdList) throws Exception {
         if (!CollectionUtils.isEmpty(roleIdList)) {
-            for (int i = 0; i < roleIdList.size(); i++) {
-                Long roleId = roleIdList.get(i);
+            for (Long roleId : roleIdList) {
                 AuthorizationRoleModel authorizationRoleModel = authorizationRoleModelMapper.getByRoleId(roleId);
                 if (authorizationRoleModel != null) {
                     if (AuthorizationRoleModel.EnumIsBuilt.TRUE.getValue() == authorizationRoleModel.getIsBuilt()) {
@@ -187,6 +184,7 @@ public class AuthorizationRoleService {
 
     /**
      * 是否为超级管理员
+     *
      * @param userId
      * @return
      * @throws BizException

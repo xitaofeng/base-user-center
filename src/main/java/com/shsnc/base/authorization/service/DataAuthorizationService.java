@@ -156,45 +156,6 @@ public class DataAuthorizationService {
         return map;
     }
 
-    public static void main(String[] args) {
-
-   /*     List<Integer> list = DataAuthorizationService.x(8);
-
-        System.out.println(JsonUtil.toJsonString(list));*/
-
-        int bit = 7;
-        System.out.println(Integer.toBinaryString(bit)); // 十进制转二进制
-
-        Integer it = Integer.valueOf("111", 2);
-        System.out.println(it);// 转换为10进制结果
-
-    }
-
-    public static List<Integer> x(Integer value) {
-        List<Integer> list = new ArrayList<>();
-        int a = 1;
-        int b = 2;
-        int c = 4;
-        int d = 8;
-        int e = 16;
-        int f = 32;
-        List<Integer> initList = new ArrayList<>();
-        initList.add(a);
-        initList.add(b);
-        initList.add(c);
-        initList.add(d);
-        initList.add(e);
-        initList.add(f);
-
-        if (initList.contains(value)) {
-            list.add(value);
-            return list;
-        }
-
-
-        return list;
-    }
-
     /**
      * 用户资源权限值查询
      *
