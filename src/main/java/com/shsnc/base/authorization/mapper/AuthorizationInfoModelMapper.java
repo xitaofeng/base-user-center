@@ -102,4 +102,13 @@ public interface AuthorizationInfoModelMapper {
      * @return
      */
     List<AuthorizationInfoModel> getPageByCondition(@Param("condition") AuthorizationInfoCondition condition, @Param("pagination") Pagination pagination);
+
+
+
+    /**
+     * 获取权限编码列表
+     *
+     * @return
+     */
+    List<String> getAuthorizationCodeList();
 }

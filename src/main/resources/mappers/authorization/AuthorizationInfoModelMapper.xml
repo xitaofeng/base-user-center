@@ -162,4 +162,12 @@
         <include refid="pageSql"/>
     </select>
 
+    <select id="getAuthorizationCodeList" resultType="java.lang.String">
+        SELECT
+        authorization_code
+        FROM
+        <include refid="tableName"/>
+        WHERE authorization_status = 1
+    </select>
+
 </mapper>
