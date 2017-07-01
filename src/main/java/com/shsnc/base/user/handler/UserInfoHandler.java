@@ -6,6 +6,7 @@ import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
+import com.shsnc.base.authorization.service.AssignService;
 import com.shsnc.base.user.bean.ExtendPropertyValue;
 import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.bean.UserInfoParam;
@@ -74,7 +75,7 @@ public class UserInfoHandler implements RequestHandler {
         if(extendPropertyValues != null){
             extendPropertyValueModels = JsonUtil.convert(extendPropertyValues, List.class, ExtendPropertyValueModel.class);
         }
-        return userInfoService.addUserInfo(userInfoModel, userInfo.getGroupIds(), extendPropertyValueModels);
+        return userInfoService.addUserInfo(userInfoModel, userInfo.getGroupIds(), extendPropertyValueModels, userInfo.getRoleIds());
     }
 
     @RequestMapper("/update")
@@ -87,7 +88,7 @@ public class UserInfoHandler implements RequestHandler {
         if(extendPropertyValues != null){
             extendPropertyValueModels = JsonUtil.convert(extendPropertyValues, List.class, ExtendPropertyValueModel.class);
         }
-        return userInfoService.updateUserInfo(userInfoModel,userInfo.getGroupIds(),extendPropertyValueModels);
+        return userInfoService.updateUserInfo(userInfoModel,userInfo.getGroupIds(),extendPropertyValueModels,userInfo.getRoleIds());
     }
 
     @RequestMapper("/delete")
