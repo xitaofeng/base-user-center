@@ -22,6 +22,7 @@ public class UserInfoParam {
     private Integer status;
     private List<Long> groupIds;
     private List<ExtendPropertyValue> extendPropertyValues;
+    private List<Long> roleIds;
 
 
     public Long getUserId() {
@@ -94,5 +95,13 @@ public class UserInfoParam {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    public void setRoleIds(List<Long> roleIds) {
+        this.roleIds = roleIds;
     }
 }

@@ -1,5 +1,6 @@
 package com.shsnc.base.user.service;
 
+import com.shsnc.base.authorization.service.AssignService;
 import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;
 import com.shsnc.base.user.model.ExtendPropertyModel;
@@ -37,6 +38,8 @@ public class UserInfoService {
     private AccountService accountService;
     @Autowired
     private ExtendPropertyValueService extendPropertyValueService;
+    @Autowired
+    private AssignService assignService;
 
     @Autowired
     private GroupService groupService;
@@ -71,7 +74,7 @@ public class UserInfoService {
      * @return
      * @throws BizException
      */
-    public Long addUserInfo(UserInfoModel userInfoModel, List<Long> groupIds, List<ExtendPropertyValueModel> extendPropertyValues) throws BizException {
+    public Long addUserInfo(UserInfoModel userInfoModel, List<Long> groupIds, List<ExtendPropertyValueModel> extendPropertyValues, List<Long> roleIds) throws BizException {
         // 数据校验以及设置默认值
         checkAdd(userInfoModel);
 
@@ -93,10 +96,15 @@ public class UserInfoService {
             }
             extendPropertyValueService.batchAddExtendPropertyValue(extendPropertyValues);
         }
+
+        // 为用户添加角色
+        if (roleIds != null) {
+            assignService.userAssignRole(userId,roleIds);
+        }
         return userId;
     }
 
-    public boolean updateUserInfo(UserInfoModel userInfoModel, List<Long> groupIds, List<ExtendPropertyValueModel> extendPropertyValues) throws BizException {
+    public boolean updateUserInfo(UserInfoModel userInfoModel, List<Long> groupIds, List<ExtendPropertyValueModel> extendPropertyValues,List<Long> roleIds) throws BizException {
         Assert.notNull(userInfoModel);
 
         // 数据校验以及设置默认值
@@ -122,6 +130,11 @@ public class UserInfoService {
             extendPropertyValueService.batchUpdateExtendPropertyValue(extendPropertyValues);
         }
         RedisUtil.delMapField(UserConstant.REDIS_USER_INFO_KEY, userId.toString());
+
+        // 为用户添加角色
+        if (roleIds != null) {
+            assignService.userAssignRole(userId,roleIds);
+        }
         return true;
     }
 
