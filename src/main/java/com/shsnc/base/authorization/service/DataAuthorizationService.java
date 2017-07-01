@@ -170,22 +170,16 @@ public class DataAuthorizationService {
     public String[] getAuthValue(Long userId, Integer resourceType, Long resourceId) {
         String authorizationValue = "";
         //根据key 直接取用户对应资源的权限值 取不到加载用户权限数据
-        String key = RedisUtils.buildRedisKey(RedisConstants.userResourceDataAuthorizationKey(userId), resourceType.toString());
-        String value = RedisUtil.getString(key);
-        if (StringUtil.isNotEmpty(value)) {
-            if (StringUtil.isNotEmpty(value)) {
-                Map<String, String> map = JsonUtil.jsonToObject(value, Map.class, String.class, String.class);
-                authorizationValue = map.get(resourceId.toString());
-            }
-        } else {
-            Map<String, String> dataAuthorizationMap = getDataAuthorization(userId);
-            if (!CollectionUtils.isEmpty(dataAuthorizationMap)) {
-                value = dataAuthorizationMap.get(resourceType.toString());
-                if (StringUtil.isNotEmpty(value)) {
-                    Map<String, String> map = JsonUtil.jsonToObject(value, Map.class, String.class, String.class);
-                    authorizationValue = map.get(resourceId.toString());
-                }
-            }
+        Map<String, String> userAuthMap = RedisUtil.getMap(RedisConstants.userResourceDataAuthorizationKey(userId));
+
+        if (CollectionUtils.isEmpty(userAuthMap)) {
+            userAuthMap = getDataAuthorization(userId);
+        }
+
+        String resourceTypeAuthStr = userAuthMap.get(String.valueOf(resourceType));
+        if (StringUtil.isNotEmpty(resourceTypeAuthStr)) {
+            Map<String, String> resourceTypeMap = JsonUtil.jsonToObject(resourceTypeAuthStr, Map.class, String.class, String.class);
+            authorizationValue = resourceTypeMap.get(resourceId.toString());
         }
         return authorizationValue.split(",");
     }
@@ -199,23 +193,20 @@ public class DataAuthorizationService {
      * @return
      */
 
-    public Integer getAuthorizationByResourceType(Long userId, Integer resourceType) {
-        Integer authorizationValue = 0;
+    public Map<String, String> getAuthorizationByResourceType(Long userId, Integer resourceType) {
         //根据key 直接取用户对应资源的权限值 取不到加载用户权限数据
-        String key = RedisUtils.buildRedisKey(RedisConstants.userResourceDataAuthorizationKey(userId), resourceType.toString());
-        String propertyValue = RedisUtil.getString(key);
-        if (StringUtil.isNotEmpty(propertyValue)) {
-            authorizationValue = Integer.parseInt(propertyValue);
-        } else {
-            Map<String, String> dataAuthorizationMap = getDataAuthorization(userId);
-            if (!CollectionUtils.isEmpty(dataAuthorizationMap)) {
-                propertyValue = dataAuthorizationMap.get(RedisUtils.buildRedisKey(resourceType.toString()));
-                if (StringUtil.isNotEmpty(propertyValue)) {
-                    authorizationValue = Integer.parseInt(propertyValue);
-                }
-            }
+        Map<String, String> userAuthMap = RedisUtil.getMap(RedisConstants.userResourceDataAuthorizationKey(userId));
+
+        if (CollectionUtils.isEmpty(userAuthMap)) {
+            userAuthMap = getDataAuthorization(userId);
         }
-        return authorizationValue;
+
+        Map<String, String> resourceTypeMap = new HashMap<>();
+        String resourceTypeAuthStr = userAuthMap.get(String.valueOf(resourceType));
+        if (StringUtil.isNotEmpty(resourceTypeAuthStr)) {
+            resourceTypeMap = JsonUtil.jsonToObject(resourceTypeAuthStr, Map.class, String.class, String.class);
+        }
+        return resourceTypeMap;
     }
 
     /**
@@ -242,7 +233,7 @@ public class DataAuthorizationService {
 
                 if (dataAuthorizationMap.containsKey(resourceType)) {
                     String mapValue = dataAuthorizationMap.get(resourceType);
-                    map = JsonUtil.jsonToObject(mapValue, Map.class, String.class, String.class);
+                    map = JsonUtil.jsonToObject(mapValue, Map.class, String.class, Integer.class);
                     if (CollectionUtils.isEmpty(map)) {
                         map = new HashMap<>();
                     }

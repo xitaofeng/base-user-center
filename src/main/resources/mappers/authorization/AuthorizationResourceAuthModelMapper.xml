@@ -56,22 +56,21 @@
 
     <select id="getUserDataAuthorization" resultType="com.shsnc.base.authorization.bean.UserDataAuthorization">
         SELECT
-        resource_type,
-        resource_id,
-        GROUP_CONCAT(property_id SEPARATOR ',') propertyValues
+        a.resource_type resourceType,
+        a.resource_id resourceId,
+        GROUP_CONCAT(p.property_value SEPARATOR ',') propertyValues
         FROM
-        authorization_resource_auth a
+        authorization_resource_auth a INNER JOIN authorization_resource_property p ON a.property_id = p.property_id
         WHERE
-        (auth_type = 1 AND auth_value = #{userId})
+        (a.auth_type = 1 AND a.auth_value = #{userId})
         <if test="roleIds != null and roleIds.size > 0">
-            OR (auth_type = 2 AND auth_value IN
+            OR (a.auth_type = 2 AND a.auth_value IN
             <foreach collection="roleIds" item="roleId" open="(" close=")" separator=",">
                 #{roleId}
             </foreach>
             )
         </if>
-        GROUP BY resource_type,
-        resource_id
+        GROUP BY a.resource_type,a.resource_id
 <!--
         SELECT * FROM authorization_resource_auth
         SELECT
