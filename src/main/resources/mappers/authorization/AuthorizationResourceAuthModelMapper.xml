@@ -56,6 +56,25 @@
 
     <select id="getUserDataAuthorization" resultType="com.shsnc.base.authorization.bean.UserDataAuthorization">
         SELECT
+        resource_type,
+        resource_id,
+        GROUP_CONCAT(property_id SEPARATOR ',') propertyValues
+        FROM
+        authorization_resource_auth a
+        WHERE
+        (auth_type = 1 AND auth_value = #{userId})
+        <if test="roleIds != null and roleIds.size > 0">
+            OR (auth_type = 2 AND auth_value IN
+            <foreach collection="roleIds" item="roleId" open="(" close=")" separator=",">
+                #{roleId}
+            </foreach>
+            )
+        </if>
+        GROUP BY resource_type,
+        resource_id
+<!--
+        SELECT * FROM authorization_resource_auth
+        SELECT
             b.resource_type,
             b.resource_id,
             SUM(p.property_value) property_value
@@ -77,7 +96,7 @@
                     GROUP BY resource_type,resource_id,property_id
         ) b INNER JOIN
         authorization_resource_property p ON b.property_id = p.parent_id
-        GROUP BY resource_type,resource_id
+        GROUP BY resource_type,resource_id-->
     </select>
 
 

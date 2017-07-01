@@ -13,7 +13,6 @@ import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.RedisUtil;
 import com.shsnc.base.util.StringUtil;
 import com.shsnc.base.util.config.BizException;
-import com.shsnc.base.utils.DataAuthorizationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,11 +128,11 @@ public class DataAuthorizationService {
      * @param authorizationPropertyValue 权限属性值
      * @return
      */
-    public Map<String, Integer> getUserResourceTypeAutValuehList(Long userId, Integer resourceType, Integer authorizationPropertyValue) {
+    public Map<String, String> getUserResourceTypeAutValuehList(Long userId, Integer resourceType, String authorizationPropertyValue) {
         String redisKey = RedisUtils.buildRedisKey(RedisConstants.userResourceDataAuthorizationKey(userId), resourceType.toString());
         String value = RedisUtil.getString(redisKey);
 
-        Map<String, Integer> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         if (StringUtil.isNotEmpty(value)) {
             map = JsonUtil.jsonToObject(value, Map.class, String.class, Integer.class);
         } else {
@@ -147,10 +146,10 @@ public class DataAuthorizationService {
         }
 
         //根据权限属性过滤
-        if (authorizationPropertyValue != null && authorizationPropertyValue != 0) {
+        if (StringUtil.isNotEmpty(authorizationPropertyValue)) {
             for (String key : map.keySet()) {
-                List<DataAuthorizationUtils.EnumDataAuthorization> list = DataAuthorizationUtils.analysisAuthorizationValue(map.get(key));
-                if (!list.contains(authorizationPropertyValue)) {
+                String propertyValues = map.get(key);
+                if (!propertyValues.contains(authorizationPropertyValue)) {
                     map.remove(key);
                 }
             }
@@ -168,14 +167,14 @@ public class DataAuthorizationService {
      * @return
      */
 
-    public Integer getAuthValue(Long userId, Integer resourceType, Long resourceId) {
-        Integer authorizationValue = 0;
+    public String[] getAuthValue(Long userId, Integer resourceType, Long resourceId) {
+        String authorizationValue = "";
         //根据key 直接取用户对应资源的权限值 取不到加载用户权限数据
         String key = RedisUtils.buildRedisKey(RedisConstants.userResourceDataAuthorizationKey(userId), resourceType.toString());
         String value = RedisUtil.getString(key);
         if (StringUtil.isNotEmpty(value)) {
             if (StringUtil.isNotEmpty(value)) {
-                Map<String, Integer> map = JsonUtil.jsonToObject(value, Map.class, String.class, Integer.class);
+                Map<String, String> map = JsonUtil.jsonToObject(value, Map.class, String.class, String.class);
                 authorizationValue = map.get(resourceId.toString());
             }
         } else {
@@ -183,12 +182,12 @@ public class DataAuthorizationService {
             if (!CollectionUtils.isEmpty(dataAuthorizationMap)) {
                 value = dataAuthorizationMap.get(resourceType.toString());
                 if (StringUtil.isNotEmpty(value)) {
-                    Map<String, Integer> map = JsonUtil.jsonToObject(value, Map.class, String.class, Integer.class);
+                    Map<String, String> map = JsonUtil.jsonToObject(value, Map.class, String.class, String.class);
                     authorizationValue = map.get(resourceId.toString());
                 }
             }
         }
-        return authorizationValue;
+        return authorizationValue.split(",");
     }
 
 
@@ -235,22 +234,22 @@ public class DataAuthorizationService {
             List<Long> roleIds = userModuleService.getRoleIdsByUserId(userId);
             List<UserDataAuthorization> userDataAuthorizations = authorizationResourceAuthModelMapper.getUserDataAuthorization(userId, roleIds);
 
-            Map<String, Integer> map = new HashMap<>();
+            HashMap<String, String> map = new HashMap<>();
             for (UserDataAuthorization userDataAuthorization : userDataAuthorizations) {
                 String resourceType = userDataAuthorization.getResourceType().toString();
                 String resourceId = userDataAuthorization.getResourceId().toString();
-                Integer propertyValue = userDataAuthorization.getPropertyValue();
+                String propertyValues = userDataAuthorization.getPropertyValues();
 
                 if (dataAuthorizationMap.containsKey(resourceType)) {
                     String mapValue = dataAuthorizationMap.get(resourceType);
-                    map = JsonUtil.jsonToObject(mapValue, Map.class, String.class, Integer.class);
+                    map = JsonUtil.jsonToObject(mapValue, Map.class, String.class, String.class);
                     if (CollectionUtils.isEmpty(map)) {
                         map = new HashMap<>();
                     }
-                    map.put(resourceId, propertyValue);
+                    map.put(resourceId, propertyValues);
                 } else {
                     map = new HashMap<>();
-                    map.put(resourceId, propertyValue);
+                    map.put(resourceId, propertyValues);
                 }
 
                 dataAuthorizationMap.put(resourceType, JsonUtil.toJsonString(map));

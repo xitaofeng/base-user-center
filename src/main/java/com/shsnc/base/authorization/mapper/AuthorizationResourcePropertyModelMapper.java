@@ -22,7 +22,7 @@ public interface AuthorizationResourcePropertyModelMapper {
 
     List<AuthorizationResourcePropertyModel> getAuthorizationResourcePropertyModelList(@Param("condition") AuthorizationResourcePropertyCondition condition);
 
-    List<AuthorizationResourcePropertyModel> getCountByResourceTypeAndPropertyValue(@Param("resourceType") Integer resourceType, @Param("propertyValue") Integer propertyValue);
+    List<AuthorizationResourcePropertyModel> getCountByResourceTypeAndPropertyValue(@Param("resourceType") Integer resourceType, @Param("propertyValue") String propertyValue);
 
     /**
      * 总数获取

@@ -4,6 +4,7 @@ import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
+import com.shsnc.api.core.validation.ValidationType;
 import com.shsnc.base.authorization.bean.DataAuthorization;
 import com.shsnc.base.authorization.service.DataAuthorizationService;
 import com.shsnc.base.util.config.BizException;
@@ -27,9 +28,9 @@ public class DataAuthorizationHandler implements RequestHandler {
     private DataAuthorizationService dataAuthorizationService;
 
     @RequestMapper("")
-    @Validate
+    @Validate(groups = ValidationType.Add.class)
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA")
-    public boolean auth(@NotEmpty DataAuthorization dataAuthorization) throws BizException {
+    public boolean auth(DataAuthorization dataAuthorization) throws BizException {
         return dataAuthorizationService.auth(dataAuthorization);
     }
 
@@ -50,7 +51,7 @@ public class DataAuthorizationHandler implements RequestHandler {
     @RequestMapper("/auth/value")
     @Validate
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_AUTH_VALUE")
-    public Integer authValue(@NotNull Long userId, @NotNull Integer resourceType, @NotNull Long resourceId) throws BizException {
+    public String[] authValue(@NotNull Long userId, @NotNull Integer resourceType, @NotNull Long resourceId) throws BizException {
         return dataAuthorizationService.getAuthValue(userId, resourceType, resourceId);
     }
 
@@ -66,7 +67,7 @@ public class DataAuthorizationHandler implements RequestHandler {
     @RequestMapper("/authorization/value")
     @Validate
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_AUTHORIZATION_VALUE")
-    public Map<String, Integer> getUserResourceTypeAutValuehList(@NotNull Long userId, @NotNull Integer resourceType,Integer authorizationPropertyValue) throws BizException {
+    public Map<String, String> getUserResourceTypeAutValuehList(@NotNull Long userId, @NotNull Integer resourceType,String authorizationPropertyValue) throws BizException {
         return dataAuthorizationService.getUserResourceTypeAutValuehList(userId, resourceType,authorizationPropertyValue);
     }
 

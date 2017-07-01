@@ -12,7 +12,7 @@ public class UserDataAuthorization implements Serializable {
 
     private Long resourceId;
 
-    private Integer propertyValue;
+    private String propertyValues;
 
     public Integer getResourceType() {
         return resourceType;
@@ -30,11 +30,11 @@ public class UserDataAuthorization implements Serializable {
         this.resourceId = resourceId;
     }
 
-    public Integer getPropertyValue() {
-        return propertyValue;
+    public String getPropertyValues() {
+        return propertyValues;
     }
 
-    public void setPropertyValue(Integer propertyValue) {
-        this.propertyValue = propertyValue;
+    public void setPropertyValues(String propertyValues) {
+        this.propertyValues = propertyValues;
     }
 }

@@ -1,5 +1,9 @@
 package com.shsnc.base.authorization.bean;
 
+import com.shsnc.api.core.validation.ValidationType;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.List;
 
@@ -9,14 +13,17 @@ import java.util.List;
  */
 public class DataAuthorization implements Serializable {
 
+    @NotNull(groups = ValidationType.Add.class)
     private Integer resourceType;
 
     private List<Long> authRoleList;
 
     private List<Long> authUserList;
 
+    @NotEmpty(groups = ValidationType.Add.class)
     private List<Long> resourceIdList;
 
+    @NotEmpty(groups = ValidationType.Add.class)
     private List<Long> propertyIdList;
 
     public Integer getResourceType() {

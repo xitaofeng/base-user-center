@@ -12,7 +12,7 @@ public class AuthorizationResourcePropertyModel implements Serializable {
 
     private String propertyName;
 
-    private Integer propertyValue;
+    private String propertyValue;
 
     private Integer resourceType;
 
@@ -36,11 +36,11 @@ public class AuthorizationResourcePropertyModel implements Serializable {
         this.propertyName = propertyName;
     }
 
-    public Integer getPropertyValue() {
+    public String getPropertyValue() {
         return propertyValue;
     }
 
-    public void setPropertyValue(Integer propertyValue) {
+    public void setPropertyValue(String propertyValue) {
         this.propertyValue = propertyValue;
     }
 
