@@ -70,7 +70,7 @@
             </foreach>
             )
         </if>
-        GROUP BY a.resource_type,s.resource_id
+        GROUP BY a.resource_type,a.resource_id
 <!--
         SELECT * FROM authorization_resource_auth
         SELECT
