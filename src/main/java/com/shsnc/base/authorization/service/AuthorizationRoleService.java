@@ -166,6 +166,15 @@ public class AuthorizationRoleService {
         return authorizationRoleModel;
     }
 
+    /**
+     * 根据用户ID获取角色主键列表
+     * @param userId
+     * @return
+     */
+    public List<Long> getRoleIdsByUserId(Long userId) {
+        return authorizationUserRoleRelationModelMapper.getRoleIdByUserId(userId);
+    }
+
 
     /**
      * 是否为管理员

@@ -94,4 +94,16 @@ public class AuthorizationRoleHandler implements RequestHandler {
         return authorizationRoleService.isAdmin(userId);
     }
 
+    /**
+     * 用户已拥有的角色
+     *
+     * @param userId
+     * @return
+     */
+    @RequestMapper("/user/have/list")
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ROLE_USER_HAVE_LIST")
+    public List<Long> userHaveRoleList(@NotNull Long userId) {
+        return authorizationRoleService.getRoleIdsByUserId(userId);
+    }
+
 }
