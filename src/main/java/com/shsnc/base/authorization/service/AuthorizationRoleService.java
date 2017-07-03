@@ -42,6 +42,7 @@ public class AuthorizationRoleService {
      * @throws Exception
      */
     public Long addAuthorizationRoleModel(AuthorizationRoleModel authorizationRoleModel) throws Exception {
+        authorizationRoleModel.setRoleId(null);
         if (isRoleName(authorizationRoleModel)) {
             throw new BizException("角色名称重复");
         }
