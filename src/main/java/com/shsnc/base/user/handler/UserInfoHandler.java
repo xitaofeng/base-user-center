@@ -65,13 +65,13 @@ public class UserInfoHandler implements RequestHandler {
         return JsonUtil.convert(userInfoModels,List.class, UserInfo.class);
     }
 
-    @RequestMapper("/getList")
-    @Authentication("BASE_USER_INFO_GET_LIST")
-    public List<UserInfo> getList(UserInfoParam userInfo){
-        UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
-        List<UserInfoModel> userInfoList = userInfoService.getUserInfoList(userInfoModel);
-        return JsonUtil.convert(userInfoList, List.class, UserInfo.class);
-    }
+//    @RequestMapper("/getList")
+//    @Authentication("BASE_USER_INFO_GET_LIST")
+//    public List<UserInfo> getList(UserInfoParam userInfo){
+//        UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
+//        List<UserInfoModel> userInfoList = userInfoService.getUserInfoList(userInfoModel);
+//        return JsonUtil.convert(userInfoList, List.class, UserInfo.class);
+//    }
 
     @RequestMapper("/add")
     @Authentication("BASE_USER_INFO_ADD")
