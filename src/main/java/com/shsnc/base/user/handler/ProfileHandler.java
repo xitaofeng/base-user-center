@@ -62,7 +62,7 @@ public class ProfileHandler implements RequestHandler {
         if(extendPropertyValues != null){
             extendPropertyValueModels = JsonUtil.convert(extendPropertyValues, List.class, ExtendPropertyValueModel.class);
         }
-        return userInfoService.updateUserInfo(userInfoModel, null, extendPropertyValueModels);
+        return userInfoService.updateUserInfo(userInfoModel, null, extendPropertyValueModels, null);
     }
 
     @RequestMapper("/modifyPassword")
@@ -74,7 +74,7 @@ public class ProfileHandler implements RequestHandler {
             UserInfoModel passwordModel = new UserInfoModel();
             passwordModel.setUserId(userId);
             passwordModel.setPassword(SHAMaker.sha256String(newPassword));
-            userInfoService.updateUserInfo(passwordModel, null, null);
+            userInfoService.updateUserInfo(passwordModel, null, null, null);
 
         } else {
             throw new BizException("原登陆密码错误！");
