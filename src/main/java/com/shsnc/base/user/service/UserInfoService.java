@@ -8,6 +8,7 @@ import com.shsnc.base.user.model.ExtendPropertyValueModel;
 import com.shsnc.base.user.model.UserInfoCondition;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.support.Assert;
+import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.RedisUtil;
 import com.shsnc.base.util.config.BaseException;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -54,7 +56,11 @@ public class UserInfoService {
         if(userInfoJson != null){
             return JsonUtil.jsonToObject(userInfoJson, UserInfoModel.class );
         }
-        return userInfoModelMapper.selectByPrimaryKey(userId);
+        UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
+        if (userInfoModel != null) {
+            RedisUtil.setFieldValue(UserConstant.REDIS_USER_INFO_KEY, userId.toString(),JsonUtil.toJsonString(userInfoModel),1000000);
+        }
+        return userInfoModel;
     }
 
     public QueryData getUserInfoPage(UserInfoCondition condition, Pagination pagination) {
@@ -323,5 +329,17 @@ public class UserInfoService {
         userInfoModel.setPassword(newPassword);
         checkPassword(userInfoModel);
         return userInfoModelMapper.updateByPrimaryKeySelective(userInfoModel)>0;
+    }
+
+    public List<UserInfoModel> getUserInfoListByUserIds(List<Long> userIds) throws BizException {
+        BizAssert.notEmpty(userIds,"用户ID不能为空！");
+        List<UserInfoModel> userInfoModels = new ArrayList<>();
+        for (Long userId : userIds) {
+            UserInfoModel userInfo = getUserInfo(userId);
+            if (userInfo != null) {
+                userInfoModels.add(userInfo);
+            }
+        }
+        return userInfoModels;
     }
 }
