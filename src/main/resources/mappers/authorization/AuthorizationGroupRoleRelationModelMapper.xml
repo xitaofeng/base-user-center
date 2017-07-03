@@ -36,6 +36,7 @@
     <select id="getGroupIdByRoleId" resultType="java.lang.Long">
         SELECT
         group_id
+        FROM
         <include refid="tableName"/>
         WHERE role_id = #{roleId }
     </select>
