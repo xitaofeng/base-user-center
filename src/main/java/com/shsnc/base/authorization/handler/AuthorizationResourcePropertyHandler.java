@@ -13,6 +13,7 @@ import com.shsnc.base.authorization.model.condition.AuthorizationResourcePropert
 import com.shsnc.base.authorization.service.AuthorizationResourcePropertyService;
 import com.shsnc.base.module.base.dictionary.DictionaryMapInfo;
 import com.shsnc.base.module.config.DictionaryService;
+import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
@@ -80,15 +81,7 @@ public class AuthorizationResourcePropertyHandler implements RequestHandler {
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_PROPERTY_GET_LIST")
     public List<AuthorizationResourceProperty> getAuthorizationList(AuthorizationResourcePropertyCondition condition) throws Exception {
         List<AuthorizationResourcePropertyModel> list = authorizationResourcePropertyService.getAuthorizationResourcePropertyModelList(condition);
-        List<AuthorizationResourceProperty> result = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(list)) {
-            list.forEach(item -> {
-                AuthorizationResourceProperty tempAuthorizationResourceProperty = new AuthorizationResourceProperty();
-                BeanUtils.copyProperties(item, tempAuthorizationResourceProperty);
-                result.add(tempAuthorizationResourceProperty);
-            });
-        }
-        return result;
+        return  JsonUtil.convert(list,List.class,AuthorizationResourceProperty.class);
     }
 
     @RequestMapper("/page/list")
