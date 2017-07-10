@@ -56,17 +56,17 @@ public class UserInfoGroupRelationService {
         Assert.notNull(groupIds);
         UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
         Assert.notNull(userInfoModel, "用户id不存在！");
-        if(groupIds.size() == 0){
+        if(groupIds.isEmpty()){
             return userInfoGroupRelationModelMapper.deleteByUserId(userId) > 0;
         } else {
             List<Long> dbGroupIds = userInfoGroupRelationModelMapper.getGroupIdsByUserId(userId);
             List<Long> deleteGroupIds = ListUtils.removeAll(dbGroupIds, groupIds);
-            if(deleteGroupIds.size() > 0){
+            if(!deleteGroupIds.isEmpty()){
                 userInfoGroupRelationModelMapper.deleteByUserId(userId);
                 batchAddUserInfoGroupRelation(userId, groupIds);
             } else {
                 List<Long> addGroupIds = ListUtils.removeAll(groupIds,dbGroupIds);
-                if(addGroupIds.size()>0){
+                if(!addGroupIds.isEmpty()){
                     batchAddUserInfoGroupRelation(userId, addGroupIds).size();
                 }
             }

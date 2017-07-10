@@ -132,10 +132,10 @@ public class ExtendPropertyValueService {
                 updateExtendPropertyValues.add(extendPropertyValueModel);
             }
         }
-        if(addExtendPropertyValues.size()>0){
+        if(!addExtendPropertyValues.isEmpty()){
             batchAddExtendPropertyValue(addExtendPropertyValues);
         }
-        if(updateExtendPropertyValues.size()>0){
+        if(!updateExtendPropertyValues.isEmpty()){
             for (ExtendPropertyValueModel extendPropertyValueModel : updateExtendPropertyValues){
                 updateExtendPropertyValue(extendPropertyValueModel);
             }

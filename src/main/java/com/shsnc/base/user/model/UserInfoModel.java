@@ -1,6 +1,7 @@
 package com.shsnc.base.user.model;
 
 public class UserInfoModel {
+
     private Long userId;
 
     private String username;

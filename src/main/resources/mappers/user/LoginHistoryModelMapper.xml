@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shsnc.base.user.mapper.LoginHistoryModelMapper">
+    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.LoginHistoryModel">
+        <id column="history_id" property="historyId" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="login_type" property="loginType" jdbcType="TINYINT"/>
+        <result column="success" property="success" jdbcType="TINYINT"/>
+        <result column="error_msg" property="errorMsg" jdbcType="VARCHAR"/>
+        <result column="account_name" property="accountName" jdbcType="VARCHAR"/>
+        <result column="login_time" property="loginTime" jdbcType="BIGINT"/>
+        <result column="login_ip" property="loginIp" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="BaseColumn">
+        history_id, user_id, login_type, success, error_msg, account_name, login_time, login_ip
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_login_history
+        WHERE history_id = #{historyId,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM user_login_history
+        WHERE history_id = #{historyId,jdbcType=BIGINT}
+    </delete>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="historyId">
+        INSERT INTO user_login_history (
+            history_id,
+            user_id,
+            login_type,
+            success,
+            error_msg,
+            account_name,
+            login_time,
+            login_ip
+        )
+        values (
+            #{historyId,jdbcType=BIGINT},
+            #{userId,jdbcType=BIGINT},
+            #{loginType,jdbcType=TINYINT},
+            #{success,jdbcType=TINYINT},
+            #{errorMsg,jdbcType=VARCHAR},
+            #{accountName,jdbcType=VARCHAR},
+            #{loginTime,jdbcType=BIGINT},
+            #{loginIp,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="historyId">
+        INSERT INTO user_login_history
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            history_id,
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="loginType != null">
+                login_type,
+            </if>
+            <if test="success != null">
+                success,
+            </if>
+            <if test="errorMsg != null">
+                error_msg,
+            </if>
+            <if test="accountName != null">
+                account_name,
+            </if>
+            <if test="loginTime != null">
+                login_time,
+            </if>
+            <if test="loginIp != null">
+                login_ip,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{historyId,jdbcType=BIGINT},
+            <if test="userId != null">
+                #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="loginType != null">
+                #{loginType,jdbcType=TINYINT},
+            </if>
+            <if test="success != null">
+                #{success,jdbcType=TINYINT},
+            </if>
+            <if test="errorMsg != null">
+                #{errorMsg,jdbcType=VARCHAR},
+            </if>
+            <if test="accountName != null">
+                #{accountName,jdbcType=VARCHAR},
+            </if>
+            <if test="loginTime != null">
+                #{loginTime,jdbcType=BIGINT},
+            </if>
+            <if test="loginIp != null">
+                #{loginIp,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        UPDATE user_login_history
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="loginType != null">
+                login_type = #{loginType,jdbcType=TINYINT},
+            </if>
+            <if test="success != null">
+                success = #{success,jdbcType=TINYINT},
+            </if>
+            <if test="errorMsg != null">
+                error_msg = #{errorMsg,jdbcType=VARCHAR},
+            </if>
+            <if test="accountName != null">
+                account_name = #{accountName,jdbcType=VARCHAR},
+            </if>
+            <if test="loginTime != null">
+                login_time = #{loginTime,jdbcType=BIGINT},
+            </if>
+            <if test="loginIp != null">
+                login_ip = #{loginIp,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where history_id = #{historyId,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey">
+        UPDATE user_login_history
+        SET user_id = #{userId,jdbcType=BIGINT},
+            login_type = #{loginType,jdbcType=TINYINT},
+            success = #{success,jdbcType=TINYINT},
+            error_msg = #{errorMsg,jdbcType=VARCHAR},
+            account_name = #{accountName,jdbcType=VARCHAR},
+            login_time = #{loginTime,jdbcType=BIGINT},
+            login_ip = #{loginIp,jdbcType=VARCHAR}
+        WHERE history_id = #{historyId,jdbcType=BIGINT}
+    </update>
+</mapper>
