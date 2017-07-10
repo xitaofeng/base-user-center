@@ -128,7 +128,7 @@ public class DataAuthorizationService {
      * @param authorizationPropertyValue 权限属性值
      * @return
      */
-    public Map<Long, String> getUserResourceTypeAutValuehList(Long userId, Integer resourceType, String authorizationPropertyValue) {
+    public Map<Long, String> getUserAutValuehListByResourceTypeAndPropertyValue(Long userId, Integer resourceType, String authorizationPropertyValue) {
 
         //根据key 直接取用户对应资源的权限值 取不到加载用户权限数据
         Map<String, String> userAuthMap = RedisUtil.getMap(RedisConstants.userResourceDataAuthorizationKey(userId));
@@ -154,6 +154,30 @@ public class DataAuthorizationService {
 
         return resourceTypeMap;
     }
+
+
+    /**
+     * 资源权限值列表(根据资源类型)
+     * @param userId
+     * @param resourceType
+     * @return
+     */
+    public Map<Long, String> getUserAutValuehListByResourceType(Long userId, Integer resourceType) {
+
+        //根据key 直接取用户对应资源的权限值 取不到加载用户权限数据
+        Map<String, String> userAuthMap = RedisUtil.getMap(RedisConstants.userResourceDataAuthorizationKey(userId));
+        if (CollectionUtils.isEmpty(userAuthMap)) {
+            userAuthMap = getDataAuthorization(userId);
+        }
+
+        Map<Long, String> resourceTypeMap = new HashMap<>();
+        String resourceTypeAuthStr = userAuthMap.get(String.valueOf(resourceType));
+        if (StringUtil.isNotEmpty(resourceTypeAuthStr)) {
+            resourceTypeMap = JsonUtil.jsonToObject(resourceTypeAuthStr, Map.class, Long.class, String.class);
+        }
+        return resourceTypeMap;
+    }
+
 
     /**
      * 用户资源权限值查询

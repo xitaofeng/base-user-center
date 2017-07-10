@@ -57,20 +57,33 @@ public class DataAuthorizationHandler implements RequestHandler {
 
 
     /**
-     *
+     * 获取用户指定资源类型下指定权限属性
      * @param userId  用户id
      * @param resourceType 资源类型
      * @param authorizationPropertyValue 权限属性值
      * @return
      * @throws BizException
      */
-    @RequestMapper("/authorization/value")
+    @RequestMapper("/resource/type/property/value")
     @Validate
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_AUTHORIZATION_VALUE")
-    public Map<Long, String> getUserResourceTypeAutValuehList(@NotNull Long userId, @NotNull Integer resourceType,String authorizationPropertyValue) throws BizException {
-        return dataAuthorizationService.getUserResourceTypeAutValuehList(userId, resourceType,authorizationPropertyValue);
+    public Map<Long, String> getUserAutValuehListByResourceTypeAndPropertyValue(@NotNull Long userId, @NotNull Integer resourceType,String authorizationPropertyValue) throws BizException {
+        return dataAuthorizationService.getUserAutValuehListByResourceTypeAndPropertyValue(userId, resourceType,authorizationPropertyValue);
     }
 
 
+    /**
+     * 资源类型权限值列表
+     * @param userId
+     * @param resourceType
+     * @return
+     * @throws BizException
+     */
+    @RequestMapper("/resource/type/value")
+    @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_AUTHORIZATION_VALUE")
+    public Map<Long, String> getUserAutValuehListByResourceType(@NotNull Long userId, @NotNull Integer resourceType) throws BizException {
+        return dataAuthorizationService.getUserAutValuehListByResourceType(userId, resourceType);
+    }
 
 }
