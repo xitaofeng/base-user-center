@@ -4,7 +4,6 @@ import com.shsnc.base.authorization.bean.DataAuthorization;
 import com.shsnc.base.authorization.bean.UserDataAuthorization;
 import com.shsnc.base.authorization.config.BeanUtils;
 import com.shsnc.base.authorization.config.RedisConstants;
-import com.shsnc.base.authorization.config.RedisUtils;
 import com.shsnc.base.authorization.mapper.AuthorizationResourceAuthModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationResourceAuthModel;
