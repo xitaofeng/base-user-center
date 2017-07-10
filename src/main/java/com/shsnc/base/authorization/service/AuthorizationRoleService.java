@@ -17,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Elena on 2017/6/7.
@@ -156,6 +158,14 @@ public class AuthorizationRoleService {
         AuthorizationRoleCondition condition = new AuthorizationRoleCondition();
         condition.setUserId(userId);
         return authorizationRoleModelMapper.getAuthorizationRoleModelList(condition);
+    }
+
+
+    public Map<Long,List<AuthorizationRoleModel>> getAuthorizationRoleMapByUserId(Long userId) throws Exception {
+        Map<Long,List<AuthorizationRoleModel>> map = new HashMap<>();
+        AuthorizationRoleCondition condition = new AuthorizationRoleCondition();
+        condition.setUserId(userId);
+        return map;
     }
 
     public QueryData getPageList(AuthorizationRoleCondition condition, Pagination pagination) {

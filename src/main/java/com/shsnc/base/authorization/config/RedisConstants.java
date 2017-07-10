@@ -16,12 +16,12 @@ public class RedisConstants {
     /**
      * 资源属性列表
      */
-    public final static String RESOURCE_PROPERTY_LIST = RedisUtils.buildRedisKey(USER_CENTER, "RESOURCE", "PROPERTY", "LIST");
+    public final static String RESOURCE_PROPERTY_LIST = RedisUtil.buildRedisKey(USER_CENTER, "RESOURCE", "PROPERTY", "LIST");
 
     /**
      * 资源数据权限
      */
-    public final static String RESOURCE_DATA_AUTHORIZATION = RedisUtils.buildRedisKey(USER_CENTER, "RESOURCE", "DATA", "AUTHORIZATION");
+    public final static String RESOURCE_DATA_AUTHORIZATION = RedisUtil.buildRedisKey(USER_CENTER, "RESOURCE", "DATA", "AUTHORIZATION");
 
 
     /**
@@ -31,7 +31,7 @@ public class RedisConstants {
      * @return
      */
     public static String userResourceDataAuthorizationKey(Long userId) {
-        return RedisUtils.buildRedisKey(RedisConstants.RESOURCE_DATA_AUTHORIZATION, userId.toString());
+        return RedisUtil.buildRedisKey(RedisConstants.RESOURCE_DATA_AUTHORIZATION, userId.toString());
     }
 
     /**
@@ -42,7 +42,7 @@ public class RedisConstants {
      * @return
      */
     public static String resourceDataAuthorizationKey(Integer resourceType, Long resourceId) {
-        return RedisUtils.buildRedisKey(RedisConstants.RESOURCE_DATA_AUTHORIZATION, resourceType.toString(), resourceId.toString());
+        return RedisUtil.buildRedisKey(RedisConstants.RESOURCE_DATA_AUTHORIZATION, resourceType.toString(), resourceId.toString());
     }
 
     /**
@@ -52,7 +52,7 @@ public class RedisConstants {
     public static void romverUserDataAuthorization(List<Long> userIdList, Integer resourceType) {
         for (Long userId : userIdList) {
             //清理redis 权限
-            String resourceDataAuthorization = RedisUtils.buildRedisKey(RedisConstants.userResourceDataAuthorizationKey(userId), resourceType.toString());
+            String resourceDataAuthorization = RedisUtil.buildRedisKey(RedisConstants.userResourceDataAuthorizationKey(userId), resourceType.toString());
             RedisUtil.remove(resourceDataAuthorization);
         }
     }
