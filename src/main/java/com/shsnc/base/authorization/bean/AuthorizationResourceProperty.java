@@ -17,7 +17,7 @@ public class AuthorizationResourceProperty implements Serializable {
     private String propertyName;
 
     @NotNull(groups = {ValidationType.Add.class})
-    private Integer propertyValue;
+    private String propertyValue;
 
     @NotNull(groups = {ValidationType.Add.class})
     private Integer resourceType;
@@ -43,11 +43,11 @@ public class AuthorizationResourceProperty implements Serializable {
         this.propertyName = propertyName;
     }
 
-    public Integer getPropertyValue() {
+    public String getPropertyValue() {
         return propertyValue;
     }
 
-    public void setPropertyValue(Integer propertyValue) {
+    public void setPropertyValue(String propertyValue) {
         this.propertyValue = propertyValue;
     }
 

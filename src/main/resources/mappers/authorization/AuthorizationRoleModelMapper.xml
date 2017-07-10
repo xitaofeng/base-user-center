@@ -7,7 +7,7 @@
     <sql id="tableName">authorization_role</sql>
 
     <resultMap id="BaseResultMap" type="com.shsnc.base.authorization.model.AuthorizationRoleModel">
-        <id column="role_id" jdbcType="BIGINT" property="roleId"/>
+        <id column="role_id"  property="roleId"/>
         <result column="role_name" jdbcType="VARCHAR" property="roleName"/>
         <result column="role_code" jdbcType="VARCHAR" property="roleCode"/>
         <result column="is_built" jdbcType="CHAR" property="isBuilt"/>
@@ -39,7 +39,7 @@
         VALUES
         (
         #{roleName},
-        #{roleRole},
+        #{roleCode},
         #{isBuilt},
         #{description},
         #{createTime},
@@ -53,8 +53,8 @@
         <include refid="tableName"/>
         SET
         role_name = #{roleName}
-        <if test="roleRole !=null and roleRole !=''">
-            ,role_code = #{roleRole}
+        <if test="roleCode !=null and roleCode !=''">
+            ,role_code = #{roleCode}
         </if>
         <if test="description !=null and description !=''">
             ,description = #{description}
@@ -104,7 +104,7 @@
         <include refid="BaseColumn"/>
         FROM
         <include refid="tableName"/>
-        WHERE role_code = #{roleRole}
+        WHERE role_code = #{roleCode}
     </select>
 
     <select id="getByRoleId" resultType="com.shsnc.base.authorization.model.AuthorizationRoleModel">
