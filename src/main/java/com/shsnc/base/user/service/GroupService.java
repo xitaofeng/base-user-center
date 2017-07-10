@@ -167,10 +167,28 @@ public class GroupService {
         return dbGroupIds.size() == groupIds.size();
     }
 
+    /**
+     * 根据用户id返回用户拥有的用户组
+     * @param userId 用户id
+     * @return 用于拥有的组列表
+     * @throws BizException 业务异常
+     */
     public List<GroupModel> getGroupsByUserId(Long userId) throws BizException {
         Assert.notNull(userId,"用户id不能为空！");
         return groupModelMapper.getGroupsByUserId(userId);
     }
+
+    /**
+     * 根据用户id返回用户拥有的用户组id已经所有的后代用户组id
+     * @param userId 用户id
+     * @return 用于拥有的组id已经所有后代用户组id列表
+     * @throws BizException 业务异常
+     */
+    public List<Long> getAllGroupIdsByUserId(Long userId) throws BizException {
+        Assert.notNull(userId,"用户id不能为空！");
+        return groupModelMapper.getAllGroupIdsByUserId(userId);
+    }
+
 
     public GroupModel getGroup(Long groupId) throws BizException {
         Assert.notNull(groupId, "用户组id不能为空！");

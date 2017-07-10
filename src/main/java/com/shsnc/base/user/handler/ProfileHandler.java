@@ -81,7 +81,4 @@ public class ProfileHandler implements RequestHandler {
         }
     }
 
-
-    private String[][] filedMapping = {{"userName","user_name"},{"userType","user_type"}};
-
 }

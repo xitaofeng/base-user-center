@@ -38,4 +38,5 @@ public interface GroupModelMapper {
     List<GroupModel> getGroupNodeList(@Param("parentId") Long parentId);
 
     List<Long> getAllGroupIdsByUserId(Long userId);
+
 }

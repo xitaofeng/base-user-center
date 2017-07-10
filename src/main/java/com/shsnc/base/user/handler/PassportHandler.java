@@ -10,8 +10,10 @@ import com.shsnc.base.user.bean.LoginResult;
 import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.config.ServerConfig;
 import com.shsnc.base.user.config.UserConstant;
+import com.shsnc.base.user.model.LoginHistoryModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.service.AccountService;
+import com.shsnc.base.user.service.LoginHistoryService;
 import com.shsnc.base.user.support.token.SimpleTokenProvider;
 import com.shsnc.base.user.support.token.TokenHelper;
 import com.shsnc.base.util.JsonUtil;
@@ -24,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
  * Created by houguangqiang on 2017/6/9.
@@ -36,28 +39,47 @@ public class PassportHandler implements RequestHandler{
 
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private LoginHistoryService loginHistoryService;
 
     @RequestMapper("/login")
     @Validate
     public LoginResult login(@NotNull String account, @NotNull String password) throws BizException {
-
         LoginResult loginResult = new LoginResult();
         // 登陆start
         String errorMsg = null;
+        String serverMsg = null;
         UserInfoModel userInfoModel = null;
+        LoginHistoryModel loginHistory = new LoginHistoryModel();
+        loginHistory.setAccountName(account);
         try {
             userInfoModel = accountService.getUserInfoByAccountName(account);
-            password = SHAMaker.sha256String(password);
-            if(userInfoModel.getPassword().equals(password)){
+        } catch (BizException e) {
+            errorMsg = e.getErrorMessage();
+            serverMsg = errorMsg;
+        }
+        if (userInfoModel != null) {
+            loginHistory.setUserId(userInfoModel.getUserId());
+            String newPassword = SHAMaker.sha256String(password);
+            if(userInfoModel.getPassword().equals(newPassword)){
                 if(userInfoModel.getStatus().equals(UserConstant.USER_STATUS_DISABLED)){
                     errorMsg = "该账户已被禁用，具体请联系管理员！";
+                    serverMsg = errorMsg;
                 } else if(userInfoModel.getStatus().equals(UserConstant.USER_STATUS_LOCKED)){
                     errorMsg = "该账户已被锁住，如需解锁请联系管理员！";
+                    serverMsg = errorMsg;
                 } else {
+                    String userId = userInfoModel.getUserId().toString();
+                    String uuid = ServerConfig.getIsSingleLogin() ? TokenHelper.encodeUID(userId) : TokenHelper.generateUUID();
+                    String token = null;
                     try {
-                        String userId = userInfoModel.getUserId().toString();
-                        String uuid = ServerConfig.getIsSingleLogin() ? TokenHelper.encodeUID(userId) : TokenHelper.generateUUID();
-                        String token = SimpleTokenProvider.generateToken(userId, uuid);
+                        token = SimpleTokenProvider.generateToken(userId, uuid);
+                    } catch (Exception e) {
+                        errorMsg = "服务器异常！生成token失败";
+                        serverMsg = "用户登陆生成token异常";
+                        logger.error(serverMsg, e);
+                    }
+                    if (token != null) {
                         UserInfo userInfo = JsonUtil.convert(userInfoModel, UserInfo.class);
                         loginResult.setUserInfo(userInfo);
                         Certification certification = new Certification(token);
@@ -66,22 +88,24 @@ public class PassportHandler implements RequestHandler{
                             RedisUtil.setFieldValue(UserConstant.REDIS_LOGIN_KEY, uuid, token, ServerConfig.getSessionTime());
                         } catch (Exception e) {
                             errorMsg = "服务器异常！";
-                            logger.error("操作REDIS失败", e);
+                            serverMsg = "操作REDIS失败";
+                            logger.error(serverMsg, e);
                         }
-                    } catch (Exception e) {
-                        errorMsg = "服务器异常！";
-                        logger.error("用户登陆生成token异常", e);
                     }
                 }
             } else {
                 errorMsg = "登陆密码错误！";
+                serverMsg = errorMsg;
             }
-        } catch (BizException e) {
-            errorMsg = e.getErrorMessage();
         }
-
         // 记录登陆历史记录
-
+        String ip = ThreadContext.getClientInfo().getClientIp();
+        loginHistory.setLoginIp(ip);
+        loginHistory.setLoginTime(new Date().getTime());
+        loginHistory.setLoginType(UserConstant.LOGIN);
+        loginHistory.setSuccess(serverMsg == null ? UserConstant.LOGIN_SUCCESS : UserConstant.LOGIN_ERROR);
+        loginHistory.setErrorMsg(serverMsg);
+        loginHistoryService.addLoginHistory(loginHistory);
         // 提示信息
         if (errorMsg != null) {
             throw new BizException(errorMsg);
@@ -94,20 +118,34 @@ public class PassportHandler implements RequestHandler{
     public void logout() throws BizException {
         String token = ThreadContext.getClientInfo().getToken();
         String errorMsg = null;
+        String serverMsg = null;
         String[] result = null;
+        LoginHistoryModel loginHistory = new LoginHistoryModel();
         try {
             result = SimpleTokenProvider.resolveToken(token);
-        } catch (Exception e) {
+            loginHistory.setUserId(Long.valueOf(result[0]));
+        } catch (IllegalArgumentException e) {
             errorMsg = "无效token！";
+            serverMsg = errorMsg;
         }
-        try {
-            RedisUtil.delMapField(UserConstant.REDIS_LOGIN_KEY, result[1]);
-        } catch (Exception e) {
-            errorMsg = "服务器异常！";
-            logger.error("操作REDIS失败", e);
+        if (result != null) {
+            try {
+                RedisUtil.delMapField(UserConstant.REDIS_LOGIN_KEY, result[1]);
+            } catch (Exception e) {
+                errorMsg = "服务器异常！";
+                serverMsg = "操作REDIS失败";
+                logger.error(serverMsg, e);
+            }
         }
 
         // 记录登出历史记录
+        String ip = ThreadContext.getClientInfo().getClientIp();
+        loginHistory.setLoginIp(ip);
+        loginHistory.setLoginTime(new Date().getTime());
+        loginHistory.setLoginType(UserConstant.LOGOUT);
+        loginHistory.setSuccess(serverMsg == null ? UserConstant.LOGIN_SUCCESS : UserConstant.LOGIN_ERROR);
+        loginHistory.setErrorMsg(serverMsg);
+        loginHistoryService.addLoginHistory(loginHistory);
 
         // 提示信息
         if(errorMsg != null){

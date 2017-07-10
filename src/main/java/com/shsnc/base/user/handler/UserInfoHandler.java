@@ -6,7 +6,7 @@ import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
-import com.shsnc.base.authorization.service.AssignService;
+import com.shsnc.base.authorization.service.AuthorizationRoleService;
 import com.shsnc.base.user.bean.ExtendPropertyValue;
 import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.bean.UserInfoParam;
@@ -38,6 +38,8 @@ public class UserInfoHandler implements RequestHandler {
     private UserInfoService userInfoService;
     @Autowired
     private ExtendPropertyValueService extendPropertyValueService;
+    @Autowired
+    private AuthorizationRoleService authorizationRoleService;
 
     private String[][] filedMapping=  {{"userId","user_id"},{"username","username"},{"alias","alias"},{"mobile","mobile"},{"email","email"},{"status","status"}};
 
@@ -54,7 +56,13 @@ public class UserInfoHandler implements RequestHandler {
     @Authentication("BASE_USER_INFO_GET_OBJECT")
     public UserInfo getObject(@NotNull Long userId) throws BizException {
         UserInfoModel userInfoModel = userInfoService.getUserInfo(userId);
-        return JsonUtil.convert(userInfoModel,UserInfo.class);
+        if (userInfoModel != null) {
+            UserInfo userInfo = JsonUtil.convert(userInfoModel, UserInfo.class);
+            List<Long> roleIds = authorizationRoleService.getRoleIdsByUserId(userId);
+            userInfo.setRoleIds(roleIds);
+            return userInfo;
+        }
+        return null;
     }
 
     @RequestMapper("/getList")
@@ -64,14 +72,6 @@ public class UserInfoHandler implements RequestHandler {
         List<UserInfoModel> userInfoModels = userInfoService.getUserInfoListByUserIds(userIds);
         return JsonUtil.convert(userInfoModels,List.class, UserInfo.class);
     }
-
-//    @RequestMapper("/getList")
-//    @Authentication("BASE_USER_INFO_GET_LIST")
-//    public List<UserInfo> getList(UserInfoParam userInfo){
-//        UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
-//        List<UserInfoModel> userInfoList = userInfoService.getUserInfoList(userInfoModel);
-//        return JsonUtil.convert(userInfoList, List.class, UserInfo.class);
-//    }
 
     @RequestMapper("/add")
     @Authentication("BASE_USER_INFO_ADD")

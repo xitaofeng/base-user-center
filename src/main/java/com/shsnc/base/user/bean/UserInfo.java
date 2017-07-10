@@ -1,5 +1,7 @@
 package com.shsnc.base.user.bean;
 
+import java.util.List;
+
 /**
  *
  */
@@ -12,6 +14,7 @@ public class UserInfo {
     private String email;
     private Integer internal;
     private Integer status;
+    private List<Long> roleIds;
 
     public Long getUserId() {
         return userId;
@@ -67,5 +70,13 @@ public class UserInfo {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    public void setRoleIds(List<Long> roleIds) {
+        this.roleIds = roleIds;
     }
 }

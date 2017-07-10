@@ -11,6 +11,14 @@ public abstract class UserConstant {
     public static final int ACCOUNT_TYPE_EMAIL = 2;
     /** 账户类型手机号 */
     public static final int ACCOUNT_TYPE_MOBILE = 3;
+    /** 登陆成功 */
+    public static final Integer LOGIN_SUCCESS = 1;
+    /** 登陆失败 */
+    public static final Integer LOGIN_ERROR = 0;
+    /** 登入 */
+    public static final Integer LOGIN = 1;
+    /** 登出 */
+    public static final Integer LOGOUT = 2;
 
     /** 正则表达式常量 */
     public static class Regex {
