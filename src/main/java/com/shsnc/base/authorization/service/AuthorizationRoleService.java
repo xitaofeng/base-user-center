@@ -143,6 +143,21 @@ public class AuthorizationRoleService {
         return authorizationRoleModelMapper.getAuthorizationRoleModelList(condition);
     }
 
+
+
+    /**
+     * 查询列表(根据用户id)
+     *
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    public List<AuthorizationRoleModel> getAuthorizationRoleModelListByUserId(Long userId) throws Exception {
+        AuthorizationRoleCondition condition = new AuthorizationRoleCondition();
+        condition.setUserId(userId);
+        return authorizationRoleModelMapper.getAuthorizationRoleModelList(condition);
+    }
+
     public QueryData getPageList(AuthorizationRoleCondition condition, Pagination pagination) {
         QueryData queryData = new QueryData(pagination);
         int totalCount = authorizationRoleModelMapper.getTotalCountByCondition(condition);
@@ -151,6 +166,8 @@ public class AuthorizationRoleService {
         queryData.setRecords(list);
         return queryData;
     }
+
+
 
     /**
      * 查询对象

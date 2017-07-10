@@ -129,6 +129,7 @@
 
     <sql id="conditionSql">
         <where>
+            role_code != 'super_admin'
             <if test="condition != null">
                 <if test="condition.roleName !=null and condition.roleName !=''">
                     AND role_name LIKE CONCAT('%', #{condition.roleName}, '%')
@@ -137,10 +138,13 @@
                     AND role_code LIKE CONCAT('%', #{condition.roleCode}, '%')
                 </if>
                 <if test="condition.isBuilt !=null and condition.isBuilt != 0">
-                    AND is_built = #{condition.is_built}=
+                    AND is_built = #{condition.is_built}
                 </if>
                 <if test="condition.description !=null and condition.description !=''">
                     AND description LIKE CONCAT('%', #{condition.description}, '%')
+                </if>
+                <if test="condition.userId !=null and condition.userId !=0 ">
+                    AND role_id IN (SELECT r.role_id FROM authorization_user_role_relation r WHERE r.user_id = #{condition.description});
                 </if>
             </if>
         </where>
