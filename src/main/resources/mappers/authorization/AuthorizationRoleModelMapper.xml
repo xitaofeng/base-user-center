@@ -146,6 +146,12 @@
                 <if test="condition.userId !=null and condition.userId !=0 ">
                     AND role_id IN (SELECT r.role_id FROM authorization_user_role_relation r WHERE r.user_id = #{condition.description});
                 </if>
+                <if test="condition.roleIds !=null and condition.roleIds.size() > 0 ">
+                    AND role_id IN
+                    <foreach collection="condition.roleIds" item="roleId" open="(" close=")" separator=",">
+                        #{roleId }
+                    </foreach>
+                </if>
             </if>
         </where>
     </sql>

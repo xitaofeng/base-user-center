@@ -148,6 +148,21 @@ public class AuthorizationRoleService {
 
 
     /**
+     * 查询列表(根据主键ids)
+     *
+     * @param roleIds
+     * @return
+     * @throws Exception
+     */
+    public List<AuthorizationRoleModel> getAuthorizationRoleListByRoleIds(List<Long> roleIds) throws Exception {
+        AuthorizationRoleCondition condition = new AuthorizationRoleCondition();
+        condition.setRoleIds(roleIds);
+        return getAuthorizationRoleModelList(condition);
+    }
+
+
+
+    /**
      * 查询列表(根据用户id)
      *
      * @param userId
