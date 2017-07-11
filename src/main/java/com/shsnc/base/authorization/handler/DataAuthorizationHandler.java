@@ -66,7 +66,7 @@ public class DataAuthorizationHandler implements RequestHandler {
      */
     @RequestMapper("/resource/type/property/value")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_AUTHORIZATION_VALUE")
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_RESOURCE_TYPE_PROPERTY_VALUE")
     public Map<Long, String> getUserAutValuehListByResourceTypeAndPropertyValue(@NotNull Long userId, @NotNull Integer resourceType,String authorizationPropertyValue) throws BizException {
         return dataAuthorizationService.getUserAutValuehListByResourceTypeAndPropertyValue(userId, resourceType,authorizationPropertyValue);
     }
@@ -81,7 +81,7 @@ public class DataAuthorizationHandler implements RequestHandler {
      */
     @RequestMapper("/resource/type/value")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_AUTHORIZATION_VALUE")
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_RESOURCE_TYPE_VALUE")
     public Map<Long, String> getUserAutValuehListByResourceType(@NotNull Long userId, @NotNull Integer resourceType) throws BizException {
         return dataAuthorizationService.getUserAutValuehListByResourceType(userId, resourceType);
     }
