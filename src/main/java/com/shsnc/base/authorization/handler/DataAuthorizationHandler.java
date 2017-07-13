@@ -52,8 +52,8 @@ public class DataAuthorizationHandler implements RequestHandler {
     @RequestMapper("/auth/value")
     @Validate
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_AUTH_VALUE")
-    public String[] authValue(@NotNull Long userId, @NotNull Integer resourceType, @NotNull Long resourceId) throws BizException {
-        return dataAuthorizationService.getAuthValue(userId, resourceType, resourceId);
+    public String[] authValue(@NotNull Long userId, @NotNull String resourceTypeCode, @NotNull Long resourceId) throws BizException {
+        return dataAuthorizationService.getAuthValue(userId, resourceTypeCode, resourceId);
     }
 
 
