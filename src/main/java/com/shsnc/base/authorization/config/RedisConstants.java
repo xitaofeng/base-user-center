@@ -47,13 +47,14 @@ public class RedisConstants {
 
     /**
      * 清理用户-资源类型下的权限数据权限
+     *
      * @param userIdList
      */
-    public static void romverUserDataAuthorization(List<Long> userIdList, Integer resourceType) {
+    public static void removeUserDataAuthorization(List<Long> userIdList) {
         for (Long userId : userIdList) {
             //清理redis 权限
-            String resourceDataAuthorization = RedisUtil.buildRedisKey(RedisConstants.userResourceDataAuthorizationKey(userId), resourceType.toString());
-            RedisUtil.remove(resourceDataAuthorization);
+            String redisKey = RedisConstants.userResourceDataAuthorizationKey(userId);
+            RedisUtil.remove(redisKey);
         }
     }
 }

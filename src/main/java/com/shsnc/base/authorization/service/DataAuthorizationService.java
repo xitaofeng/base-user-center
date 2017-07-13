@@ -61,7 +61,7 @@ public class DataAuthorizationService {
         if (!CollectionUtils.isEmpty(userIdList)) {
             List<AuthorizationResourceAuthModel> authorizationResourceAuthModels = buildAuthorizationResourceAuthModel(resourceType, EnumAuthType.USER, userIdList, propertyIdList, resourceIdList);
             if (authorizationResourceAuthModelMapper.addBatchAuthorizationResourceAuthModel(authorizationResourceAuthModels) > 0) {
-                RedisConstants.romverUserDataAuthorization(userIdList, resourceType);
+                RedisConstants.removeUserDataAuthorization(userIdList);
             }
         }
         return true;
@@ -85,7 +85,7 @@ public class DataAuthorizationService {
             List<AuthorizationResourceAuthModel> authorizationResourceAuthModels = buildAuthorizationResourceAuthModel(resourceType, EnumAuthType.ROLE, roleIdList, propertyIdList, resourceIdList);
             if (authorizationResourceAuthModelMapper.addBatchAuthorizationResourceAuthModel(authorizationResourceAuthModels) > 0) {
                 List<Long> userIdList = authorizationUserRoleRelationModelMapper.getUserIdByRoleIds(roleIdList);
-                RedisConstants.romverUserDataAuthorization(userIdList, resourceType);
+                RedisConstants.removeUserDataAuthorization(userIdList);
             }
         }
         return true;
@@ -123,11 +123,11 @@ public class DataAuthorizationService {
      * 根据用户id和资源类型获取 资源类型下所有有权限的资源数据及权限值
      *
      * @param userId
-     * @param resourceType
+     * @param resourceTypeCode
      * @param authorizationPropertyValue 权限属性值
      * @return
      */
-    public Map<Long, String> getUserAutValuehListByResourceTypeAndPropertyValue(Long userId, Integer resourceType, String authorizationPropertyValue) {
+    public Map<Long, String> getUserAutValuehListByResourceTypeAndPropertyValue(Long userId, String resourceTypeCode, String authorizationPropertyValue) {
 
         //根据key 直接取用户对应资源的权限值 取不到加载用户权限数据
         Map<String, String> userAuthMap = RedisUtil.getMap(RedisConstants.userResourceDataAuthorizationKey(userId));
@@ -136,7 +136,7 @@ public class DataAuthorizationService {
         }
 
         Map<Long, String> resourceTypeMap = new HashMap<>();
-        String resourceTypeAuthStr = userAuthMap.get(String.valueOf(resourceType));
+        String resourceTypeAuthStr = userAuthMap.get(resourceTypeCode);
         if (StringUtil.isNotEmpty(resourceTypeAuthStr)) {
           resourceTypeMap = JsonUtil.jsonToObject(resourceTypeAuthStr, Map.class, Long.class, String.class);
         }
@@ -158,10 +158,10 @@ public class DataAuthorizationService {
     /**
      * 资源权限值列表(根据资源类型)
      * @param userId
-     * @param resourceType
+     * @param resourceTypeCode
      * @return
      */
-    public Map<Long, String> getUserAutValuehListByResourceType(Long userId, Integer resourceType) {
+    public Map<Long, String> getUserAutValuehListByResourceType(Long userId, String resourceTypeCode) {
 
         //根据key 直接取用户对应资源的权限值 取不到加载用户权限数据
         Map<String, String> userAuthMap = RedisUtil.getMap(RedisConstants.userResourceDataAuthorizationKey(userId));
@@ -170,7 +170,7 @@ public class DataAuthorizationService {
         }
 
         Map<Long, String> resourceTypeMap = new HashMap<>();
-        String resourceTypeAuthStr = userAuthMap.get(String.valueOf(resourceType));
+        String resourceTypeAuthStr = userAuthMap.get(resourceTypeCode);
         if (StringUtil.isNotEmpty(resourceTypeAuthStr)) {
             resourceTypeMap = JsonUtil.jsonToObject(resourceTypeAuthStr, Map.class, Long.class, String.class);
         }
@@ -245,15 +245,15 @@ public class DataAuthorizationService {
             List<Long> roleIds = userModuleService.getRoleIdsByUserId(userId);
             List<UserDataAuthorization> userDataAuthorizations = authorizationResourceAuthModelMapper.getUserDataAuthorization(userId, roleIds);
 
-            HashMap<String, String> map = new HashMap<>();
+            HashMap<Long, String> map = new HashMap<>();
             for (UserDataAuthorization userDataAuthorization : userDataAuthorizations) {
-                String resourceType = userDataAuthorization.getResourceType().toString();
-                String resourceId = userDataAuthorization.getResourceId().toString();
+                String resourceTypeCode = userDataAuthorization.getResourceTypeCode();
+                Long resourceId = userDataAuthorization.getResourceId();
                 String propertyValues = userDataAuthorization.getPropertyValues();
 
-                if (dataAuthorizationMap.containsKey(resourceType)) {
-                    String mapValue = dataAuthorizationMap.get(resourceType);
-                    map = JsonUtil.jsonToObject(mapValue, Map.class, String.class, Integer.class);
+                if (dataAuthorizationMap.containsKey(resourceTypeCode)) {
+                    String mapValue = dataAuthorizationMap.get(resourceTypeCode);
+                    map = JsonUtil.jsonToObject(mapValue, Map.class, Long.class, String.class);
                     if (CollectionUtils.isEmpty(map)) {
                         map = new HashMap<>();
                     }
@@ -263,7 +263,7 @@ public class DataAuthorizationService {
                     map.put(resourceId, propertyValues);
                 }
 
-                dataAuthorizationMap.put(resourceType, JsonUtil.toJsonString(map));
+                dataAuthorizationMap.put(resourceTypeCode, JsonUtil.toJsonString(map));
             }
             if (!CollectionUtils.isEmpty(dataAuthorizationMap)) {
                 RedisUtil.saveMap(resourceDataAuthorizationKey, dataAuthorizationMap);

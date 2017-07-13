@@ -8,18 +8,18 @@ import java.io.Serializable;
  */
 public class UserDataAuthorization implements Serializable {
 
-    private Integer resourceType;
+    private String resourceTypeCode;
 
     private Long resourceId;
 
     private String propertyValues;
 
-    public Integer getResourceType() {
-        return resourceType;
+    public String getResourceTypeCode() {
+        return resourceTypeCode;
     }
 
-    public void setResourceType(Integer resourceType) {
-        this.resourceType = resourceType;
+    public void setResourceTypeCode(String resourceTypeCode) {
+        this.resourceTypeCode = resourceTypeCode;
     }
 
     public Long getResourceId() {

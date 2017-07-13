@@ -12,6 +12,8 @@ import com.shsnc.base.authorization.model.AuthorizationResourcePropertyModel;
 import com.shsnc.base.authorization.model.condition.AuthorizationResourcePropertyCondition;
 import com.shsnc.base.authorization.service.AuthorizationResourcePropertyService;
 import com.shsnc.base.module.base.dictionary.DictionaryMapInfo;
+import com.shsnc.base.module.base.resource.ResourceInfo;
+import com.shsnc.base.module.config.BaseResourceService;
 import com.shsnc.base.module.config.DictionaryService;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BizException;
@@ -115,14 +117,12 @@ public class AuthorizationResourcePropertyHandler implements RequestHandler {
         BeanUtils.copyProperties(authorizationResourceProperty, authorizationResourcePropertyModel);
 
 
-        Integer resourceType = null;
+        String resourceTypeCode = authorizationResourceProperty.getResourceTypeCode();
         String resourceTypeName = "";
-        DictionaryMapInfo typeDictionaryMapInfo = DictionaryService.getDictionaryMap(DictionaryConstant.ATM_CODE, DictionaryConstant.DATA_AUTHORIZATION_RESOURCE_TYPE, authorizationResourceProperty.getResourceTypeCode());
-        if (typeDictionaryMapInfo != null) {
-            resourceType = Integer.parseInt(typeDictionaryMapInfo.getMapValue());
-            resourceTypeName = typeDictionaryMapInfo.getMapDesc();
+        ResourceInfo resourceInfo = BaseResourceService.getResourceInfoByResourceCode(resourceTypeCode);
+        if (resourceInfo != null) {
+            resourceTypeName = resourceInfo.getResourceName();
         }
-        authorizationResourcePropertyModel.setResourceType(resourceType);
         authorizationResourcePropertyModel.setResourceTypeName(resourceTypeName);
 
         String propertyName = "";
