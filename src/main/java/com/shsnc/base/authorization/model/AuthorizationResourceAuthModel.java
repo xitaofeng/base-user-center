@@ -11,16 +11,16 @@ public class AuthorizationResourceAuthModel implements Serializable {
     /**
      * 创建用户授对象
      *
-     * @param resourceType
+     * @param resourceTypeCode
      * @param resourceId
      * @param propertyId
      * @param enumAuthType
      * @param authValue
      * @return
      */
-    public static AuthorizationResourceAuthModel createAuthorizationResourceAuthModel(Integer resourceType, Long resourceId, Long propertyId, EnumAuthType enumAuthType, Long authValue) {
+    public static AuthorizationResourceAuthModel createAuthorizationResourceAuthModel(String resourceTypeCode, Long resourceId, Long propertyId, EnumAuthType enumAuthType, Long authValue) {
         AuthorizationResourceAuthModel authorizationResourceAuthModel = new AuthorizationResourceAuthModel();
-        authorizationResourceAuthModel.setResourceType(resourceType);
+        authorizationResourceAuthModel.setResourceTypeCode(resourceTypeCode);
         authorizationResourceAuthModel.setResourceId(resourceId);
         authorizationResourceAuthModel.setPropertyId(propertyId);
         authorizationResourceAuthModel.setAuthType(enumAuthType.getValue());
@@ -50,7 +50,7 @@ public class AuthorizationResourceAuthModel implements Serializable {
 
     private Long id;
 
-    private Integer resourceType;
+    private String resourceTypeCode;
 
     private Long resourceId;
 
@@ -60,20 +60,20 @@ public class AuthorizationResourceAuthModel implements Serializable {
 
     private Long authValue;
 
+    public String getResourceTypeCode() {
+        return resourceTypeCode;
+    }
+
+    public void setResourceTypeCode(String resourceTypeCode) {
+        this.resourceTypeCode = resourceTypeCode;
+    }
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Integer getResourceType() {
-        return resourceType;
-    }
-
-    public void setResourceType(Integer resourceType) {
-        this.resourceType = resourceType;
     }
 
     public Long getResourceId() {

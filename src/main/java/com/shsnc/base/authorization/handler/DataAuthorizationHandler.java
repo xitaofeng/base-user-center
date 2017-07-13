@@ -38,15 +38,15 @@ public class DataAuthorizationHandler implements RequestHandler {
     @RequestMapper("/user")
     @Validate
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_USER")
-    public boolean userAuth(@NotNull Integer resourceType, @NotEmpty List<Long> userIdList, @NotEmpty List<Long> resourceIdList, @NotEmpty List<Long> propertyIdList) throws Exception {
-        return dataAuthorizationService.userAuth(resourceType, userIdList, resourceIdList, propertyIdList);
+    public boolean userAuth(@NotNull String resourceTypeCode, @NotEmpty List<Long> userIdList, @NotEmpty List<Long> resourceIdList, @NotEmpty List<Long> propertyIdList) throws Exception {
+        return dataAuthorizationService.userAuth(resourceTypeCode, userIdList, resourceIdList, propertyIdList);
     }
 
     @RequestMapper("/role")
     @Validate
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_ROLE")
-    public boolean roleAuth(@NotNull Integer resourceType, @NotEmpty List<Long> roleIdList, @NotEmpty List<Long> resourceIdList, @NotEmpty List<Long> propertyIdList) throws BizException {
-        return dataAuthorizationService.roleAuth(resourceType, roleIdList, resourceIdList, propertyIdList);
+    public boolean roleAuth(@NotNull String resourceTypeCode, @NotEmpty List<Long> roleIdList, @NotEmpty List<Long> resourceIdList, @NotEmpty List<Long> propertyIdList) throws BizException {
+        return dataAuthorizationService.roleAuth(resourceTypeCode, roleIdList, resourceIdList, propertyIdList);
     }
 
     @RequestMapper("/auth/value")

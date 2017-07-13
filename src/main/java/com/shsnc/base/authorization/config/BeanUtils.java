@@ -17,9 +17,8 @@ public final class BeanUtils {
      */
     public static List<AuthorizationResourceAuthModel> removeDuplicate(List<AuthorizationResourceAuthModel> list) {
         Map<String, AuthorizationResourceAuthModel> map = new HashMap<>();
-        List<String> setKey = new ArrayList<>();
         for (AuthorizationResourceAuthModel item : list) {
-            String key = item.getResourceType() + "-" + item.getResourceId() + "-" + item.getPropertyId() + "-" + item.getAuthType() + "-" + item.getAuthValue();
+            String key = item.getResourceTypeCode() + "-" + item.getResourceId() + "-" + item.getPropertyId() + "-" + item.getAuthType() + "-" + item.getAuthValue();
             map.put(key, item);
         }
         Collection<AuthorizationResourceAuthModel> collection = map.values();
