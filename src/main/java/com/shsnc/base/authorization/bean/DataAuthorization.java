@@ -14,7 +14,7 @@ import java.util.List;
 public class DataAuthorization implements Serializable {
 
     @NotNull(groups = ValidationType.Add.class)
-    private Integer resourceType;
+    private String resourceTypeCode;
 
     private List<Long> authRoleList;
 
@@ -26,12 +26,12 @@ public class DataAuthorization implements Serializable {
     @NotEmpty(groups = ValidationType.Add.class)
     private List<Long> propertyIdList;
 
-    public Integer getResourceType() {
-        return resourceType;
+    public String getResourceTypeCode() {
+        return resourceTypeCode;
     }
 
-    public void setResourceType(Integer resourceType) {
-        this.resourceType = resourceType;
+    public void setResourceTypeCode(String resourceTypeCode) {
+        this.resourceTypeCode = resourceTypeCode;
     }
 
     public List<Long> getResourceIdList() {

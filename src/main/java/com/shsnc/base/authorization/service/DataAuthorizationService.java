@@ -48,18 +48,18 @@ public class DataAuthorizationService {
     /**
      * 用户授权
      *
-     * @param resourceType   授权资源类型
+     * @param resourceTypeCode   授权资源类型
      * @param userIdList     授权用户列表
      * @param propertyIdList 授权
      * @return
      */
     @Transactional
-    public boolean userAuth(Integer resourceType, List<Long> userIdList, List<Long> resourceIdList, List<Long> propertyIdList) throws BizException {
+    public boolean userAuth(String resourceTypeCode, List<Long> userIdList, List<Long> resourceIdList, List<Long> propertyIdList) throws BizException {
         if (CollectionUtils.isEmpty(propertyIdList)) {
             throw new BizException("选择授权的权限");
         }
         if (!CollectionUtils.isEmpty(userIdList)) {
-            List<AuthorizationResourceAuthModel> authorizationResourceAuthModels = buildAuthorizationResourceAuthModel(resourceType, EnumAuthType.USER, userIdList, propertyIdList, resourceIdList);
+            List<AuthorizationResourceAuthModel> authorizationResourceAuthModels = buildAuthorizationResourceAuthModel(resourceTypeCode, EnumAuthType.USER, userIdList, propertyIdList, resourceIdList);
             if (authorizationResourceAuthModelMapper.addBatchAuthorizationResourceAuthModel(authorizationResourceAuthModels) > 0) {
                 RedisConstants.removeUserDataAuthorization(userIdList);
             }
@@ -70,19 +70,19 @@ public class DataAuthorizationService {
     /**
      * 角色授权
      *
-     * @param resourceType    资源类型
+     * @param resourceTypeCode  资源类型
      * @param roleIdList
      * @param resourceIdList;
      * @param propertyIdList
      * @return
      */
     @Transactional
-    public boolean roleAuth(Integer resourceType, List<Long> roleIdList, List<Long> resourceIdList, List<Long> propertyIdList) throws BizException {
+    public boolean roleAuth(String resourceTypeCode, List<Long> roleIdList, List<Long> resourceIdList, List<Long> propertyIdList) throws BizException {
         if (CollectionUtils.isEmpty(propertyIdList)) {
             throw new BizException("选择授权的权限");
         }
         if (!CollectionUtils.isEmpty(roleIdList)) {
-            List<AuthorizationResourceAuthModel> authorizationResourceAuthModels = buildAuthorizationResourceAuthModel(resourceType, EnumAuthType.ROLE, roleIdList, propertyIdList, resourceIdList);
+            List<AuthorizationResourceAuthModel> authorizationResourceAuthModels = buildAuthorizationResourceAuthModel(resourceTypeCode, EnumAuthType.ROLE, roleIdList, propertyIdList, resourceIdList);
             if (authorizationResourceAuthModelMapper.addBatchAuthorizationResourceAuthModel(authorizationResourceAuthModels) > 0) {
                 List<Long> userIdList = authorizationUserRoleRelationModelMapper.getUserIdByRoleIds(roleIdList);
                 RedisConstants.removeUserDataAuthorization(userIdList);
@@ -103,16 +103,16 @@ public class DataAuthorizationService {
             throw new BizException("选择授权的数据");
         }
 
-        Integer resourceType = dataAuthorization.getResourceType();
+        String resourceTypeCode = dataAuthorization.getResourceTypeCode();
         List<Long> resourceIdList = dataAuthorization.getResourceIdList();
         List<Long> propertyIdList = dataAuthorization.getPropertyIdList();
 
         if (!CollectionUtils.isEmpty(dataAuthorization.getAuthUserList())) {
-            userAuth(resourceType, dataAuthorization.getAuthUserList(), resourceIdList, propertyIdList);
+            userAuth(resourceTypeCode, dataAuthorization.getAuthUserList(), resourceIdList, propertyIdList);
         }
 
         if (!CollectionUtils.isEmpty(dataAuthorization.getAuthRoleList())) {
-            userAuth(resourceType, dataAuthorization.getAuthRoleList(), resourceIdList, propertyIdList);
+            userAuth(resourceTypeCode, dataAuthorization.getAuthRoleList(), resourceIdList, propertyIdList);
         }
 
         return true;
@@ -295,7 +295,7 @@ public class DataAuthorizationService {
     /**
      * 构建添加的权限
      *
-     * @param resourceType
+     * @param resourceTypeCode
      * @param enumAuthType
      * @param authValues
      * @param propertyIds
@@ -303,21 +303,21 @@ public class DataAuthorizationService {
      * @return
      * @throws BizException
      */
-    private List<AuthorizationResourceAuthModel> buildAuthorizationResourceAuthModel(Integer resourceType, AuthorizationResourceAuthModel.EnumAuthType enumAuthType, List<Long> authValues, List<Long> propertyIds, List<Long> resourceIds) throws BizException {
+    private List<AuthorizationResourceAuthModel> buildAuthorizationResourceAuthModel(String resourceTypeCode, AuthorizationResourceAuthModel.EnumAuthType enumAuthType, List<Long> authValues, List<Long> propertyIds, List<Long> resourceIds) throws BizException {
         List<AuthorizationResourceAuthModel> authorizationResourceAuthModels = new ArrayList<>();
 
         for (Long resourceId : resourceIds) {
 
             for (Long authValue : authValues) {
                 //清理权限
-                deleteResourceDataAuthorization(enumAuthType, authValue, resourceType, resourceId);
+                deleteResourceDataAuthorization(enumAuthType, authValue, resourceTypeCode, resourceId);
 
                 for (Long propertyId : propertyIds) {
                     //propertyId 继承权限查询
                     List<Long> ids = authorizationResourcePropertyService.getAuthorizationResourcePropertyModelPidById(propertyId);
 
                     for (Long id : ids) {
-                        AuthorizationResourceAuthModel authorizationResourceAuthModel = AuthorizationResourceAuthModel.createAuthorizationResourceAuthModel(resourceType, resourceId, id, enumAuthType, authValue);
+                        AuthorizationResourceAuthModel authorizationResourceAuthModel = AuthorizationResourceAuthModel.createAuthorizationResourceAuthModel(resourceTypeCode, resourceId, id, enumAuthType, authValue);
                         authorizationResourceAuthModels.add(authorizationResourceAuthModel);
                     }
                 }
@@ -331,11 +331,11 @@ public class DataAuthorizationService {
      *
      * @param enumAuthType
      * @param authValue
-     * @param resourceType
+     * @param resourceTypeCode
      * @param resourceId
      * @return
      */
-    private Integer deleteResourceDataAuthorization(EnumAuthType enumAuthType, Long authValue, Integer resourceType, Long resourceId) {
-        return authorizationResourceAuthModelMapper.deleteResourceDataAuthorization(enumAuthType.getValue(), authValue, resourceType, resourceId);
+    private Integer deleteResourceDataAuthorization(EnumAuthType enumAuthType, Long authValue, String resourceTypeCode, Long resourceId) {
+        return authorizationResourceAuthModelMapper.deleteResourceDataAuthorization(enumAuthType.getValue(), authValue, resourceTypeCode, resourceId);
     }
 }
