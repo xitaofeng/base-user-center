@@ -182,12 +182,12 @@ public class DataAuthorizationService {
      * 用户资源权限值查询
      *
      * @param userId
-     * @param resourceType
+     * @param resourceTypeCode
      * @param resourceId
      * @return
      */
 
-    public String[] getAuthValue(Long userId, Integer resourceType, Long resourceId) {
+    public String[] getAuthValue(Long userId, String resourceTypeCode, Long resourceId) {
         String authorizationValue = "";
         //根据key 直接取用户对应资源的权限值 取不到加载用户权限数据
         Map<String, String> userAuthMap = RedisUtil.getMap(RedisConstants.userResourceDataAuthorizationKey(userId));
@@ -196,7 +196,7 @@ public class DataAuthorizationService {
             userAuthMap = getDataAuthorization(userId);
         }
 
-        String resourceTypeAuthStr = userAuthMap.get(String.valueOf(resourceType));
+        String resourceTypeAuthStr = userAuthMap.get(resourceTypeCode);
         if (StringUtil.isNotEmpty(resourceTypeAuthStr)) {
             Map<String, String> resourceTypeMap = JsonUtil.jsonToObject(resourceTypeAuthStr, Map.class, String.class, String.class);
             authorizationValue = resourceTypeMap.get(resourceId.toString());
