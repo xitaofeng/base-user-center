@@ -18,7 +18,7 @@ public interface AuthorizationRoleModelMapper {
      * @param authorizationRoleModel
      * @return
      */
-    public int addAuthorizationRoleModel(AuthorizationRoleModel authorizationRoleModel);
+    int addAuthorizationRoleModel(AuthorizationRoleModel authorizationRoleModel);
 
     /**
      * 编辑权限角色信息 返回数据编辑成功数据条数
@@ -26,7 +26,7 @@ public interface AuthorizationRoleModelMapper {
      * @param authorizationRoleModel
      * @return
      */
-    public Integer editAuthorizationRoleModel(AuthorizationRoleModel authorizationRoleModel);
+    Integer editAuthorizationRoleModel(AuthorizationRoleModel authorizationRoleModel);
 
     /**
      * 批量删除
@@ -34,7 +34,7 @@ public interface AuthorizationRoleModelMapper {
      * @param roleIdList
      * @return
      */
-    public Integer batchDeleteAuthorizationRole(List<Long> roleIdList);
+    Integer batchDeleteAuthorizationRole(List<Long> roleIdList);
 
     /**
      * 获取单一对象数据
@@ -42,7 +42,7 @@ public interface AuthorizationRoleModelMapper {
      * @param roleId
      * @return
      */
-    public AuthorizationRoleModel getAuthorizationRoleModelByRoleId(Long roleId);
+    AuthorizationRoleModel getAuthorizationRoleModelByRoleId(Long roleId);
 
     /**
      * 获取列表数据
@@ -50,7 +50,7 @@ public interface AuthorizationRoleModelMapper {
      * @param condition
      * @return
      */
-    public List<AuthorizationRoleModel> getAuthorizationRoleModelList(@Param("condition")AuthorizationRoleCondition condition);
+    List<AuthorizationRoleModel> getAuthorizationRoleModelList(@Param("condition")AuthorizationRoleCondition condition);
 
     /**
      * 根据角色名称获取列表
@@ -58,7 +58,7 @@ public interface AuthorizationRoleModelMapper {
      * @param roleName
      * @return
      */
-    public List<AuthorizationRoleModel> getListByRoleName(String roleName);
+    List<AuthorizationRoleModel> getListByRoleName(String roleName);
 
     /**
      * 角色编码
@@ -66,7 +66,7 @@ public interface AuthorizationRoleModelMapper {
      * @param roleCode
      * @return
      */
-    public List<AuthorizationRoleModel> getListByRoleCode(String roleCode);
+    List<AuthorizationRoleModel> getListByRoleCode(String roleCode);
 
     /**
      * 根据roleId获取对象
@@ -74,7 +74,7 @@ public interface AuthorizationRoleModelMapper {
      * @param roleId
      * @return
      */
-    public AuthorizationRoleModel getByRoleId(Long roleId);
+    AuthorizationRoleModel getByRoleId(Long roleId);
 
     /**
      * 总数获取

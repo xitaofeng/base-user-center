@@ -1,8 +1,10 @@
 package com.shsnc.base.module.config;
 
+import com.shsnc.api.core.ThreadContext;
 import com.shsnc.base.api.constant.BaseDictionaryConstant;
 import com.shsnc.base.api.constant.BaseResourceConstant;
 import com.shsnc.base.module.base.dictionary.DictionaryMapInfo;
+import com.shsnc.base.module.base.resource.ResourceInfo;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.api.ApiClient;
 import com.shsnc.base.util.api.ApiResult;
@@ -17,35 +19,26 @@ import java.util.Map;
 /**
  * Created by Elena on 2017/6/26.
  */
-public class DictionaryService {
+public class BaseResourceService {
 
-    public static Logger LOG = LoggerFactory.getLogger(DictionaryService.class);
+    public static Logger LOG = LoggerFactory.getLogger(BaseResourceService.class);
 
     /**
-     * 根据字典id 和 mapkey 获取 对象
+     * 根据resourceCode 获取对象
      *
-     * @param moduleCode
-     * @param dictCode
-     * @param mapKey
+     * @param resourceCode
      * @return
      */
-    public static DictionaryMapInfo getDictionaryMap(String moduleCode, String dictCode, String mapKey) throws BizException {
-        Map<String, Object> params = new HashMap();
+    public static ResourceInfo getResourceInfoByResourceCode(String resourceCode) {
+        Map<String, String> params = new HashMap<>();
 
-        Map<String, String> entity = new HashMap<>();
-
-        entity.put("moduleCode", moduleCode);
-        entity.put("dictCode", dictCode);
-        entity.put("mapKey", mapKey);
-        params.put("entity", entity);
+        params.put("resourceCode", resourceCode);
         try {
-            String url =  ModuleConstant.BASE_DICTIONARY_MODULE + BaseDictionaryConstant.DICTIONARY_MAP_GETBYPROJECTDICTKEY;
-            ApiResult<DictionaryMapInfo> apiResult = ApiClient.request(url, params, DictionaryMapInfo.class);
+            String url =  ModuleConstant.BASE_RESOURCE_MODULE + BaseResourceConstant.RESOURCE_INSTANCE_GETINSTANCEBYID;
+            ApiResult<ResourceInfo> apiResult = ApiClient.request(url, params, ResourceInfo.class);
             LOG.debug("请求数据字典服务：地址【{}】，参数【{}】，结果【{}】", url, JsonUtil.toJsonString(params), JsonUtil.toJsonString(apiResult));
             if (apiResult.getMessageCode() == 200) {
                 return apiResult.getData();
-            } else {
-                throw new BizException("请求数据字典服务出现异常");
             }
         } catch (IOException e) {
             LOG.error("获取是否为管理员出现异常", e);
@@ -53,4 +46,5 @@ public class DictionaryService {
         }
         return null;
     }
+
 }

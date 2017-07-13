@@ -2,6 +2,7 @@ package com.shsnc.base.authorization.handler;
 
 import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.annotation.Authentication;
+import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
@@ -59,31 +60,32 @@ public class DataAuthorizationHandler implements RequestHandler {
     /**
      * 获取用户指定资源类型下指定权限属性
      * @param userId  用户id
-     * @param resourceType 资源类型
+     * @param resourceTypeCode 资源类型编码
      * @param authorizationPropertyValue 权限属性值
      * @return
      * @throws BizException
      */
-    @RequestMapper("/resource/type/property/value")
+    @RequestMapper("/resource/type/code/property/value")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_AUTHORIZATION_VALUE")
-    public Map<Long, String> getUserAutValuehListByResourceTypeAndPropertyValue(@NotNull Long userId, @NotNull Integer resourceType,String authorizationPropertyValue) throws BizException {
-        return dataAuthorizationService.getUserAutValuehListByResourceTypeAndPropertyValue(userId, resourceType,authorizationPropertyValue);
+    //@Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_RESOURCE_TYPE_CODE_PROPERTY_VALUE")
+    @LoginRequired
+    public Map<Long, String> getUserAutValuehListByResourceTypeAndPropertyValue(@NotNull Long userId, @NotNull String resourceTypeCode,String authorizationPropertyValue) throws BizException {
+        return dataAuthorizationService.getUserAutValuehListByResourceTypeAndPropertyValue(userId, resourceTypeCode,authorizationPropertyValue);
     }
-
 
     /**
      * 资源类型权限值列表
      * @param userId
-     * @param resourceType
+     * @param resourceTypeCode
      * @return
      * @throws BizException
      */
-    @RequestMapper("/resource/type/value")
+    @RequestMapper("/resource/type/code/value")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_AUTHORIZATION_VALUE")
-    public Map<Long, String> getUserAutValuehListByResourceType(@NotNull Long userId, @NotNull Integer resourceType) throws BizException {
-        return dataAuthorizationService.getUserAutValuehListByResourceType(userId, resourceType);
+    //@Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_RESOURCE_TYPE_VALUE")
+    @LoginRequired
+    public Map<Long, String> getUserAutValuehListByResourceTypeCode(@NotNull Long userId, @NotNull String resourceTypeCode) throws BizException {
+        return dataAuthorizationService.getUserAutValuehListByResourceType(userId, resourceTypeCode);
     }
 
 }

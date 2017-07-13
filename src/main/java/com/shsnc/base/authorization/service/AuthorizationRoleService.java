@@ -148,6 +148,21 @@ public class AuthorizationRoleService {
 
 
     /**
+     * 查询列表(根据主键ids)
+     *
+     * @param roleIds
+     * @return
+     * @throws Exception
+     */
+    public List<AuthorizationRoleModel> getAuthorizationRoleListByRoleIds(List<Long> roleIds) throws Exception {
+        AuthorizationRoleCondition condition = new AuthorizationRoleCondition();
+        condition.setRoleIds(roleIds);
+        return getAuthorizationRoleModelList(condition);
+    }
+
+
+
+    /**
      * 查询列表(根据用户id)
      *
      * @param userId
@@ -161,10 +176,21 @@ public class AuthorizationRoleService {
     }
 
 
-    public Map<Long,List<AuthorizationRoleModel>> getAuthorizationRoleMapByUserId(Long userId) throws Exception {
+    /**
+     * 根据userIds 获取 每个用户对应的角色列表 已Map 的方式返回
+     * @param userIds
+     * @return
+     * @throws Exception
+     */
+    public Map<Long,List<AuthorizationRoleModel>> getAuthorizationRoleMapByUserId(List<Long> userIds) throws Exception {
         Map<Long,List<AuthorizationRoleModel>> map = new HashMap<>();
+        //TODO  未实现
+        for (Long userId : userIds){
+
+        }
+        //根据用户列表获取关系
         AuthorizationRoleCondition condition = new AuthorizationRoleCondition();
-        condition.setUserId(userId);
+        //condition.setUserId(userId);
         return map;
     }
 
