@@ -14,55 +14,33 @@ import java.util.List;
 public class DataAuthorization implements Serializable {
 
     @NotNull(groups = ValidationType.Add.class)
-    private String resourceTypeCode;
+    private Long resourceId;
 
-    private List<Long> authRoleList;
+    private List<DataAuthorizationRole> authRoleList;
 
-    private List<Long> authUserList;
+    private List<DataAuthorizationUser> authUserList;
 
-    @NotEmpty(groups = ValidationType.Add.class)
-    private List<Long> resourceIdList;
-
-    @NotEmpty(groups = ValidationType.Add.class)
-    private List<Long> propertyIdList;
-
-    public String getResourceTypeCode() {
-        return resourceTypeCode;
+    public Long getResourceId() {
+        return resourceId;
     }
 
-    public void setResourceTypeCode(String resourceTypeCode) {
-        this.resourceTypeCode = resourceTypeCode;
+    public void setResourceId(Long resourceId) {
+        this.resourceId = resourceId;
     }
 
-    public List<Long> getResourceIdList() {
-        return resourceIdList;
-    }
-
-    public void setResourceIdList(List<Long> resourceIdList) {
-        this.resourceIdList = resourceIdList;
-    }
-
-    public List<Long> getPropertyIdList() {
-        return propertyIdList;
-    }
-
-    public void setPropertyIdList(List<Long> propertyIdList) {
-        this.propertyIdList = propertyIdList;
-    }
-
-    public List<Long> getAuthRoleList() {
+    public List<DataAuthorizationRole> getAuthRoleList() {
         return authRoleList;
     }
 
-    public void setAuthRoleList(List<Long> authRoleList) {
+    public void setAuthRoleList(List<DataAuthorizationRole> authRoleList) {
         this.authRoleList = authRoleList;
     }
 
-    public List<Long> getAuthUserList() {
+    public List<DataAuthorizationUser> getAuthUserList() {
         return authUserList;
     }
 
-    public void setAuthUserList(List<Long> authUserList) {
+    public void setAuthUserList(List<DataAuthorizationUser> authUserList) {
         this.authUserList = authUserList;
     }
 }

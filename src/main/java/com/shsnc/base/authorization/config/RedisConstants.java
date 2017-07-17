@@ -45,16 +45,5 @@ public class RedisConstants {
         return RedisUtil.buildRedisKey(RedisConstants.RESOURCE_DATA_AUTHORIZATION, resourceType.toString(), resourceId.toString());
     }
 
-    /**
-     * 清理用户-资源类型下的权限数据权限
-     *
-     * @param userIdList
-     */
-    public static void removeUserDataAuthorization(List<Long> userIdList) {
-        for (Long userId : userIdList) {
-            //清理redis 权限
-            String redisKey = RedisConstants.userResourceDataAuthorizationKey(userId);
-            RedisUtil.remove(redisKey);
-        }
-    }
+
 }

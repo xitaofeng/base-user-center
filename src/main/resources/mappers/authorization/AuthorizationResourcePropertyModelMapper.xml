@@ -79,7 +79,6 @@
         SELECT *
         FROM
         <include refid="tableName"/>
-        WHERE 1 = 1
         <include refid="conditionSql"/>
     </select>
 
@@ -105,8 +104,8 @@
     <sql id="conditionSql">
         <where>
             <if test="condition != null">
-                <if test="condition.resourceTypeCode != null and condition.resourceTypeCode > 0 ">
-                    AND  resource_type_code = #{condition.resourceType}
+                <if test="condition.resourceTypeCode != null and condition.resourceTypeCode != ''">
+                    AND  resource_type_code = #{condition.resourceTypeCode}
                 </if>
                 <if test="condition.resourceTypeName !=null and condition.resourceTypeName !=''">
                     AND resource_type_name LIKE CONCAT('%', #{condition.resourceTypeName}, '%')
