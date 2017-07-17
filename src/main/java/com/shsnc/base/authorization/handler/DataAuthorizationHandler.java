@@ -31,22 +31,22 @@ public class DataAuthorizationHandler implements RequestHandler {
     @RequestMapper("")
     @Validate(groups = ValidationType.Add.class)
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA")
-    public boolean auth(DataAuthorization dataAuthorization) throws BizException {
-        return dataAuthorizationService.auth(dataAuthorization);
+    public boolean auth(String resourceTypeCode, List<DataAuthorization> dataAuthorizationList) throws BizException {
+        return dataAuthorizationService.auth(resourceTypeCode, dataAuthorizationList);
     }
 
     @RequestMapper("/user")
     @Validate
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_USER")
     public boolean userAuth(@NotNull String resourceTypeCode, @NotEmpty List<Long> userIdList, @NotEmpty List<Long> resourceIdList, @NotEmpty List<Long> propertyIdList) throws Exception {
-        return dataAuthorizationService.userAuth(resourceTypeCode, userIdList, resourceIdList, propertyIdList);
+        return false;//dataAuthorizationService.userAuth(resourceTypeCode, userIdList, resourceIdList, propertyIdList);
     }
 
     @RequestMapper("/role")
     @Validate
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_ROLE")
     public boolean roleAuth(@NotNull String resourceTypeCode, @NotEmpty List<Long> roleIdList, @NotEmpty List<Long> resourceIdList, @NotEmpty List<Long> propertyIdList) throws BizException {
-        return dataAuthorizationService.roleAuth(resourceTypeCode, roleIdList, resourceIdList, propertyIdList);
+        return false;// dataAuthorizationService.roleAuth(resourceTypeCode, roleIdList, resourceIdList, propertyIdList);
     }
 
     @RequestMapper("/auth/value")
@@ -59,8 +59,9 @@ public class DataAuthorizationHandler implements RequestHandler {
 
     /**
      * 获取用户指定资源类型下指定权限属性
-     * @param userId  用户id
-     * @param resourceTypeCode 资源类型编码
+     *
+     * @param userId                     用户id
+     * @param resourceTypeCode           资源类型编码
      * @param authorizationPropertyValue 权限属性值
      * @return
      * @throws BizException
@@ -69,12 +70,13 @@ public class DataAuthorizationHandler implements RequestHandler {
     @Validate
     //@Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA_RESOURCE_TYPE_CODE_PROPERTY_VALUE")
     @LoginRequired
-    public Map<Long, String> getUserAutValuehListByResourceTypeAndPropertyValue(@NotNull Long userId, @NotNull String resourceTypeCode,String authorizationPropertyValue) throws BizException {
-        return dataAuthorizationService.getUserAutValuehListByResourceTypeAndPropertyValue(userId, resourceTypeCode,authorizationPropertyValue);
+    public Map<Long, String> getUserAutValuehListByResourceTypeAndPropertyValue(@NotNull Long userId, @NotNull String resourceTypeCode, String authorizationPropertyValue) throws BizException {
+        return dataAuthorizationService.getUserAutValuehListByResourceTypeAndPropertyValue(userId, resourceTypeCode, authorizationPropertyValue);
     }
 
     /**
      * 资源类型权限值列表
+     *
      * @param userId
      * @param resourceTypeCode
      * @return
