@@ -2,6 +2,7 @@ package com.shsnc.base.authorization.handler;
 
 import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.annotation.Authentication;
+import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.base.authorization.service.AuthorizationRoleRelationService;
 import com.shsnc.base.util.config.BizException;
@@ -43,7 +44,8 @@ public class FunctionAuthorizationHandler implements RequestHandler {
      * @return
      */
     @RequestMapper("/role/have/list")
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_FUNCTION_ROLE_HAVE_LIST")
+    /*@Authentication("BASE_USER_CENTER_AUTHORIZATION_FUNCTION_ROLE_HAVE_LIST")*/
+    @LoginRequired
     public List<String> roleHaveAuthorizationList(@NotNull Long roleId) {
         return authorizationRoleRelationService.getAuthorizationIdByRoleId(roleId);
     }
@@ -55,7 +57,8 @@ public class FunctionAuthorizationHandler implements RequestHandler {
      * @return
      */
     @RequestMapper("/user/have/list")
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_FUNCTION_USER_HAVE_LIST")
+    /*@Authentication("BASE_USER_CENTER_AUTHORIZATION_FUNCTION_USER_HAVE_LIST")*/
+    @LoginRequired
     public List<String> userHaveAuthorizationList(Long userId) throws BizException {
         return authorizationRoleRelationService.getAuthorizationCodeByUserId(userId);
     }
