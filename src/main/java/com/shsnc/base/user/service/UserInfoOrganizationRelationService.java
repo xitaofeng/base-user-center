@@ -29,11 +29,11 @@ public class UserInfoOrganizationRelationService {
 
     public List<Long> batchAddUserInfoOrganizationRelation(Long userId, List<Long> organizationIds) throws BizException {
         Assert.notNull(userId,"用户id不能为空！");
-        Assert.notNull(organizationIds, "组织机构id不能为空！");
+        Assert.notNull(organizationIds, "组织部门id不能为空！");
         UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
         Assert.notNull(userInfoModel, "用户id不存在！");
         List<Long> dbOrganizationIds = organizationModelMapper.getOrganizationIdsByOrganizationIds(organizationIds);
-        Assert.isTrue(dbOrganizationIds.size() == organizationIds.size(), "含有不存在的用户组id！");
+        Assert.isTrue(dbOrganizationIds.size() == organizationIds.size(), "含有不存在的组织部门id！");
 
         List<UserInfoOrganizationRelationModel> userInfoOrganizationRelationModels = new ArrayList<>();
         for(Long organizationId : organizationIds){

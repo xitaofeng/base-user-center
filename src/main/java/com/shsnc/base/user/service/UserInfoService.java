@@ -111,7 +111,7 @@ public class UserInfoService {
     /**
      * 新增用户信息
      * @param userInfoModel 用户信息
-     * @param organizationIds 组织机构id集合，用户可以属于多个组织结构
+     * @param organizationIds 组织部门id集合，用户可以属于多个组织结构
      * @param extendPropertyValues 用户扩展属性值
      * @return
      * @throws BizException
@@ -158,7 +158,7 @@ public class UserInfoService {
         // 更新账户信息
         accountService.updateAccount(userInfoModel);
 
-        // 更新与组织机构的关联
+        // 更新与组织部门的关联
         if(organizationIds != null){
             userInfoOrganizationRelationService.batchUpdateUserInfoOrganizationRelation(userInfoModel.getUserId(), organizationIds);
         }
