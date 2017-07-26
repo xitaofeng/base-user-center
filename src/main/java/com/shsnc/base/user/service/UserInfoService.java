@@ -2,15 +2,15 @@ package com.shsnc.base.user.service;
 
 import com.shsnc.base.authorization.service.AssignService;
 import com.shsnc.base.user.config.UserConstant;
+import com.shsnc.base.user.mapper.GroupModelMapper;
+import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;
-import com.shsnc.base.user.model.ExtendPropertyModel;
-import com.shsnc.base.user.model.ExtendPropertyValueModel;
-import com.shsnc.base.user.model.UserInfoCondition;
-import com.shsnc.base.user.model.UserInfoModel;
+import com.shsnc.base.user.model.*;
 import com.shsnc.base.user.support.Assert;
 import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.RedisUtil;
+import com.shsnc.base.util.bean.RelationMap;
 import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.crypto.SHAMaker;
@@ -21,9 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -34,6 +33,10 @@ public class UserInfoService {
 
     @Autowired
     private UserInfoModelMapper userInfoModelMapper;
+    @Autowired
+    private GroupModelMapper groupModelMapper;
+    @Autowired
+    private UserInfoGroupRelationModelMapper userInfoGroupRelationModelMapper;
     @Autowired
     private UserInfoGroupRelationService userInfoGroupRelationService;
     @Autowired
@@ -67,9 +70,42 @@ public class UserInfoService {
         QueryData queryData = new QueryData(pagination);
         int totalCount = userInfoModelMapper.getTotalCountByCondition(condition);
         queryData.setRowCount(totalCount);
-        List<ExtendPropertyModel> list = userInfoModelMapper.getPageByCondition(condition, pagination);
+        List<UserInfoModel> list = userInfoModelMapper.getPageByCondition(condition, pagination);
+        selectGroups(list);
+        selectRoles(list);
         queryData.setRecords(list);
         return queryData;
+    }
+
+    private void selectRoles(List<UserInfoModel> userInfoModels) {
+        if (CollectionUtils.isEmpty(userInfoModels)) {
+            return;
+        }
+        List<Long> userIds = userInfoModels.stream().map(UserInfoModel::getUserId).collect(Collectors.toList());
+        if (!userIds.isEmpty()) {
+
+        }
+    }
+
+    private void selectGroups(List<UserInfoModel> userInfoModels) {
+        if (CollectionUtils.isEmpty(userInfoModels)) {
+            return;
+        }
+        List<Long> userIds = userInfoModels.stream().map(UserInfoModel::getUserId).collect(Collectors.toList());
+        if (!userIds.isEmpty()) {
+            List<UserInfoGroupRelationModel> relations = userInfoGroupRelationModelMapper.getByUserIds(userIds);
+            RelationMap relationMap = new RelationMap();
+            for (UserInfoGroupRelationModel relation : relations) {
+                relationMap.addRelation(relation.getUserId(),relation.getGroupId());
+            }
+            if (relationMap.hasRelatedIds()) {
+                List<GroupModel> groupModels = groupModelMapper.getByGroupIds(relationMap.getRelatedIds());
+                Map<Long, GroupModel> groupModelMap = groupModels.stream().collect(Collectors.toMap(GroupModel::getGroupId, x -> x, (oldValue,newValue)->oldValue));
+                for (UserInfoModel userInfoModel : userInfoModels) {
+                    userInfoModel.setGroups(relationMap.getRelatedObjects(userInfoModel.getUserId(),groupModelMap));
+                }
+            }
+        }
     }
 
     /**

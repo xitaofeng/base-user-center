@@ -105,4 +105,14 @@
         FROM user_info_group_relation
         WHERE group_id=#{groupId}
     </select>
+
+    <select id="getByUserIds" resultMap="BaseResultMap">
+        SELECT
+            group_id
+        FROM user_info_group_relation
+        WHERE user_id IN
+        <foreach collection="userIds" item="userId" separator="," open="(" close=")">
+            #{userId}
+        </foreach>
+    </select>
 </mapper>

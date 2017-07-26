@@ -45,11 +45,11 @@
         </javaClientGenerator>
 
         <!-- !!!! Table Configurations !!!! -->
-        <table tableName="user_group_structure" domainObjectName="GroupStructureModel" enableCountByExample="false" enableDeleteByExample="false"
+        <table tableName="user_login_history" domainObjectName="LoginHistoryModel" enableCountByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false"
                enableUpdateByExample="false">
 
-            <generatedKey column="structureId" sqlStatement="MySql"/>
+            <generatedKey column="history_id" sqlStatement="MySql"/>
         </table>
 
     </context>

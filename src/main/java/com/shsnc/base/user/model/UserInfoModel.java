@@ -1,5 +1,7 @@
 package com.shsnc.base.user.model;
 
+import java.util.List;
+
 public class UserInfoModel {
 
     private Long userId;
@@ -25,6 +27,8 @@ public class UserInfoModel {
     private String attemptIp;
 
     private Integer isDelete;
+
+    private List<GroupModel> groups;
 
     public Long getUserId() {
         return userId;
@@ -120,5 +124,13 @@ public class UserInfoModel {
 
     public void setIsDelete(Integer isDelete) {
         this.isDelete = isDelete;
+    }
+
+    public List<GroupModel> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<GroupModel> groups) {
+        this.groups = groups;
     }
 }

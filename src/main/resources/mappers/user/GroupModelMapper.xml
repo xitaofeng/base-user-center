@@ -144,7 +144,7 @@
 
     <select id="getGroupsByUserId" resultMap="BaseResultMap">
         SELECT
-            name,code,description
+            ug.group_id,name,code,description
         FROM
             user_group ug, user_info_group_relation ugr
         WHERE ug.group_id=ugr.group_id AND ug.status=1 AND ugr.user_id=#{userId}
@@ -203,5 +203,27 @@
         SELECT DISTINCT ugs.descendant_id
         FROM user_info_group_relation ugr,user_group_structure ugs
         WHERE ugr.group_id = ugs.ancestor_id AND ugr.user_id=#{userId}
+    </select>
+
+    <select id="getGroupsByUserIds" resultMap="BaseResultMap">
+        SELECT
+            ug.group_id,name,code,description
+        FROM
+            user_group ug, user_info_group_relation ugr
+        WHERE ug.group_id=ugr.group_id AND ug.status=1 AND ugr.user_id IN
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+    </select>
+
+    <select id="getByGroupIds" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM
+            user_group
+        WHERE group_id IN
+        <foreach collection="groupIds" item="groupId" separator="," open="(" close=")">
+            #{groupId}
+        </foreach>
     </select>
 </mapper>

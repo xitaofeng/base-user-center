@@ -39,4 +39,7 @@ public interface GroupModelMapper {
 
     List<Long> getAllGroupIdsByUserId(Long userId);
 
+    List<GroupModel> getGroupsByUserIds(@Param("userIds") Collection<Long> userIds);
+
+    List<GroupModel> getByGroupIds(@Param("groupIds") Collection<Long> groupIds);
 }

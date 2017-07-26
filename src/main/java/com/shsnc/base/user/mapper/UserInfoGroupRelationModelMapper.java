@@ -3,6 +3,7 @@ package com.shsnc.base.user.mapper;
 import com.shsnc.base.user.model.UserInfoGroupRelationModel;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface UserInfoGroupRelationModelMapper {
@@ -29,4 +30,6 @@ public interface UserInfoGroupRelationModelMapper {
     int deleteByGroupId(Long groupId);
 
     int deleteWithChildrenByGroupId(Long groupId);
+
+    List<UserInfoGroupRelationModel> getByUserIds(@Param("userIds") Collection<Long> userIds);
 }
