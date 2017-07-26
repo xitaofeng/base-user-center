@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shsnc.base.user.mapper.GroupModelMapper" >
+
+    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.GroupModel" >
+        <id column="group_id" property="groupId" jdbcType="BIGINT" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="code" property="code" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="BaseColumn" >
+        group_id, 
+        name, 
+        code
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
+        SELECT 
+            <include refid="BaseColumn" />
+        FROM user_group
+        WHERE group_id = #{groupId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn" />
+        FROM user_group
+    </select>
+
+    <sql id="pageSql">
+        <if test="pagination != null" >
+            LIMIT #{pagination.start}, #{pagination.pagesize}
+        </if>
+    </sql>
+
+    <sql id="orderSql">
+        <if test="pagination != null">
+            <if test="pagination.sorting != null">
+                ORDER BY ${pagination.sorting}
+            </if>
+            <if test="pagination.sorting == null">
+                ORDER BY group_id DESC
+            </if>
+        </if>
+    </sql>
+
+    <sql id="conditionSql">
+        <where>
+            <if test="condition != null">
+                <if test="condition.name != null and condition.name != ''">
+                    AND INSTR(name,#{condition.name})>0
+                </if>
+                <if test="condition.code != null and condition.code != ''">
+                    AND INSTR(code,#{condition.code})>0
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <select id="getTotalCountByCondition" resultType="java.lang.Integer">
+        SELECT
+            count(group_id)
+        FROM user_group
+        <include refid="conditionSql"/>
+    </select>
+
+    <select id="getPageByCondition" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn" />
+        FROM user_group
+        <include refid="conditionSql"/>
+        <include refid="orderSql"/>
+        <include refid="pageSql"/>
+    </select>
+
+    <select id="selectOne" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn" />
+        FROM user_group
+        <where>
+            <if test="name != null and name != ''">
+                name=#{name}
+            </if>
+            <if test="code != null and code != ''">
+                AND code=#{code}
+            </if>
+        </where>
+        LIMIT 1
+    </select>
+
+    <delete id="deleteByPrimaryKey" >
+        DELETE FROM user_group
+        WHERE group_id = #{groupId,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByGroupIds">
+        DELETE FROM user_group
+        WHERE group_id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
+    </delete>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="groupId" >
+        INSERT INTO user_group (name, code)
+        VALUES (#{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="groupId" >
+        INSERT INTO user_group
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="name != null" >
+                name,
+            </if>
+            <if test="code != null" >
+                code,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="name != null" >
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null" >
+                #{code,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" >
+        UPDATE user_group
+        <set >
+            <if test="name != null" >
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null" >
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+        </set>
+        WHERE group_id = #{groupId,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" >
+        UPDATE user_group
+        SET name = #{name,jdbcType=VARCHAR},
+          code = #{code,jdbcType=VARCHAR}
+        WHERE group_id = #{groupId,jdbcType=BIGINT}
+    </update>
+      
+</mapper>

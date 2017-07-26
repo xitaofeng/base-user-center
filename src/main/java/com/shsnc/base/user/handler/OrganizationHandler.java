@@ -21,7 +21,11 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * Created by houguangqiang on 2017/6/9.
+ * 组织部门管理
+ *
+ * @author houguangqiang
+ * @since 1.0
+ * @date 2017-07-26
  */
 @Component
 @RequestMapper("/user/organization")
