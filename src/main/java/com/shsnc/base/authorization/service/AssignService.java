@@ -5,7 +5,7 @@ import com.shsnc.base.authorization.mapper.AuthorizationRoleModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationGroupRoleRelationModel;
 import com.shsnc.base.authorization.model.AuthorizationUserRoleRelationModel;
-import com.shsnc.base.user.mapper.GroupStructureModelMapper;
+import com.shsnc.base.user.mapper.OrganizationIdStructureModelMapper;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;
 import com.shsnc.base.util.config.BizException;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -32,7 +32,7 @@ public class AssignService {
     private UserInfoModelMapper userInfoModelMapper;
 
     @Autowired
-    private GroupStructureModelMapper groupStructureModelMapper;
+    private OrganizationIdStructureModelMapper groupStructureModelMapper;
 
     @Autowired
     private AuthorizationUserRoleRelationModelMapper authorizationUserRoleRelationModelMapper;

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.shsnc.base.user.mapper.GroupStructureModelMapper">
+<mapper namespace="com.shsnc.base.user.mapper.OrganizationIdStructureModelMapper">
 
-    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.GroupStructureModel">
+    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.OrganizationStructureModel">
         <id column="structure_id" property="structureId" jdbcType="BIGINT"/>
         <result column="ancestor_id" property="ancestorId" jdbcType="BIGINT"/>
         <result column="descendant_id" property="descendantId" jdbcType="BIGINT"/>
@@ -16,60 +16,60 @@
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
         SELECT
             <include refid="BaseColumn"/>
-        FROM user_group_structure
+        FROM user_organization_structure
         WHERE structure_id = #{structureId}
     </select>
 
-    <select id="getParentIdByGroupId" resultType="java.lang.Long">
+    <select id="getParentIdByOrganizationId" resultType="java.lang.Long">
         SELECT
             ancestor_id
         FROM
-            user_group_structure
-        WHERE descendant_id = #{groupId} AND level = 1
+            user_organization_structure
+        WHERE descendant_id = #{organizationId} AND level = 1
     </select>
 
     <delete id="deleteByPrimaryKey">
-        DELETE FROM user_group_structure
+        DELETE FROM user_organization_structure
         WHERE structure_id = #{structureId}
     </delete>
     <delete id="deleteOldRelation">
-        DELETE FROM user_group_structure
+        DELETE FROM user_organization_structure
         WHERE ancestor_id IN (
             SELECT * FROM (
                 SELECT ancestor_id
-                FROM user_group_structure
-                <![CDATA[WHERE descendant_id=#{groupId} AND ancestor_id<>descendant_id ]]>
+                FROM user_organization_structure
+                <![CDATA[WHERE descendant_id=#{organizationId} AND ancestor_id<>descendant_id ]]>
             ) a
         )
         AND descendant_id IN (
             SELECT * FROM (
                 SELECT descendant_id
-                FROM user_group_structure
-                WHERE ancestor_id=#{groupId}
+                FROM user_organization_structure
+                WHERE ancestor_id=#{organizationId}
             ) a
         )
     </delete>
 
-    <delete id="deleteGroupStructure">
-        DELETE FROM user_group_structure WHERE ancestor_id=#{groupId} OR descendant_id=#{groupId}
+    <delete id="deleteOrganizationStructure">
+        DELETE FROM user_organization_structure WHERE ancestor_id=#{organizationId} OR descendant_id=#{organizationId}
     </delete>
 
-    <delete id="deleteGroupAndChildrenRelation">
-        DELETE FROM user_group_structure
+    <delete id="deleteOrganizationAndChildrenRelation">
+        DELETE FROM user_organization_structure
         WHERE ancestor_id IN (
             SELECT * FROM (
-                SELECT descendant_id FROM user_group_structure WHERE ancestor_id=#{groupId}
+                SELECT descendant_id FROM user_organization_structure WHERE ancestor_id=#{organizationId}
             ) a
         )
         OR descendant_id IN (
             SELECT * FROM (
-                SELECT descendant_id FROM user_group_structure WHERE ancestor_id=#{groupId}
+                SELECT descendant_id FROM user_organization_structure WHERE ancestor_id=#{organizationId}
             ) a
         )
     </delete>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="structureId">
-        INSERT INTO user_group_structure (
+        INSERT INTO user_organization_structure (
             ancestor_id,
             descendant_id,
             level
@@ -82,7 +82,7 @@
     </insert>
 
     <insert id="insertSelective" useGeneratedKeys="true" keyProperty="structureId">
-        INSERT INTO user_group_structure
+        INSERT INTO user_organization_structure
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="structureId != null">
                 structure_id,
@@ -113,23 +113,23 @@
         </trim>
     </insert>
 
-    <insert id="insertGroupStructure">
-        INSERT INTO user_group_structure(ancestor_id,descendant_id,level)
-            SELECT ancestor_id,#{groupId},level+1
-            FROM user_group_structure
+    <insert id="insertOrganizationStructure">
+        INSERT INTO user_organization_structure(ancestor_id,descendant_id,level)
+            SELECT ancestor_id,#{organizationId},level+1
+            FROM user_organization_structure
             WHERE descendant_id=#{parentId}
             UNION ALL
-            SELECT #{groupId},#{groupId}, 0;
+            SELECT #{organizationId},#{organizationId}, 0;
     </insert>
     <insert id="insertNewRelation">
-        INSERT INTO user_group_structure(ancestor_id,descendant_id,level)
+        INSERT INTO user_organization_structure(ancestor_id,descendant_id,level)
             SELECT ugs1.ancestor_id,ugs2.descendant_id,ugs1.level+ugs2.level+1
-            FROM user_group_structure ugs1, (SELECT descendant_id,level FROM user_group_structure WHERE ancestor_id=#{groupId}) ugs2
+            FROM user_organization_structure ugs1, (SELECT descendant_id,level FROM user_organization_structure WHERE ancestor_id=#{organizationId}) ugs2
             WHERE ugs1.descendant_id=#{parentId}
     </insert>
 
     <update id="updateByPrimaryKeySelective">
-        UPDATE user_group_structure
+        UPDATE user_organization_structure
         <set>
             <if test="ancestorId != null">
                 ancestor_id = #{ancestorId},
@@ -145,7 +145,7 @@
     </update>
 
     <update id="updateByPrimaryKey">
-        UPDATE user_group_structure
+        UPDATE user_organization_structure
         SET ancestor_id = #{ancestorId},
             descendant_id = #{descendantId},
             level = #{level}
@@ -153,15 +153,15 @@
     </update>
 
     <update id="updateChildrenLevel">
-        UPDATE user_group_structure SET level=level-1
+        UPDATE user_organization_structure SET level=level-1
         WHERE ancestor_id IN (
             SELECT * FROM (
-                SELECT ancestor_id FROM user_group_structure WHERE descendant_id=#{groupId}
+                SELECT ancestor_id FROM user_organization_structure WHERE descendant_id=#{organizationId}
             ) a
         )
         AND descendant_id IN (
             SELECT * FROM (
-                SELECT descendant_id FROM user_group_structure WHERE ancestor_id=#{groupId}
+                SELECT descendant_id FROM user_organization_structure WHERE ancestor_id=#{organizationId}
             ) a
         );
     </update>

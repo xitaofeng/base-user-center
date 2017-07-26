@@ -1,8 +1,8 @@
 package com.shsnc.base.user.model;
 
-public class GroupCondition {
+public class OrganizationCondition {
 
-    private Long groupId;
+    private Long organizationId;
 
     private String name;
 
@@ -14,12 +14,12 @@ public class GroupCondition {
 
     private Long parentId;
 
-    public Long getGroupId() {
-        return groupId;
+    public Long getOrganizationId() {
+        return organizationId;
     }
 
-    public void setGroupId(Long groupId) {
-        this.groupId = groupId;
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
     }
 
     public String getName() {

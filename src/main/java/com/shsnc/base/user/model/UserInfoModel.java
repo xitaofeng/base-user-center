@@ -28,7 +28,7 @@ public class UserInfoModel {
 
     private Integer isDelete;
 
-    private List<GroupModel> groups;
+    private List<OrganizationModel> organizations;
 
     public Long getUserId() {
         return userId;
@@ -126,11 +126,11 @@ public class UserInfoModel {
         this.isDelete = isDelete;
     }
 
-    public List<GroupModel> getGroups() {
-        return groups;
+    public List<OrganizationModel> getOrganizations() {
+        return organizations;
     }
 
-    public void setGroups(List<GroupModel> groups) {
-        this.groups = groups;
+    public void setOrganizations(List<OrganizationModel> organizations) {
+        this.organizations = organizations;
     }
 }

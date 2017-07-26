@@ -1,11 +1,11 @@
 package com.shsnc.base.user.model;
 
-public class UserInfoGroupRelationModel {
+public class UserInfoOrganizationRelationModel {
     private Long relationId;
 
     private Long userId;
 
-    private Long groupId;
+    private Long organizationId;
 
     public Long getRelationId() {
         return relationId;
@@ -23,11 +23,11 @@ public class UserInfoGroupRelationModel {
         this.userId = userId;
     }
 
-    public Long getGroupId() {
-        return groupId;
+    public Long getOrganizationId() {
+        return organizationId;
     }
 
-    public void setGroupId(Long groupId) {
-        this.groupId = groupId;
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
     }
 }

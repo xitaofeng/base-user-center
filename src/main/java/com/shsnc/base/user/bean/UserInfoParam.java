@@ -20,7 +20,7 @@ public class UserInfoParam {
     private String email;
     private String mobile;
     private Integer status;
-    private List<Long> groupIds;
+    private List<Long> organizationIds;
     private List<ExtendPropertyValue> extendPropertyValues;
     private List<Long> roleIds;
 
@@ -65,12 +65,12 @@ public class UserInfoParam {
         this.status = status;
     }
 
-    public List<Long> getGroupIds() {
-        return groupIds;
+    public List<Long> getOrganizationIds() {
+        return organizationIds;
     }
 
-    public void setGroupIds(List<Long> groupIds) {
-        this.groupIds = groupIds;
+    public void setOrganizationIds(List<Long> organizationIds) {
+        this.organizationIds = organizationIds;
     }
 
     public List<ExtendPropertyValue> getExtendPropertyValues() {

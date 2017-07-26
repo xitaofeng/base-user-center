@@ -17,7 +17,7 @@ public class UserInfo {
     private Integer internal;
     private Integer status;
     private List<Long> roleIds;
-    private List<Group> groups;
+    private List<Organization> organizations;
     private List<AuthorizationRole> roles;
 
     public Long getUserId() {
@@ -84,12 +84,12 @@ public class UserInfo {
         this.roleIds = roleIds;
     }
 
-    public List<Group> getGroups() {
-        return groups;
+    public List<Organization> getOrganizations() {
+        return organizations;
     }
 
-    public void setGroups(List<Group> groups) {
-        this.groups = groups;
+    public void setOrganizations(List<Organization> organizations) {
+        this.organizations = organizations;
     }
 
     public List<AuthorizationRole> getRoles() {

@@ -1,6 +1,6 @@
 package com.shsnc.base.user.model;
 
-public class GroupStructureModel {
+public class OrganizationStructureModel {
     private Long structureId;
 
     private Long ancestorId;

@@ -1,115 +1,115 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper">
+<mapper namespace="com.shsnc.base.user.mapper.UserInfoOrganizationRelationModelMapper">
 
-    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.UserInfoGroupRelationModel">
+    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.UserInfoOrganizationRelationModel">
         <id column="relation_id" property="relationId" jdbcType="BIGINT"/>
         <result column="user_id" property="userId" jdbcType="BIGINT"/>
-        <result column="group_id" property="groupId" jdbcType="BIGINT"/>
+        <result column="organization_id" property="organizationId" jdbcType="BIGINT"/>
     </resultMap>
 
     <sql id="BaseColumn">
-        relation_id, user_id, group_id
+        relation_id, user_id, organization_id
     </sql>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
         SELECT
             <include refid="BaseColumn"/>
-        FROM user_info_group_relation
+        FROM user_info_organization_relation
         WHERE relation_id = #{relationId}
     </select>
 
     <delete id="deleteByPrimaryKey">
-        DELETE FROM user_info_group_relation
+        DELETE FROM user_info_organization_relation
         WHERE relation_id = #{relationId}
     </delete>
 
     <delete id="deleteByUserId">
-        DELETE FROM user_info_group_relation
+        DELETE FROM user_info_organization_relation
         WHERE user_id = #{userId}
     </delete>
 
-    <delete id="deleteByGroupId">
-        DELETE FROM user_info_group_relation
-        WHERE group_id = #{groupId}
+    <delete id="deleteByOrganizationId">
+        DELETE FROM user_info_organization_relation
+        WHERE organization_id = #{organizationId}
     </delete>
 
-    <delete id="deleteWithChildrenByGroupId">
-        DELETE FROM user_info_group_relation WHERE group_id IN (SELECT descendant_id FROM user_group_structure WHERE ancestor_id=#{groupId})
+    <delete id="deleteWithChildrenByOrganizationId">
+        DELETE FROM user_info_organization_relation WHERE organization_id IN (SELECT descendant_id FROM user_organization_structure WHERE ancestor_id=#{organizationId})
     </delete>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="relationId">
-        INSERT INTO user_info_group_relation (user_id, group_id)
-        VALUES (#{userId}, #{groupId})
+        INSERT INTO user_info_organization_relation (user_id, organization_id)
+        VALUES (#{userId}, #{organizationId})
     </insert>
 
     <insert id="insertSelective" useGeneratedKeys="true" keyProperty="relationId">
-        INSERT INTO user_info_group_relation
+        INSERT INTO user_info_organization_relation
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="userId != null">
                 user_id,
             </if>
-            <if test="groupId != null">
-                group_id,
+            <if test="organizationId != null">
+                organization_id,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="userId != null">
                 #{userId},
             </if>
-            <if test="groupId != null">
-                #{groupId},
+            <if test="organizationId != null">
+                #{organizationId},
             </if>
         </trim>
     </insert>
 
     <update id="updateByPrimaryKeySelective">
-        UPDATE user_info_group_relation
+        UPDATE user_info_organization_relation
         <set>
             <if test="userId != null">
                 user_id = #{userId},
             </if>
-            <if test="groupId != null">
-                group_id = #{groupId},
+            <if test="organizationId != null">
+                organization_id = #{organizationId},
             </if>
         </set>
         WHERE relation_id = #{relationId}
     </update>
 
     <update id="updateByPrimaryKey">
-        UPDATE user_info_group_relation
+        UPDATE user_info_organization_relation
         SET user_id  = #{userId},
-            group_id = #{groupId}
+            organization_id = #{organizationId}
         WHERE relation_id = #{relationId}
     </update>
 
     <insert id="insertRelationList">
         INSERT INTO
-        user_info_group_relation(user_id, group_id)
+        user_info_organization_relation(user_id, organization_id)
         VALUES (
-            <foreach collection="userInfoGroupRelationModels" item="userInfoGroupRelationModel" separator="),(">
-                #{userInfoGroupRelationModel.userId},#{userInfoGroupRelationModel.groupId}
+            <foreach collection="userInfoOrganizationRelationModels" item="userInfoOrganizationRelationModel" separator="),(">
+                #{userInfoOrganizationRelationModel.userId},#{userInfoOrganizationRelationModel.organizationId}
             </foreach>
         )
     </insert>
 
-    <select id="getGroupIdsByUserId" resultType="java.lang.Long">
-        SELECT group_id
-        FROM user_info_group_relation
+    <select id="getOrganizationIdsByUserId" resultType="java.lang.Long">
+        SELECT organization_id
+        FROM user_info_organization_relation
         WHERE user_id = #{userId}
     </select>
 
-    <select id="getUserIdsByGroupId" resultType="java.lang.Long">
+    <select id="getUserIdsByOrganizationId" resultType="java.lang.Long">
         SELECT
             user_id
-        FROM user_info_group_relation
-        WHERE group_id=#{groupId}
+        FROM user_info_organization_relation
+        WHERE organization_id=#{organizationId}
     </select>
 
     <select id="getByUserIds" resultMap="BaseResultMap">
         SELECT
-            group_id
-        FROM user_info_group_relation
+            organization_id
+        FROM user_info_organization_relation
         WHERE user_id IN
         <foreach collection="userIds" item="userId" separator="," open="(" close=")">
             #{userId}

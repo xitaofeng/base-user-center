@@ -2,8 +2,8 @@ package com.shsnc.base.user.service;
 
 import com.shsnc.base.authorization.service.AssignService;
 import com.shsnc.base.user.config.UserConstant;
-import com.shsnc.base.user.mapper.GroupModelMapper;
-import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
+import com.shsnc.base.user.mapper.OrganizationModelMapper;
+import com.shsnc.base.user.mapper.UserInfoOrganizationRelationModelMapper;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;
 import com.shsnc.base.user.model.*;
 import com.shsnc.base.user.support.Assert;
@@ -34,11 +34,11 @@ public class UserInfoService {
     @Autowired
     private UserInfoModelMapper userInfoModelMapper;
     @Autowired
-    private GroupModelMapper groupModelMapper;
+    private OrganizationModelMapper organizationModelMapper;
     @Autowired
-    private UserInfoGroupRelationModelMapper userInfoGroupRelationModelMapper;
+    private UserInfoOrganizationRelationModelMapper userInfoOrganizationRelationModelMapper;
     @Autowired
-    private UserInfoGroupRelationService userInfoGroupRelationService;
+    private UserInfoOrganizationRelationService userInfoOrganizationRelationService;
     @Autowired
     private AccountService accountService;
     @Autowired
@@ -47,7 +47,7 @@ public class UserInfoService {
     private AssignService assignService;
 
     @Autowired
-    private GroupService groupService;
+    private OrganizationService organizationService;
 
     public List<UserInfoModel> getUserInfoList(UserInfoModel userInfoModel){
         return userInfoModelMapper.findUserInfoList(userInfoModel);
@@ -71,7 +71,7 @@ public class UserInfoService {
         int totalCount = userInfoModelMapper.getTotalCountByCondition(condition);
         queryData.setRowCount(totalCount);
         List<UserInfoModel> list = userInfoModelMapper.getPageByCondition(condition, pagination);
-        selectGroups(list);
+        selectOrganizations(list);
         selectRoles(list);
         queryData.setRecords(list);
         return queryData;
@@ -87,22 +87,22 @@ public class UserInfoService {
         }
     }
 
-    private void selectGroups(List<UserInfoModel> userInfoModels) {
+    private void selectOrganizations(List<UserInfoModel> userInfoModels) {
         if (CollectionUtils.isEmpty(userInfoModels)) {
             return;
         }
         List<Long> userIds = userInfoModels.stream().map(UserInfoModel::getUserId).collect(Collectors.toList());
         if (!userIds.isEmpty()) {
-            List<UserInfoGroupRelationModel> relations = userInfoGroupRelationModelMapper.getByUserIds(userIds);
+            List<UserInfoOrganizationRelationModel> relations = userInfoOrganizationRelationModelMapper.getByUserIds(userIds);
             RelationMap relationMap = new RelationMap();
-            for (UserInfoGroupRelationModel relation : relations) {
-                relationMap.addRelation(relation.getUserId(),relation.getGroupId());
+            for (UserInfoOrganizationRelationModel relation : relations) {
+                relationMap.addRelation(relation.getUserId(),relation.getOrganizationId());
             }
             if (relationMap.hasRelatedIds()) {
-                List<GroupModel> groupModels = groupModelMapper.getByGroupIds(relationMap.getRelatedIds());
-                Map<Long, GroupModel> groupModelMap = groupModels.stream().collect(Collectors.toMap(GroupModel::getGroupId, x -> x, (oldValue,newValue)->oldValue));
+                List<OrganizationModel> organizationModels = organizationModelMapper.getByOrganizationIdIds(relationMap.getRelatedIds());
+                Map<Long, OrganizationModel> organizationModelMap = organizationModels.stream().collect(Collectors.toMap(OrganizationModel::getOrganizationId, x -> x, (oldValue, newValue)->oldValue));
                 for (UserInfoModel userInfoModel : userInfoModels) {
-                    userInfoModel.setGroups(relationMap.getRelatedObjects(userInfoModel.getUserId(),groupModelMap));
+                    userInfoModel.setOrganizations(relationMap.getRelatedObjects(userInfoModel.getUserId(),organizationModelMap));
                 }
             }
         }
@@ -111,12 +111,12 @@ public class UserInfoService {
     /**
      * 新增用户信息
      * @param userInfoModel 用户信息
-     * @param groupIds 用户所属组，用户可以属于多个用户组
+     * @param organizationIds 组织机构id集合，用户可以属于多个组织结构
      * @param extendPropertyValues 用户扩展属性值
      * @return
      * @throws BizException
      */
-    public Long addUserInfo(UserInfoModel userInfoModel, List<Long> groupIds, List<ExtendPropertyValueModel> extendPropertyValues, List<Long> roleIds) throws BizException {
+    public Long addUserInfo(UserInfoModel userInfoModel, List<Long> organizationIds, List<ExtendPropertyValueModel> extendPropertyValues, List<Long> roleIds) throws BizException {
         // 数据校验以及设置默认值
         checkAdd(userInfoModel);
 
@@ -126,9 +126,9 @@ public class UserInfoService {
         // 新增账户记录
         accountService.addAccount(userInfoModel);
 
-        // 关联用户组
-        if(CollectionUtils.isNotEmpty(groupIds)){
-            userInfoGroupRelationService.batchAddUserInfoGroupRelation(userInfoModel.getUserId(), groupIds);
+        // 关联组织结构
+        if(CollectionUtils.isNotEmpty(organizationIds)){
+            userInfoOrganizationRelationService.batchAddUserInfoOrganizationRelation(userInfoModel.getUserId(), organizationIds);
         }
 
         Long userId = userInfoModel.getUserId();
@@ -146,7 +146,7 @@ public class UserInfoService {
         return userId;
     }
 
-    public boolean updateUserInfo(UserInfoModel userInfoModel, List<Long> groupIds, List<ExtendPropertyValueModel> extendPropertyValues,List<Long> roleIds) throws BizException {
+    public boolean updateUserInfo(UserInfoModel userInfoModel, List<Long> organizationIds, List<ExtendPropertyValueModel> extendPropertyValues, List<Long> roleIds) throws BizException {
         Assert.notNull(userInfoModel);
 
         // 数据校验以及设置默认值
@@ -158,9 +158,9 @@ public class UserInfoService {
         // 更新账户信息
         accountService.updateAccount(userInfoModel);
 
-        // 更新用户组关联
-        if(groupIds != null){
-            userInfoGroupRelationService.batchUpdateUserInfoGroupRelation(userInfoModel.getUserId(), groupIds);
+        // 更新与组织机构的关联
+        if(organizationIds != null){
+            userInfoOrganizationRelationService.batchUpdateUserInfoOrganizationRelation(userInfoModel.getUserId(), organizationIds);
         }
 
         // 更新用户扩展属性值

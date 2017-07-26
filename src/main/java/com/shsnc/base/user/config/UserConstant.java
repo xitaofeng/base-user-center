@@ -45,10 +45,6 @@ public abstract class UserConstant {
     public static final int USER_INTERNAL_FALSE = 1;
     /** 用户是内部使用 */
     public static final int USER_INTERNAL_TRUE = 2;
-    /** 用户组启用状态 */
-    public static final int GROUP_STATUS_ENABLED = 1;
-    /** 用户组禁用状态 */
-    public static final int GROUP_STATUS_DISABLED = 2;
 
     public static final String REDIS_LOGIN_KEY = "USERCENTER_LOGIN_TOKEN";
     public static final String REDIS_USER_INFO_KEY = "USERCENTER_USER_INFO_TOKEN";

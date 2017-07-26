@@ -1,62 +1,58 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.shsnc.base.user.mapper.GroupModelMapper">
+<mapper namespace="com.shsnc.base.user.mapper.OrganizationModelMapper">
 
-    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.GroupModel">
-        <id column="group_id" property="groupId" jdbcType="BIGINT"/>
+    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.OrganizationModel">
+        <id column="organization_id" property="organizationId" jdbcType="BIGINT"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="code" property="code" jdbcType="VARCHAR"/>
         <result column="description" property="description" jdbcType="VARCHAR"/>
-        <result column="status" property="status" jdbcType="TINYINT"/>
         <result column="parent_id" property="parentId" jdbcType="BIGINT"/>
     </resultMap>
 
     <sql id="BaseColumn">
-        group_id,
+        organization_id,
         name,
         code,
-        description,
-        status
+        description
     </sql>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
         SELECT
             <include refid="BaseColumn"/>
         FROM
-            user_group
+            user_organization
         WHERE
-            group_id = #{groupId}
+            organization_id = #{organizationId}
     </select>
 
     <delete id="deleteByPrimaryKey">
         DELETE FROM
-            user_group
+            user_organization
         WHERE
-            group_id = #{groupId}
+            organization_id = #{organizationId}
     </delete>
 
-    <delete id="deleteGroupAndChildren">
-        DELETE FROM user_group WHERE group_id IN (SELECT descendant_id FROM user_group_structure WHERE ancestor_id=#{groupId})
+    <delete id="deleteOrganizationAndChildren">
+        DELETE FROM user_organization WHERE organization_id IN (SELECT descendant_id FROM user_organization_structure WHERE ancestor_id=#{organizationId})
     </delete>
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="groupId">
-        INSERT INTO user_group (
+    <insert id="insert" useGeneratedKeys="true" keyProperty="organizationId">
+        INSERT INTO user_organization (
             name,
             code,
-            description,
-            status
+            description
         )
         VALUES (
             #{name},
             #{code},
-            #{description},
-            #{status}
+            #{description}
         )
     </insert>
 
-    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="groupId">
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="organizationId">
         INSERT INTO
-            user_group
+            user_organization
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="name != null">
                 name,
@@ -66,9 +62,6 @@
             </if>
             <if test="description != null">
                 description,
-            </if>
-            <if test="status != null">
-                status,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -81,15 +74,12 @@
             <if test="description != null">
                 #{description},
             </if>
-            <if test="status != null">
-                #{status},
-            </if>
         </trim>
     </insert>
 
     <update id="updateByPrimaryKeySelective">
         UPDATE
-            user_group
+            user_organization
         <set>
             <if test="name != null">
                 name = #{name},
@@ -100,31 +90,27 @@
             <if test="description != null">
                 description = #{description},
             </if>
-            <if test="status != null">
-                status = #{status},
-            </if>
         </set>
         WHERE
-            group_id = #{groupId}
+            organization_id = #{organizationId}
     </update>
 
     <update id="updateByPrimaryKey">
         UPDATE
-            user_group
+            user_organization
         SET
             name= #{name},
             code= #{code},
-            description= #{description},
-            status= #{status}
+            description= #{description}
         WHERE
-            group_id=#{groupId}
+            organization_id=#{organizationId}
     </update>
 
-    <select id="selectOneGroup" resultMap="BaseResultMap">
+    <select id="selectOne" resultMap="BaseResultMap">
         SELECT
               <include refid="BaseColumn"/>
         FROM
-            user_group
+            user_organization
         <where>
             <if test="code != null">
                 code = #{code}
@@ -133,21 +119,21 @@
         LIMIT 1
     </select>
 
-    <select id="getGroupIdsByGroupIds" resultType="java.lang.Long">
-        SELECT group_id
-        FROM user_group
-        WHERE group_id IN
-        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
-            #{groupId}
+    <select id="getOrganizationIdsByOrganizationIds" resultType="java.lang.Long">
+        SELECT organization_id
+        FROM user_organization
+        WHERE organization_id IN
+        <foreach collection="organizationIds" item="organizationId" open="(" close=")" separator=",">
+            #{organizationId}
         </foreach>
     </select>
 
-    <select id="getGroupsByUserId" resultMap="BaseResultMap">
+    <select id="getOrganizationsByUserId" resultMap="BaseResultMap">
         SELECT
-            ug.group_id,name,code,description
+            ug.organization_id,name,code,description
         FROM
-            user_group ug, user_info_group_relation ugr
-        WHERE ug.group_id=ugr.group_id AND ug.status=1 AND ugr.user_id=#{userId}
+            user_organization ug, user_info_organization_relation ugr
+        WHERE ug.organization_id=ugr.organization_id AND ugr.user_id=#{userId}
     </select>
 
     <sql id="conditionSql">
@@ -162,9 +148,6 @@
                 <if test="condition.description != null and condition.description != ''">
                     AND INSTR(description,#{condition.description})>0
                 </if>
-                <if test="condition.status != null and condition.status != ''">
-                    AND status=#{status}
-                </if>
             </if>
         </where>
     </sql>
@@ -172,25 +155,25 @@
         SELECT
             COUNT(1)
         FROM
-            user_group
+            user_organization
         <include refid="conditionSql"/>
     </select>
     <select id="getPageByCondition" resultMap="BaseResultMap">
         SELECT
             <include refid="BaseColumn"/>
-        FROM user_group
+        FROM user_organization
         <include refid="conditionSql"/>
         <include refid="Sql.orderSql"/>
         <include refid="Sql.pageSql"/>
     </select>
-    <select id="getGroupNodeList" resultMap="BaseResultMap">
+    <select id="getOrganizationNodeList" resultMap="BaseResultMap">
         SELECT ug.*,ugs.ancestor_id parent_id
-        FROM user_group ug
+        FROM user_organization ug
         JOIN (
             SELECT ancestor_id,descendant_id
-            FROM user_group_structure
+            FROM user_organization_structure
             WHERE level=1
-        ) ugs ON ug.group_id=ugs.descendant_id
+        ) ugs ON ug.organization_id=ugs.descendant_id
         <where>
             <if test="parentId != null">
                 ugs.ancestor_id=#{parentId}
@@ -199,31 +182,31 @@
 
 
     </select>
-    <select id="getAllGroupIdsByUserId" resultType="java.lang.Long">
+    <select id="getAllOrganizationIdsByUserId" resultType="java.lang.Long">
         SELECT DISTINCT ugs.descendant_id
-        FROM user_info_group_relation ugr,user_group_structure ugs
-        WHERE ugr.group_id = ugs.ancestor_id AND ugr.user_id=#{userId}
+        FROM user_info_organization_relation ugr,user_organization_structure ugs
+        WHERE ugr.organization_id = ugs.ancestor_id AND ugr.user_id=#{userId}
     </select>
 
-    <select id="getGroupsByUserIds" resultMap="BaseResultMap">
+    <select id="getOrganizationsByUserIds" resultMap="BaseResultMap">
         SELECT
-            ug.group_id,name,code,description
+            ug.organization_id,name,code,description
         FROM
-            user_group ug, user_info_group_relation ugr
-        WHERE ug.group_id=ugr.group_id AND ug.status=1 AND ugr.user_id IN
+            user_organization ug, user_info_organization_relation ugr
+        WHERE ug.organization_id=ugr.organization_id AND ugr.user_id IN
         <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
             #{userId}
         </foreach>
     </select>
 
-    <select id="getByGroupIds" resultMap="BaseResultMap">
+    <select id="getByOrganizationIdIds" resultMap="BaseResultMap">
         SELECT
             <include refid="BaseColumn"/>
         FROM
-            user_group
-        WHERE group_id IN
-        <foreach collection="groupIds" item="groupId" separator="," open="(" close=")">
-            #{groupId}
+            user_organization
+        WHERE organization_id IN
+        <foreach collection="organizationIds" item="organizationId" separator="," open="(" close=")">
+            #{organizationId}
         </foreach>
     </select>
 </mapper>
