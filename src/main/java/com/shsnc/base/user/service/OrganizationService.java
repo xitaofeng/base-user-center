@@ -1,6 +1,6 @@
 package com.shsnc.base.user.service;
 
-import com.shsnc.base.user.mapper.OrganizationIdStructureModelMapper;
+import com.shsnc.base.user.mapper.OrganizationStructureModelMapper;
 import com.shsnc.base.user.mapper.OrganizationModelMapper;
 import com.shsnc.base.user.mapper.UserInfoOrganizationRelationModelMapper;
 import com.shsnc.base.user.model.ExtendPropertyModel;
@@ -28,7 +28,7 @@ public class OrganizationService {
     @Autowired
     private OrganizationModelMapper organizationModelMapper;
     @Autowired
-    private OrganizationIdStructureModelMapper organizationIdStructureModelMapper;
+    private OrganizationStructureModelMapper organizationStructureModelMapper;
     @Autowired
     private UserInfoOrganizationRelationModelMapper userInfoOrganizationRelationModelMapper;
 
@@ -51,7 +51,7 @@ public class OrganizationService {
         organizationModelMapper.insertSelective(organizationModel);
 
         // 添加组结构关系
-        organizationIdStructureModelMapper.insertOrganizationStructure(organizationModel.getOrganizationId(),parentId);
+        organizationStructureModelMapper.insertOrganizationStructure(organizationModel.getOrganizationId(),parentId);
 
         return organizationModel.getOrganizationId();
     }
@@ -77,14 +77,14 @@ public class OrganizationService {
 
         // 更新父节点关系
         if(parentId != null){
-            Long dbParentId = organizationIdStructureModelMapper.getParentIdByOrganizationId(organizationModel.getOrganizationId());
+            Long dbParentId = organizationStructureModelMapper.getParentIdByOrganizationId(organizationModel.getOrganizationId());
             if(parentId != dbParentId){
                 // 断开与所有祖先节点的关系
                 if(dbParentId != null){
-                    organizationIdStructureModelMapper.deleteOldRelation(organizationModel.getOrganizationId());
+                    organizationStructureModelMapper.deleteOldRelation(organizationModel.getOrganizationId());
                 }
                 // 连接与新的父节点的关系
-                organizationIdStructureModelMapper.insertNewRelation(organizationModel.getOrganizationId(), parentId);
+                organizationStructureModelMapper.insertNewRelation(organizationModel.getOrganizationId(), parentId);
             }
         }
         return true;
@@ -102,11 +102,11 @@ public class OrganizationService {
         // 删除与用户的关系
         userInfoOrganizationRelationModelMapper.deleteByOrganizationId(organizationId);
         // 更新要删除节点的后代节点与祖先节点的层级减去1
-        organizationIdStructureModelMapper.updateChildrenLevel(organizationId);
+        organizationStructureModelMapper.updateChildrenLevel(organizationId);
         // 删除组织部门信息
         organizationModelMapper.deleteByPrimaryKey(organizationId);
         // 删除节点关系
-        organizationIdStructureModelMapper.deleteOrganizationStructure(organizationId);
+        organizationStructureModelMapper.deleteOrganizationStructure(organizationId);
 
         return true;
     }
@@ -125,7 +125,7 @@ public class OrganizationService {
         // 删除组织部门与用户的关系
         userInfoOrganizationRelationModelMapper.deleteWithChildrenByOrganizationId(organizationId);
         // 删除节点关系
-        organizationIdStructureModelMapper.deleteOrganizationAndChildrenRelation(organizationId);
+        organizationStructureModelMapper.deleteOrganizationAndChildrenRelation(organizationId);
         return true;
     }
 
@@ -189,7 +189,7 @@ public class OrganizationService {
     public OrganizationModel getOrganization(Long organizationId) throws BizException {
         Assert.notNull(organizationId, "组织部门id不能为空！");
         OrganizationModel organizationModel = organizationModelMapper.selectByPrimaryKey(organizationId);
-        organizationModel.setParentId(organizationIdStructureModelMapper.getParentIdByOrganizationId(organizationId));
+        organizationModel.setParentId(organizationStructureModelMapper.getParentIdByOrganizationId(organizationId));
         return organizationModel;
     }
 

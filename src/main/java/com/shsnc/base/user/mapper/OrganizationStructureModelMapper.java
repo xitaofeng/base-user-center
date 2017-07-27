@@ -3,7 +3,7 @@ package com.shsnc.base.user.mapper;
 import com.shsnc.base.user.model.OrganizationStructureModel;
 import org.apache.ibatis.annotations.Param;
 
-public interface OrganizationIdStructureModelMapper {
+public interface OrganizationStructureModelMapper {
     int deleteByPrimaryKey(Long structureId);
 
     int insert(OrganizationStructureModel record);
