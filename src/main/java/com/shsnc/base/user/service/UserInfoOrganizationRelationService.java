@@ -3,6 +3,7 @@ package com.shsnc.base.user.service;
 import com.shsnc.base.user.mapper.OrganizationModelMapper;
 import com.shsnc.base.user.mapper.UserInfoOrganizationRelationModelMapper;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;
+import com.shsnc.base.user.model.OrganizationModel;
 import com.shsnc.base.user.model.UserInfoOrganizationRelationModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.support.Assert;
@@ -27,50 +28,35 @@ public class UserInfoOrganizationRelationService {
     @Autowired
     private OrganizationModelMapper organizationModelMapper;
 
-    public List<Long> batchAddUserInfoOrganizationRelation(Long userId, List<Long> organizationIds) throws BizException {
+    public Long addUserInfoOrganizationRelation(Long userId, Long organizationId) throws BizException {
         Assert.notNull(userId,"用户id不能为空！");
-        Assert.notNull(organizationIds, "组织部门id不能为空！");
+        Assert.notNull(organizationId, "组织部门id不能为空！");
         UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
         Assert.notNull(userInfoModel, "用户id不存在！");
-        List<Long> dbOrganizationIds = organizationModelMapper.getOrganizationIdsByOrganizationIds(organizationIds);
-        Assert.isTrue(dbOrganizationIds.size() == organizationIds.size(), "含有不存在的组织部门id！");
+        OrganizationModel organizationModel = organizationModelMapper.selectByPrimaryKey(organizationId);
+        Assert.notNull(organizationModel, "含有不存在的组织部门id！");
 
-        List<UserInfoOrganizationRelationModel> userInfoOrganizationRelationModels = new ArrayList<>();
-        for(Long organizationId : organizationIds){
-            UserInfoOrganizationRelationModel relation = new UserInfoOrganizationRelationModel();
-            relation.setOrganizationId(organizationId);
-            relation.setUserId(userId);
-            userInfoOrganizationRelationModels.add(relation);
-        }
+        UserInfoOrganizationRelationModel userInfoOrganizationRelationModel = new UserInfoOrganizationRelationModel();
+        userInfoOrganizationRelationModel.setOrganizationId(organizationId);
+        userInfoOrganizationRelationModel.setUserId(userId);
+        userInfoOrganizationRelationModelMapper.insert(userInfoOrganizationRelationModel);
 
-        userInfoOrganizationRelationModelMapper.insertRelationList(userInfoOrganizationRelationModels);
-        List<Long> ids = new ArrayList<>();
-        for (UserInfoOrganizationRelationModel userInfoOrganizationRelationModel : userInfoOrganizationRelationModels){
-            ids.add(userInfoOrganizationRelationModel.getRelationId());
-        }
-        return ids;
+        return userInfoOrganizationRelationModel.getRelationId();
     }
 
-    public boolean batchUpdateUserInfoOrganizationRelation(Long userId, List<Long> organizationIds) throws BizException {
+    public boolean updateUserInfoOrganizationRelation(Long userId, Long organizationId) throws BizException {
         Assert.notNull(userId, "用户id不能为空！");
-        Assert.notNull(organizationIds);
+        Assert.notNull(organizationId, "组织部门id不能为空！");
         UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
-        Assert.notNull(userInfoModel, "用户id不存在！");
-        if(organizationIds.isEmpty()){
-            return userInfoOrganizationRelationModelMapper.deleteByUserId(userId) > 0;
-        } else {
-            List<Long> dbOrganizationIds = userInfoOrganizationRelationModelMapper.getOrganizationIdsByUserId(userId);
-            List<Long> deleteOrganizationIds = ListUtils.removeAll(dbOrganizationIds, organizationIds);
-            if(!deleteOrganizationIds.isEmpty()){
-                userInfoOrganizationRelationModelMapper.deleteByUserId(userId);
-                batchAddUserInfoOrganizationRelation(userId, organizationIds);
-            } else {
-                List<Long> addOrganizationIds = ListUtils.removeAll(organizationIds,dbOrganizationIds);
-                if(!addOrganizationIds.isEmpty()){
-                    batchAddUserInfoOrganizationRelation(userId, addOrganizationIds).size();
-                }
+        Assert.notNull(userInfoModel, "用户不存在！");
+        UserInfoOrganizationRelationModel userInfoOrganizationRelationModel = userInfoOrganizationRelationModelMapper.getByUserId(userId);
+        if (userInfoOrganizationRelationModel != null) {
+            if (organizationId.equals(userInfoOrganizationRelationModel.getOrganizationId())) {
+                return true;
             }
+            userInfoOrganizationRelationModelMapper.deleteByUserId(userId);
         }
+        this.addUserInfoOrganizationRelation(userId, organizationId);
         return true;
     }
 }

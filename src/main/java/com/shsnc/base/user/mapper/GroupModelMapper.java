@@ -5,6 +5,7 @@ import com.shsnc.base.user.model.GroupModel;
 import com.shsnc.base.util.sql.Pagination;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface GroupModelMapper {
@@ -29,4 +30,8 @@ public interface GroupModelMapper {
     boolean deleteByGroupIds(@Param("groupIds") List<Long> groupIds);
 
     GroupModel selectOne(GroupModel group);
+
+    List<Long> getGroupIdsByGroupIds(@Param("groupIds") List<Long> groupIds);
+
+    List<GroupModel> getByGroupIds(@Param("groupIds") Collection<Long> groupIds);
 }

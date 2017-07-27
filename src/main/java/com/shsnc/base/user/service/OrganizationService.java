@@ -1,7 +1,7 @@
 package com.shsnc.base.user.service;
 
-import com.shsnc.base.user.mapper.OrganizationModelMapper;
 import com.shsnc.base.user.mapper.OrganizationIdStructureModelMapper;
+import com.shsnc.base.user.mapper.OrganizationModelMapper;
 import com.shsnc.base.user.mapper.UserInfoOrganizationRelationModelMapper;
 import com.shsnc.base.user.model.ExtendPropertyModel;
 import com.shsnc.base.user.model.OrganizationCondition;
@@ -205,4 +205,5 @@ public class OrganizationService {
     public List<OrganizationModel> getNodeList(Long parentId) {
         return  organizationModelMapper.getOrganizationNodeList(parentId);
     }
+
 }

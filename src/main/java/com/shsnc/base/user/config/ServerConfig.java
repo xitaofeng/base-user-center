@@ -10,16 +10,19 @@ import java.util.Properties;
  */
 public class ServerConfig {
 
-    private static Boolean isSingleLogin;
+    private static Boolean onlyCheck;
     private static Integer sessionTime;
+    private static Boolean devModel;
 
     static {
         try {
             Properties properties = PropertiesLoaderUtils.loadAllProperties("server.properties");
-            String isSingleLogin = properties.getProperty("isSingleLogin","false");
-            String session = properties.getProperty("sessionTime","1800");
-            ServerConfig.isSingleLogin = Boolean.valueOf(isSingleLogin);
-            ServerConfig.sessionTime = Integer.valueOf(session);
+            String onlyCheck = properties.getProperty("LOGIN.ONLY_CHECK","false");
+            String sessionTime = properties.getProperty("LOGIN.SESSION_TIME","1800");
+            String devModel = properties.getProperty("LOGIN.DEV_MODEL","false");
+            ServerConfig.onlyCheck = Boolean.valueOf(onlyCheck);
+            ServerConfig.sessionTime = Integer.valueOf(sessionTime);
+            ServerConfig.devModel = Boolean.valueOf(devModel);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -28,11 +31,15 @@ public class ServerConfig {
     private ServerConfig(){
     }
 
-    public static Boolean getIsSingleLogin() {
-        return isSingleLogin;
+    public static Boolean isOnlyCheck() {
+        return onlyCheck;
     }
 
     public static Integer getSessionTime() {
         return sessionTime;
     }
+
+    public static Boolean isDevModel(){
+        return devModel;
+    };
 }

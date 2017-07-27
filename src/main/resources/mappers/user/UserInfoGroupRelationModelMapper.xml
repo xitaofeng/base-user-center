@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.shsnc.base.user.mapper.UserInfoGrouopRelationModelMapper" >
+<mapper namespace="com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper" >
 
-    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.UserInfoGrouopRelationModel" >
+    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.UserInfoGroupRelationModel" >
         <id column="relation_id" property="relationId" jdbcType="BIGINT" />
         <result column="user_id" property="userId" jdbcType="BIGINT" />
         <result column="group_id" property="groupId" jdbcType="BIGINT" />
@@ -17,22 +17,43 @@
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
         SELECT 
             <include refid="BaseColumn" />
-        FROM user_info_grouop_relation
+        FROM user_info_group_relation
         WHERE relation_id = #{relationId,jdbcType=BIGINT}
     </select>
 
+    <select id="getGroupIdsByUserId" resultType="java.lang.Long">
+        SELECT
+            group_id
+        FROM user_info_group_relation
+        WHERE user_id=#{userId}
+    </select>
+    <select id="getByUserIds" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn" />
+        FROM user_info_group_relation
+        WHERE user_id IN
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+    </select>
+
     <delete id="deleteByPrimaryKey" >
-        DELETE FROM user_info_grouop_relation
+        DELETE FROM user_info_group_relation
         WHERE relation_id = #{relationId,jdbcType=BIGINT}
     </delete>
 
+    <delete id="deleteByUserId">
+        DELETE FROM user_info_group_relation
+        WHERE user_id = #{userId}
+    </delete>
+
     <insert id="insert" useGeneratedKeys="true" keyProperty="relationId" >
-        INSERT INTO user_info_grouop_relation (user_id, group_id)
+        INSERT INTO user_info_group_relation (user_id, group_id)
         VALUES (#{userId,jdbcType=BIGINT}, #{groupId,jdbcType=BIGINT})
     </insert>
 
     <insert id="insertSelective" useGeneratedKeys="true" keyProperty="relationId" >
-        INSERT INTO user_info_grouop_relation
+        INSERT INTO user_info_group_relation
         <trim prefix="(" suffix=")" suffixOverrides="," >
             <if test="userId != null" >
                 user_id,
@@ -50,9 +71,18 @@
             </if>
         </trim>
     </insert>
+    <insert id="insertRelationList">
+        INSERT INTO
+          user_info_group_relation(user_id, group_id)
+        VALUES (
+        <foreach collection="userInfoGroupRelationModels" item="userInfoGroupRelationModel" separator="),(">
+            #{userInfoGroupRelationModel.userId},#{userInfoGroupRelationModel.groupId}
+        </foreach>
+        )
+    </insert>
 
     <update id="updateByPrimaryKeySelective" >
-        UPDATE user_info_grouop_relation
+        UPDATE user_info_group_relation
         <set >
             <if test="userId != null" >
                 user_id = #{userId,jdbcType=BIGINT},
@@ -65,7 +95,7 @@
     </update>
 
     <update id="updateByPrimaryKey" >
-        UPDATE user_info_grouop_relation
+        UPDATE user_info_group_relation
         SET user_id = #{userId,jdbcType=BIGINT},
           group_id = #{groupId,jdbcType=BIGINT}
         WHERE relation_id = #{relationId,jdbcType=BIGINT}

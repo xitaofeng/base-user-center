@@ -1,5 +1,7 @@
 package com.shsnc.base.user.model;
 
+import com.shsnc.base.authorization.bean.AuthorizationRole;
+
 import java.util.List;
 
 public class UserInfoModel {
@@ -28,7 +30,14 @@ public class UserInfoModel {
 
     private Integer isDelete;
 
-    private List<OrganizationModel> organizations;
+    private Long organizationId;
+    private OrganizationModel organization;
+
+    private List<Long> groupIds;
+    private List<GroupModel> groups;
+
+    private List<Long> roleIds;
+    private List<AuthorizationRole> roles;
 
     public Long getUserId() {
         return userId;
@@ -126,11 +135,51 @@ public class UserInfoModel {
         this.isDelete = isDelete;
     }
 
-    public List<OrganizationModel> getOrganizations() {
-        return organizations;
+    public Long getOrganizationId() {
+        return organizationId;
     }
 
-    public void setOrganizations(List<OrganizationModel> organizations) {
-        this.organizations = organizations;
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public OrganizationModel getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(OrganizationModel organization) {
+        this.organization = organization;
+    }
+
+    public List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    public void setRoleIds(List<Long> roleIds) {
+        this.roleIds = roleIds;
+    }
+
+    public List<AuthorizationRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<AuthorizationRole> roles) {
+        this.roles = roles;
+    }
+
+    public List<Long> getGroupIds() {
+        return groupIds;
+    }
+
+    public void setGroupIds(List<Long> groupIds) {
+        this.groupIds = groupIds;
+    }
+
+    public List<GroupModel> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<GroupModel> groups) {
+        this.groups = groups;
     }
 }

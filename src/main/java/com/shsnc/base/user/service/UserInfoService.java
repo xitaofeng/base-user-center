@@ -1,17 +1,15 @@
 package com.shsnc.base.user.service;
 
 import com.shsnc.base.authorization.service.AssignService;
+import com.shsnc.base.user.bean.Group;
 import com.shsnc.base.user.config.UserConstant;
-import com.shsnc.base.user.mapper.OrganizationModelMapper;
-import com.shsnc.base.user.mapper.UserInfoOrganizationRelationModelMapper;
-import com.shsnc.base.user.mapper.UserInfoModelMapper;
+import com.shsnc.base.user.mapper.*;
 import com.shsnc.base.user.model.*;
 import com.shsnc.base.user.support.Assert;
 import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.RedisUtil;
 import com.shsnc.base.util.bean.RelationMap;
-import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.crypto.SHAMaker;
 import com.shsnc.base.util.sql.Pagination;
@@ -19,22 +17,29 @@ import com.shsnc.base.util.sql.QueryData;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  *
  */
 @Service
-@Transactional(rollbackFor = BaseException.class)
 public class UserInfoService {
 
     @Autowired
     private UserInfoModelMapper userInfoModelMapper;
     @Autowired
     private OrganizationModelMapper organizationModelMapper;
+    @Autowired
+    private GroupModelMapper groupModelMapper;
+    @Autowired
+    private UserInfoGroupRelationModelMapper userInfoGroupRelationModelMapper;
+    @Autowired
+    private UserInfoGroupRelationService userInfoGroupRelationService;
     @Autowired
     private UserInfoOrganizationRelationModelMapper userInfoOrganizationRelationModelMapper;
     @Autowired
@@ -71,13 +76,14 @@ public class UserInfoService {
         int totalCount = userInfoModelMapper.getTotalCountByCondition(condition);
         queryData.setRowCount(totalCount);
         List<UserInfoModel> list = userInfoModelMapper.getPageByCondition(condition, pagination);
-        selectOrganizations(list);
+        selectOrganization(list);
+        selectGroups(list);
         selectRoles(list);
         queryData.setRecords(list);
         return queryData;
     }
 
-    private void selectRoles(List<UserInfoModel> userInfoModels) {
+    public void selectRoles(List<UserInfoModel> userInfoModels) {
         if (CollectionUtils.isEmpty(userInfoModels)) {
             return;
         }
@@ -87,7 +93,7 @@ public class UserInfoService {
         }
     }
 
-    private void selectOrganizations(List<UserInfoModel> userInfoModels) {
+    public void selectOrganization(List<UserInfoModel> userInfoModels) {
         if (CollectionUtils.isEmpty(userInfoModels)) {
             return;
         }
@@ -102,7 +108,28 @@ public class UserInfoService {
                 List<OrganizationModel> organizationModels = organizationModelMapper.getByOrganizationIdIds(relationMap.getRelatedIds());
                 Map<Long, OrganizationModel> organizationModelMap = organizationModels.stream().collect(Collectors.toMap(OrganizationModel::getOrganizationId, x -> x, (oldValue, newValue)->oldValue));
                 for (UserInfoModel userInfoModel : userInfoModels) {
-                    userInfoModel.setOrganizations(relationMap.getRelatedObjects(userInfoModel.getUserId(),organizationModelMap));
+                    userInfoModel.setOrganization(relationMap.getRelatedObject(userInfoModel.getUserId(),organizationModelMap));
+                }
+            }
+        }
+    }
+
+    public void selectGroups(List<UserInfoModel> userInfoModels) {
+        if (CollectionUtils.isEmpty(userInfoModels)) {
+            return;
+        }
+        List<Long> userIds = userInfoModels.stream().map(UserInfoModel::getUserId).collect(Collectors.toList());
+        if (!userIds.isEmpty()) {
+            List<UserInfoGroupRelationModel> relations = userInfoGroupRelationModelMapper.getByUserIds(userIds);
+            RelationMap relationMap = new RelationMap();
+            for (UserInfoGroupRelationModel relation : relations) {
+                relationMap.addRelation(relation.getUserId(),relation.getGroupId());
+            }
+            if (relationMap.hasRelatedIds()) {
+                List<GroupModel> groupModels = groupModelMapper.getByGroupIds(relationMap.getRelatedIds());
+                Map<Long, GroupModel> groupModelMap = groupModels.stream().collect(Collectors.toMap(GroupModel::getGroupId, x -> x, (oldValue, newValue)->oldValue));
+                for (UserInfoModel userInfoModel : userInfoModels) {
+                    userInfoModel.setGroups(relationMap.getRelatedObjects(userInfoModel.getUserId(),groupModelMap));
                 }
             }
         }
@@ -111,12 +138,12 @@ public class UserInfoService {
     /**
      * 新增用户信息
      * @param userInfoModel 用户信息
-     * @param organizationIds 组织部门id集合，用户可以属于多个组织结构
+     * @param groupIds 用户组id集合，用户可以属于多个用户组
      * @param extendPropertyValues 用户扩展属性值
      * @return
      * @throws BizException
      */
-    public Long addUserInfo(UserInfoModel userInfoModel, List<Long> organizationIds, List<ExtendPropertyValueModel> extendPropertyValues, List<Long> roleIds) throws BizException {
+    public Long addUserInfo(UserInfoModel userInfoModel, List<Long> groupIds, List<ExtendPropertyValueModel> extendPropertyValues, List<Long> roleIds) throws BizException {
         // 数据校验以及设置默认值
         checkAdd(userInfoModel);
 
@@ -127,10 +154,14 @@ public class UserInfoService {
         accountService.addAccount(userInfoModel);
 
         // 关联组织结构
-        if(CollectionUtils.isNotEmpty(organizationIds)){
-            userInfoOrganizationRelationService.batchAddUserInfoOrganizationRelation(userInfoModel.getUserId(), organizationIds);
+        userInfoOrganizationRelationService.addUserInfoOrganizationRelation(userInfoModel.getUserId(), userInfoModel.getOrganizationId());
+
+        // 关联用户组
+        if(CollectionUtils.isNotEmpty(groupIds)){
+            userInfoGroupRelationService.batchAddUserInfoGroupRelation(userInfoModel.getUserId(), groupIds );
         }
 
+        // 添加扩展属性
         Long userId = userInfoModel.getUserId();
         if(CollectionUtils.isNotEmpty(extendPropertyValues)){
             for (ExtendPropertyValueModel extendPropertyValue : extendPropertyValues){
@@ -146,7 +177,7 @@ public class UserInfoService {
         return userId;
     }
 
-    public boolean updateUserInfo(UserInfoModel userInfoModel, List<Long> organizationIds, List<ExtendPropertyValueModel> extendPropertyValues, List<Long> roleIds) throws BizException {
+    public boolean updateUserInfo(UserInfoModel userInfoModel, List<Long> groupIds, List<ExtendPropertyValueModel> extendPropertyValues, List<Long> roleIds) throws BizException {
         Assert.notNull(userInfoModel);
 
         // 数据校验以及设置默认值
@@ -159,8 +190,13 @@ public class UserInfoService {
         accountService.updateAccount(userInfoModel);
 
         // 更新与组织部门的关联
-        if(organizationIds != null){
-            userInfoOrganizationRelationService.batchUpdateUserInfoOrganizationRelation(userInfoModel.getUserId(), organizationIds);
+        if (userInfoModel.getOrganizationId() != null) {
+            userInfoOrganizationRelationService.updateUserInfoOrganizationRelation(userInfoModel.getUserId(), userInfoModel.getOrganizationId());
+        }
+
+        // 更新与用户组的关系
+        if(groupIds != null){
+            userInfoGroupRelationService.batchUpdateUserInfoGroupRelation(userInfoModel.getUserId(), groupIds);
         }
 
         // 更新用户扩展属性值
@@ -238,6 +274,10 @@ public class UserInfoService {
         userInfoModel.setAttemptIp("");
         userInfoModel.setAttemptTime(0L);
         userInfoModel.setCreateTime(new Date().getTime());
+        Long organizationId = userInfoModel.getOrganizationId();
+        BizAssert.notNull(organizationId, "用户所属组织id不能为空！");
+        OrganizationModel organizationModel = organizationModelMapper.selectByPrimaryKey(organizationId);
+        BizAssert.notNull(organizationModel, String.format("用户所属组织id【%s】不存在！", organizationId));
     }
 
     /**
@@ -378,4 +418,5 @@ public class UserInfoService {
         }
         return userInfoModels;
     }
+
 }

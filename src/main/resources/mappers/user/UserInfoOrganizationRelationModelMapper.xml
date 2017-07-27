@@ -108,11 +108,18 @@
 
     <select id="getByUserIds" resultMap="BaseResultMap">
         SELECT
-            organization_id
+            <include refid="BaseColumn"/>
         FROM user_info_organization_relation
         WHERE user_id IN
         <foreach collection="userIds" item="userId" separator="," open="(" close=")">
             #{userId}
         </foreach>
+    </select>
+
+    <select id="getByUserId" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_info_organization_relation
+        WHERE user_id=#{userId}
     </select>
 </mapper>

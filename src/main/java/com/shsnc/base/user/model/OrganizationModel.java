@@ -10,6 +10,8 @@ public class OrganizationModel {
 
     private String description;
 
+    private Integer sequence;
+
     private Long parentId;
 
     public Long getOrganizationId() {
@@ -42,6 +44,14 @@ public class OrganizationModel {
 
     public void setDescription(String description) {
         this.description = description == null ? null : description.trim();
+    }
+
+    public Integer getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(Integer sequence) {
+        this.sequence = sequence;
     }
 
     public Long getParentId() {

@@ -88,6 +88,26 @@
         LIMIT 1
     </select>
 
+    <select id="getGroupIdsByGroupIds" resultType="java.lang.Long">
+        SELECT
+            group_id
+        FROM user_group
+        WHERE group_id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
+    </select>
+
+    <select id="getByGroupIds" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn" />
+        FROM user_group
+        WHERE group_id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
+    </select>
+
     <delete id="deleteByPrimaryKey" >
         DELETE FROM user_group
         WHERE group_id = #{groupId,jdbcType=BIGINT}

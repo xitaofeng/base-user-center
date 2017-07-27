@@ -78,12 +78,14 @@ public class OrganizationHandler implements RequestHandler {
 
     @RequestMapper("/delete")
     @Authentication("BASE_USER_ORGANIZATION_DELETE")
+    @Validate
     public boolean delete(@NotNull Long organizationId) throws BizException {
         return organizationService.deleteOrganization(organizationId);
     }
 
     @RequestMapper("/deleteTree")
     @Authentication("BASE_USER_ORGANIZATION_DELETE_TREE")
+    @Validate
     public boolean deleteTree(@NotNull Long organizationId) throws BizException {
         return organizationService.deleteOrganizationTree(organizationId);
     }

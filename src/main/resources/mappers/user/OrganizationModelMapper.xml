@@ -136,6 +136,23 @@
         WHERE ug.organization_id=ugr.organization_id AND ugr.user_id=#{userId}
     </select>
 
+    <sql id="pageSql">
+        <if test="pagination != null" >
+            LIMIT #{pagination.start}, #{pagination.pagesize}
+        </if>
+    </sql>
+
+    <sql id="orderSql">
+        <if test="pagination != null">
+            <if test="pagination.sorting != null">
+                ORDER BY ${pagination.sorting}
+            </if>
+            <if test="pagination.sorting == null">
+                ORDER BY organization_id DESC
+            </if>
+        </if>
+    </sql>
+
     <sql id="conditionSql">
         <where>
             <if test="condition != null">
@@ -163,8 +180,8 @@
             <include refid="BaseColumn"/>
         FROM user_organization
         <include refid="conditionSql"/>
-        <include refid="Sql.orderSql"/>
-        <include refid="Sql.pageSql"/>
+        <include refid="orderSql"/>
+        <include refid="pageSql"/>
     </select>
     <select id="getOrganizationNodeList" resultMap="BaseResultMap">
         SELECT ug.*,ugs.ancestor_id parent_id

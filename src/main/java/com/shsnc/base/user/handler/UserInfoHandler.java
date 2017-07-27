@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -57,10 +58,11 @@ public class UserInfoHandler implements RequestHandler {
     public UserInfo getObject(@NotNull Long userId) throws BizException {
         UserInfoModel userInfoModel = userInfoService.getUserInfo(userId);
         if (userInfoModel != null) {
-            UserInfo userInfo = JsonUtil.convert(userInfoModel, UserInfo.class);
-            List<Long> roleIds = authorizationRoleService.getRoleIdsByUserId(userId);
-            userInfo.setRoleIds(roleIds);
-            return userInfo;
+            List<UserInfoModel> userInfoModels = Collections.singletonList(userInfoModel);
+            userInfoService.selectOrganization(userInfoModels);
+            userInfoService.selectGroups(userInfoModels);
+            userInfoService.selectRoles(userInfoModels);
+            return JsonUtil.convert(userInfoModel, UserInfo.class);
         }
         return null;
     }
@@ -83,7 +85,7 @@ public class UserInfoHandler implements RequestHandler {
         if(extendPropertyValues != null){
             extendPropertyValueModels = JsonUtil.convert(extendPropertyValues, List.class, ExtendPropertyValueModel.class);
         }
-        return userInfoService.addUserInfo(userInfoModel, userInfo.getOrganizationIds(), extendPropertyValueModels, userInfo.getRoleIds());
+        return userInfoService.addUserInfo(userInfoModel, userInfo.getGroupIds(), extendPropertyValueModels, userInfo.getRoleIds());
     }
 
     @RequestMapper("/update")
@@ -96,7 +98,7 @@ public class UserInfoHandler implements RequestHandler {
         if(extendPropertyValues != null){
             extendPropertyValueModels = JsonUtil.convert(extendPropertyValues, List.class, ExtendPropertyValueModel.class);
         }
-        return userInfoService.updateUserInfo(userInfoModel,userInfo.getOrganizationIds(),extendPropertyValueModels,userInfo.getRoleIds());
+        return userInfoService.updateUserInfo(userInfoModel,userInfo.getGroupIds(),extendPropertyValueModels,userInfo.getRoleIds());
     }
 
     @RequestMapper("/delete")

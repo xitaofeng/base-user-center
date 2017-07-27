@@ -1,6 +1,6 @@
 package com.shsnc.base.user.model;
 
-public class UserInfoGrouopRelationModel {
+public class UserInfoGroupRelationModel {
     
     /**
      * 自增主键
