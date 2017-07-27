@@ -1,27 +1,45 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper">
+<mapper namespace="com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper" >
 
-    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.UserInfoGroupRelationModel">
-        <id column="relation_id" property="relationId" jdbcType="BIGINT"/>
-        <result column="user_id" property="userId" jdbcType="BIGINT"/>
-        <result column="group_id" property="groupId" jdbcType="BIGINT"/>
+    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.UserInfoGroupRelationModel" >
+        <id column="relation_id" property="relationId" jdbcType="BIGINT" />
+        <result column="user_id" property="userId" jdbcType="BIGINT" />
+        <result column="group_id" property="groupId" jdbcType="BIGINT" />
     </resultMap>
 
-    <sql id="BaseColumn">
-        relation_id, user_id, group_id
+    <sql id="BaseColumn" >
+        relation_id, 
+        user_id, 
+        group_id
     </sql>
 
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
-        SELECT
-            <include refid="BaseColumn"/>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
+        SELECT 
+            <include refid="BaseColumn" />
         FROM user_info_group_relation
-        WHERE relation_id = #{relationId}
+        WHERE relation_id = #{relationId,jdbcType=BIGINT}
     </select>
 
-    <delete id="deleteByPrimaryKey">
+    <select id="getGroupIdsByUserId" resultType="java.lang.Long">
+        SELECT
+            group_id
+        FROM user_info_group_relation
+        WHERE user_id=#{userId}
+    </select>
+    <select id="getByUserIds" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn" />
+        FROM user_info_group_relation
+        WHERE user_id IN
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+    </select>
+
+    <delete id="deleteByPrimaryKey" >
         DELETE FROM user_info_group_relation
-        WHERE relation_id = #{relationId}
+        WHERE relation_id = #{relationId,jdbcType=BIGINT}
     </delete>
 
     <delete id="deleteByUserId">
@@ -29,80 +47,58 @@
         WHERE user_id = #{userId}
     </delete>
 
-    <delete id="deleteByGroupId">
-        DELETE FROM user_info_group_relation
-        WHERE group_id = #{groupId}
-    </delete>
-
-    <delete id="deleteWithChildrenByGroupId">
-        DELETE FROM user_info_group_relation WHERE group_id IN (SELECT descendant_id FROM user_group_structure WHERE ancestor_id=#{groupId})
-    </delete>
-
-    <insert id="insert" useGeneratedKeys="true" keyProperty="relationId">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="relationId" >
         INSERT INTO user_info_group_relation (user_id, group_id)
-        VALUES (#{userId}, #{groupId})
+        VALUES (#{userId,jdbcType=BIGINT}, #{groupId,jdbcType=BIGINT})
     </insert>
 
-    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="relationId">
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="relationId" >
         INSERT INTO user_info_group_relation
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="userId != null">
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="userId != null" >
                 user_id,
             </if>
-            <if test="groupId != null">
+            <if test="groupId != null" >
                 group_id,
             </if>
         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="userId != null">
-                #{userId},
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="userId != null" >
+                #{userId,jdbcType=BIGINT},
             </if>
-            <if test="groupId != null">
-                #{groupId},
+            <if test="groupId != null" >
+                #{groupId,jdbcType=BIGINT},
             </if>
         </trim>
     </insert>
-
-    <update id="updateByPrimaryKeySelective">
-        UPDATE user_info_group_relation
-        <set>
-            <if test="userId != null">
-                user_id = #{userId},
-            </if>
-            <if test="groupId != null">
-                group_id = #{groupId},
-            </if>
-        </set>
-        WHERE relation_id = #{relationId}
-    </update>
-
-    <update id="updateByPrimaryKey">
-        UPDATE user_info_group_relation
-        SET user_id  = #{userId},
-            group_id = #{groupId}
-        WHERE relation_id = #{relationId}
-    </update>
-
     <insert id="insertRelationList">
         INSERT INTO
-        user_info_group_relation(user_id, group_id)
+          user_info_group_relation(user_id, group_id)
         VALUES (
-            <foreach collection="userInfoGroupRelationModels" item="userInfoGroupRelationModel" separator="),(">
-                #{userInfoGroupRelationModel.userId},#{userInfoGroupRelationModel.groupId}
-            </foreach>
+        <foreach collection="userInfoGroupRelationModels" item="userInfoGroupRelationModel" separator="),(">
+            #{userInfoGroupRelationModel.userId},#{userInfoGroupRelationModel.groupId}
+        </foreach>
         )
     </insert>
 
-    <select id="getGroupIdsByUserId" resultType="java.lang.Long">
-        SELECT group_id
-        FROM user_info_group_relation
-        WHERE user_id = #{userId}
-    </select>
+    <update id="updateByPrimaryKeySelective" >
+        UPDATE user_info_group_relation
+        <set >
+            <if test="userId != null" >
+                user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="groupId != null" >
+                group_id = #{groupId,jdbcType=BIGINT},
+            </if>
+        </set>
+        WHERE relation_id = #{relationId,jdbcType=BIGINT}
+    </update>
 
-    <select id="getUserIdsByGroupId" resultType="java.lang.Long">
-        SELECT
-            user_id
-        FROM user_info_group_relation
-        WHERE group_id=#{groupId}
-    </select>
+    <update id="updateByPrimaryKey" >
+        UPDATE user_info_group_relation
+        SET user_id = #{userId,jdbcType=BIGINT},
+          group_id = #{groupId,jdbcType=BIGINT}
+        WHERE relation_id = #{relationId,jdbcType=BIGINT}
+    </update>
+      
 </mapper>

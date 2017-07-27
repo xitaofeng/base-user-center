@@ -1,5 +1,7 @@
 package com.shsnc.base.user.bean;
 
+import com.shsnc.base.authorization.bean.AuthorizationRole;
+
 import java.util.List;
 
 /**
@@ -14,7 +16,9 @@ public class UserInfo {
     private String email;
     private Integer internal;
     private Integer status;
-    private List<Long> roleIds;
+    private Organization organization;
+    private List<Group> groups;
+    private List<AuthorizationRole> roles;
 
     public Long getUserId() {
         return userId;
@@ -72,11 +76,27 @@ public class UserInfo {
         this.email = email;
     }
 
-    public List<Long> getRoleIds() {
-        return roleIds;
+    public Organization getOrganization() {
+        return organization;
     }
 
-    public void setRoleIds(List<Long> roleIds) {
-        this.roleIds = roleIds;
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
+    }
+
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
+    }
+
+    public List<AuthorizationRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<AuthorizationRole> roles) {
+        this.roles = roles;
     }
 }

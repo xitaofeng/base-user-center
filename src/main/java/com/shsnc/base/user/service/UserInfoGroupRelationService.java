@@ -5,9 +5,9 @@ import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;
 import com.shsnc.base.user.model.UserInfoGroupRelationModel;
 import com.shsnc.base.user.model.UserInfoModel;
-import com.shsnc.base.user.support.Assert;
+import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.config.BizException;
-import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.collections.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by houguangqiang on 2017/6/8.
+ * @author houguangqiang
+ * @date 2017-07-26
+ * @since 1.0
  */
 @Service
 public class UserInfoGroupRelationService {
@@ -28,12 +30,12 @@ public class UserInfoGroupRelationService {
     private GroupModelMapper groupModelMapper;
 
     public List<Long> batchAddUserInfoGroupRelation(Long userId, List<Long> groupIds) throws BizException {
-        Assert.notNull(userId,"用户id不能为空！");
-        Assert.notNull(groupIds, "组id不能为空！");
+        BizAssert.notNull(userId,"用户id不能为空！");
+        BizAssert.notEmpty(groupIds, "用户组id不能为空！");
         UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
-        Assert.notNull(userInfoModel, "用户id不存在！");
+        BizAssert.notNull(userInfoModel, "用户id不存在！");
         List<Long> dbGroupIds = groupModelMapper.getGroupIdsByGroupIds(groupIds);
-        Assert.isTrue(dbGroupIds.size() == groupIds.size(), "含有不存在的用户组id！");
+        BizAssert.isTrue(dbGroupIds.size() == groupIds.size(), "含有不存在的用户组id！");
 
         List<UserInfoGroupRelationModel> userInfoGroupRelationModels = new ArrayList<>();
         for(Long groupId : groupIds){
@@ -52,10 +54,10 @@ public class UserInfoGroupRelationService {
     }
 
     public boolean batchUpdateUserInfoGroupRelation(Long userId, List<Long> groupIds) throws BizException {
-        Assert.notNull(userId, "用户id不能为空！");
-        Assert.notNull(groupIds);
+        BizAssert.notNull(userId, "用户id不能为空！");
+        BizAssert.notNull(groupIds);
         UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
-        Assert.notNull(userInfoModel, "用户id不存在！");
+        BizAssert.notNull(userInfoModel, "用户id不存在！");
         if(groupIds.isEmpty()){
             return userInfoGroupRelationModelMapper.deleteByUserId(userId) > 0;
         } else {
@@ -67,10 +69,11 @@ public class UserInfoGroupRelationService {
             } else {
                 List<Long> addGroupIds = ListUtils.removeAll(groupIds,dbGroupIds);
                 if(!addGroupIds.isEmpty()){
-                    batchAddUserInfoGroupRelation(userId, addGroupIds).size();
+                    batchAddUserInfoGroupRelation(userId, addGroupIds);
                 }
             }
         }
         return true;
     }
+
 }

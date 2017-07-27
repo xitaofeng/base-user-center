@@ -5,13 +5,13 @@ import com.shsnc.api.core.ThreadContext;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.base.user.bean.ExtendPropertyValue;
-import com.shsnc.base.user.bean.Group;
+import com.shsnc.base.user.bean.Organization;
 import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.bean.UserInfoParam;
 import com.shsnc.base.user.model.ExtendPropertyValueModel;
-import com.shsnc.base.user.model.GroupModel;
+import com.shsnc.base.user.model.OrganizationModel;
 import com.shsnc.base.user.model.UserInfoModel;
-import com.shsnc.base.user.service.GroupService;
+import com.shsnc.base.user.service.OrganizationService;
 import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BizException;
@@ -33,7 +33,7 @@ public class ProfileHandler implements RequestHandler {
     @Autowired
     private UserInfoService userInfoService;
     @Autowired
-    private GroupService groupService;
+    private OrganizationService organizationService;
 
     @RequestMapper("/getInfo")
     public UserInfo getInfo() throws BizException {
@@ -42,11 +42,11 @@ public class ProfileHandler implements RequestHandler {
         return JsonUtil.convert(userInfoModel,UserInfo.class);
     }
 
-    @RequestMapper("/getGroups")
-    public List<Group> getGroups() throws BizException {
+    @RequestMapper("/getOrganizations")
+    public List<Organization> getOrganizations() throws BizException {
         Long userId = ThreadContext.getUserInfo().getUserId();
-        List<GroupModel> groupModels = groupService.getGroupsByUserId(userId);
-        return JsonUtil.convert(groupModels,List.class, Group.class);
+        List<OrganizationModel> organizationModels = organizationService.getOrganizationsByUserId(userId);
+        return JsonUtil.convert(organizationModels,List.class, Organization.class);
     }
 
     @RequestMapper("/modifyInfo")

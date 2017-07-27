@@ -1,140 +1,96 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.shsnc.base.user.mapper.GroupModelMapper">
+<mapper namespace="com.shsnc.base.user.mapper.GroupModelMapper" >
 
-    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.GroupModel">
-        <id column="group_id" property="groupId" jdbcType="BIGINT"/>
-        <result column="name" property="name" jdbcType="VARCHAR"/>
-        <result column="code" property="code" jdbcType="VARCHAR"/>
-        <result column="description" property="description" jdbcType="VARCHAR"/>
-        <result column="status" property="status" jdbcType="TINYINT"/>
-        <result column="parent_id" property="parentId" jdbcType="BIGINT"/>
+    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.GroupModel" >
+        <id column="group_id" property="groupId" jdbcType="BIGINT" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="code" property="code" jdbcType="VARCHAR" />
     </resultMap>
 
-    <sql id="BaseColumn">
-        group_id,
-        name,
-        code,
-        description,
-        status
+    <sql id="BaseColumn" >
+        group_id, 
+        name, 
+        code
     </sql>
 
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
-        SELECT
-            <include refid="BaseColumn"/>
-        FROM
-            user_group
-        WHERE
-            group_id = #{groupId}
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
+        SELECT 
+            <include refid="BaseColumn" />
+        FROM user_group
+        WHERE group_id = #{groupId,jdbcType=BIGINT}
     </select>
 
-    <delete id="deleteByPrimaryKey">
-        DELETE FROM
-            user_group
-        WHERE
-            group_id = #{groupId}
-    </delete>
-
-    <delete id="deleteGroupAndChildren">
-        DELETE FROM user_group WHERE group_id IN (SELECT descendant_id FROM user_group_structure WHERE ancestor_id=#{groupId})
-    </delete>
-
-    <insert id="insert" useGeneratedKeys="true" keyProperty="groupId">
-        INSERT INTO user_group (
-            name,
-            code,
-            description,
-            status
-        )
-        VALUES (
-            #{name},
-            #{code},
-            #{description},
-            #{status}
-        )
-    </insert>
-
-    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="groupId">
-        INSERT INTO
-            user_group
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="name != null">
-                name,
-            </if>
-            <if test="code != null">
-                code,
-            </if>
-            <if test="description != null">
-                description,
-            </if>
-            <if test="status != null">
-                status,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="name != null">
-                #{name},
-            </if>
-            <if test="code != null">
-                #{code},
-            </if>
-            <if test="description != null">
-                #{description},
-            </if>
-            <if test="status != null">
-                #{status},
-            </if>
-        </trim>
-    </insert>
-
-    <update id="updateByPrimaryKeySelective">
-        UPDATE
-            user_group
-        <set>
-            <if test="name != null">
-                name = #{name},
-            </if>
-            <if test="code != null">
-                code = #{code},
-            </if>
-            <if test="description != null">
-                description = #{description},
-            </if>
-            <if test="status != null">
-                status = #{status},
-            </if>
-        </set>
-        WHERE
-            group_id = #{groupId}
-    </update>
-
-    <update id="updateByPrimaryKey">
-        UPDATE
-            user_group
-        SET
-            name= #{name},
-            code= #{code},
-            description= #{description},
-            status= #{status}
-        WHERE
-            group_id=#{groupId}
-    </update>
-
-    <select id="selectOneGroup" resultMap="BaseResultMap">
+    <select id="selectAll" resultMap="BaseResultMap">
         SELECT
-              <include refid="BaseColumn"/>
-        FROM
-            user_group
+            <include refid="BaseColumn" />
+        FROM user_group
+    </select>
+
+    <sql id="pageSql">
+        <if test="pagination != null" >
+            LIMIT #{pagination.start}, #{pagination.pagesize}
+        </if>
+    </sql>
+
+    <sql id="orderSql">
+        <if test="pagination != null">
+            <if test="pagination.sorting != null">
+                ORDER BY ${pagination.sorting}
+            </if>
+            <if test="pagination.sorting == null">
+                ORDER BY group_id DESC
+            </if>
+        </if>
+    </sql>
+
+    <sql id="conditionSql">
         <where>
-            <if test="code != null">
-                code = #{code}
+            <if test="condition != null">
+                <if test="condition.name != null and condition.name != ''">
+                    AND INSTR(name,#{condition.name})>0
+                </if>
+                <if test="condition.code != null and condition.code != ''">
+                    AND INSTR(code,#{condition.code})>0
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <select id="getTotalCountByCondition" resultType="java.lang.Integer">
+        SELECT
+            count(group_id)
+        FROM user_group
+        <include refid="conditionSql"/>
+    </select>
+
+    <select id="getPageByCondition" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn" />
+        FROM user_group
+        <include refid="conditionSql"/>
+        <include refid="orderSql"/>
+        <include refid="pageSql"/>
+    </select>
+
+    <select id="selectOne" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn" />
+        FROM user_group
+        <where>
+            <if test="name != null and name != ''">
+                name=#{name}
+            </if>
+            <if test="code != null and code != ''">
+                AND code=#{code}
             </if>
         </where>
         LIMIT 1
     </select>
 
     <select id="getGroupIdsByGroupIds" resultType="java.lang.Long">
-        SELECT group_id
+        SELECT
+            group_id
         FROM user_group
         WHERE group_id IN
         <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
@@ -142,66 +98,72 @@
         </foreach>
     </select>
 
-    <select id="getGroupsByUserId" resultMap="BaseResultMap">
+    <select id="getByGroupIds" resultMap="BaseResultMap">
         SELECT
-            name,code,description
-        FROM
-            user_group ug, user_info_group_relation ugr
-        WHERE ug.group_id=ugr.group_id AND ug.status=1 AND ugr.user_id=#{userId}
-    </select>
-
-    <sql id="conditionSql">
-        <where>
-            <if test="condition != null">
-                <if test="condition.name != null and condition.name != ''">
-                    INSTR(name,#{condition.name})>0
-                </if>
-                <if test="condition.code != null and condition.code != ''">
-                    AND INSTR(code,#{condition.code})>0
-                </if>
-                <if test="condition.description != null and condition.description != ''">
-                    AND INSTR(description,#{condition.description})>0
-                </if>
-                <if test="condition.status != null and condition.status != ''">
-                    AND status=#{status}
-                </if>
-            </if>
-        </where>
-    </sql>
-    <select id="getTotalCountByCondition" resultType="java.lang.Integer">
-        SELECT
-            COUNT(1)
-        FROM
-            user_group
-        <include refid="conditionSql"/>
-    </select>
-    <select id="getPageByCondition" resultMap="BaseResultMap">
-        SELECT
-            <include refid="BaseColumn"/>
+            <include refid="BaseColumn" />
         FROM user_group
-        <include refid="conditionSql"/>
-        <include refid="Sql.orderSql"/>
-        <include refid="Sql.pageSql"/>
+        WHERE group_id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
     </select>
-    <select id="getGroupNodeList" resultMap="BaseResultMap">
-        SELECT ug.*,ugs.ancestor_id parent_id
-        FROM user_group ug
-        JOIN (
-            SELECT ancestor_id,descendant_id
-            FROM user_group_structure
-            WHERE level=1
-        ) ugs ON ug.group_id=ugs.descendant_id
-        <where>
-            <if test="parentId != null">
-                ugs.ancestor_id=#{parentId}
+
+    <delete id="deleteByPrimaryKey" >
+        DELETE FROM user_group
+        WHERE group_id = #{groupId,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByGroupIds">
+        DELETE FROM user_group
+        WHERE group_id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
+    </delete>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="groupId" >
+        INSERT INTO user_group (name, code)
+        VALUES (#{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="groupId" >
+        INSERT INTO user_group
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="name != null" >
+                name,
             </if>
-        </where>
+            <if test="code != null" >
+                code,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="name != null" >
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null" >
+                #{code,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
 
+    <update id="updateByPrimaryKeySelective" >
+        UPDATE user_group
+        <set >
+            <if test="name != null" >
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null" >
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+        </set>
+        WHERE group_id = #{groupId,jdbcType=BIGINT}
+    </update>
 
-    </select>
-    <select id="getAllGroupIdsByUserId" resultType="java.lang.Long">
-        SELECT DISTINCT ugs.descendant_id
-        FROM user_info_group_relation ugr,user_group_structure ugs
-        WHERE ugr.group_id = ugs.ancestor_id AND ugr.user_id=#{userId}
-    </select>
+    <update id="updateByPrimaryKey" >
+        UPDATE user_group
+        SET name = #{name,jdbcType=VARCHAR},
+          code = #{code,jdbcType=VARCHAR}
+        WHERE group_id = #{groupId,jdbcType=BIGINT}
+    </update>
+      
 </mapper>

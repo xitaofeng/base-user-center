@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shsnc.base.user.mapper.OrganizationModelMapper">
+
+    <resultMap id="BaseResultMap" type="com.shsnc.base.user.model.OrganizationModel">
+        <id column="organization_id" property="organizationId" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="parent_id" property="parentId" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="BaseColumn">
+        organization_id,
+        name,
+        code,
+        description
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM
+            user_organization
+        WHERE
+            organization_id = #{organizationId}
+    </select>
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM
+            user_organization
+        WHERE
+            organization_id = #{organizationId}
+    </delete>
+
+    <delete id="deleteOrganizationAndChildren">
+        DELETE FROM user_organization WHERE organization_id IN (SELECT descendant_id FROM user_organization_structure WHERE ancestor_id=#{organizationId})
+    </delete>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="organizationId">
+        INSERT INTO user_organization (
+            name,
+            code,
+            description
+        )
+        VALUES (
+            #{name},
+            #{code},
+            #{description}
+        )
+    </insert>
+
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="organizationId">
+        INSERT INTO
+            user_organization
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                name,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                #{name},
+            </if>
+            <if test="code != null">
+                #{code},
+            </if>
+            <if test="description != null">
+                #{description},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        UPDATE
+            user_organization
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+        </set>
+        WHERE
+            organization_id = #{organizationId}
+    </update>
+
+    <update id="updateByPrimaryKey">
+        UPDATE
+            user_organization
+        SET
+            name= #{name},
+            code= #{code},
+            description= #{description}
+        WHERE
+            organization_id=#{organizationId}
+    </update>
+
+    <select id="selectOne" resultMap="BaseResultMap">
+        SELECT
+              <include refid="BaseColumn"/>
+        FROM
+            user_organization
+        <where>
+            <if test="code != null">
+                code = #{code}
+            </if>
+        </where>
+        LIMIT 1
+    </select>
+
+    <select id="getOrganizationIdsByOrganizationIds" resultType="java.lang.Long">
+        SELECT organization_id
+        FROM user_organization
+        WHERE organization_id IN
+        <foreach collection="organizationIds" item="organizationId" open="(" close=")" separator=",">
+            #{organizationId}
+        </foreach>
+    </select>
+
+    <select id="getOrganizationsByUserId" resultMap="BaseResultMap">
+        SELECT
+            ug.organization_id,name,code,description
+        FROM
+            user_organization ug, user_info_organization_relation ugr
+        WHERE ug.organization_id=ugr.organization_id AND ugr.user_id=#{userId}
+    </select>
+
+    <sql id="pageSql">
+        <if test="pagination != null" >
+            LIMIT #{pagination.start}, #{pagination.pagesize}
+        </if>
+    </sql>
+
+    <sql id="orderSql">
+        <if test="pagination != null">
+            <if test="pagination.sorting != null">
+                ORDER BY ${pagination.sorting}
+            </if>
+            <if test="pagination.sorting == null">
+                ORDER BY organization_id DESC
+            </if>
+        </if>
+    </sql>
+
+    <sql id="conditionSql">
+        <where>
+            <if test="condition != null">
+                <if test="condition.name != null and condition.name != ''">
+                    INSTR(name,#{condition.name})>0
+                </if>
+                <if test="condition.code != null and condition.code != ''">
+                    AND INSTR(code,#{condition.code})>0
+                </if>
+                <if test="condition.description != null and condition.description != ''">
+                    AND INSTR(description,#{condition.description})>0
+                </if>
+            </if>
+        </where>
+    </sql>
+    <select id="getTotalCountByCondition" resultType="java.lang.Integer">
+        SELECT
+            COUNT(1)
+        FROM
+            user_organization
+        <include refid="conditionSql"/>
+    </select>
+    <select id="getPageByCondition" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM user_organization
+        <include refid="conditionSql"/>
+        <include refid="orderSql"/>
+        <include refid="pageSql"/>
+    </select>
+    <select id="getOrganizationNodeList" resultMap="BaseResultMap">
+        SELECT ug.*,ugs.ancestor_id parent_id
+        FROM user_organization ug
+        JOIN (
+            SELECT ancestor_id,descendant_id
+            FROM user_organization_structure
+            WHERE level=1
+        ) ugs ON ug.organization_id=ugs.descendant_id
+        <where>
+            <if test="parentId != null">
+                ugs.ancestor_id=#{parentId}
+            </if>
+        </where>
+
+
+    </select>
+    <select id="getAllOrganizationIdsByUserId" resultType="java.lang.Long">
+        SELECT DISTINCT ugs.descendant_id
+        FROM user_info_organization_relation ugr,user_organization_structure ugs
+        WHERE ugr.organization_id = ugs.ancestor_id AND ugr.user_id=#{userId}
+    </select>
+
+    <select id="getOrganizationsByUserIds" resultMap="BaseResultMap">
+        SELECT
+            ug.organization_id,name,code,description
+        FROM
+            user_organization ug, user_info_organization_relation ugr
+        WHERE ug.organization_id=ugr.organization_id AND ugr.user_id IN
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+    </select>
+
+    <select id="getByOrganizationIdIds" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM
+            user_organization
+        WHERE organization_id IN
+        <foreach collection="organizationIds" item="organizationId" separator="," open="(" close=")">
+            #{organizationId}
+        </foreach>
+    </select>
+</mapper>

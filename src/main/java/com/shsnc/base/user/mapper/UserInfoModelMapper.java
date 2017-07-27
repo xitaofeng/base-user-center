@@ -1,6 +1,5 @@
 package com.shsnc.base.user.mapper;
 
-import com.shsnc.base.user.model.ExtendPropertyModel;
 import com.shsnc.base.user.model.UserInfoCondition;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.util.sql.Pagination;
@@ -33,6 +32,6 @@ public interface UserInfoModelMapper {
 
     int getTotalCountByCondition(@Param("condition") UserInfoCondition condition);
 
-    List<ExtendPropertyModel> getPageByCondition(@Param("condition") UserInfoCondition condition, @Param("pagination") Pagination pagination);
+    List<UserInfoModel> getPageByCondition(@Param("condition") UserInfoCondition condition, @Param("pagination") Pagination pagination);
 
 }

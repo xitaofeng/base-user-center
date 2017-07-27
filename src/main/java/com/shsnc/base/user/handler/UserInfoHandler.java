@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -57,10 +58,11 @@ public class UserInfoHandler implements RequestHandler {
     public UserInfo getObject(@NotNull Long userId) throws BizException {
         UserInfoModel userInfoModel = userInfoService.getUserInfo(userId);
         if (userInfoModel != null) {
-            UserInfo userInfo = JsonUtil.convert(userInfoModel, UserInfo.class);
-            List<Long> roleIds = authorizationRoleService.getRoleIdsByUserId(userId);
-            userInfo.setRoleIds(roleIds);
-            return userInfo;
+            List<UserInfoModel> userInfoModels = Collections.singletonList(userInfoModel);
+            userInfoService.selectOrganization(userInfoModels);
+            userInfoService.selectGroups(userInfoModels);
+            userInfoService.selectRoles(userInfoModels);
+            return JsonUtil.convert(userInfoModel, UserInfo.class);
         }
         return null;
     }

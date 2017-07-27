@@ -4,10 +4,10 @@ import com.shsnc.api.core.validation.ValidationType;
 
 import javax.validation.constraints.NotNull;
 
-public class GroupParam {
+public class OrganizationParam {
 
     @NotNull(groups = ValidationType.Update.class)
-    private Long groupId;
+    private Long organizationId;
 
     @NotNull(groups = ValidationType.Add.class)
     private String name;
@@ -19,14 +19,12 @@ public class GroupParam {
 
     private String description;
 
-    private Integer status;
-
-    public Long getGroupId() {
-        return groupId;
+    public Long getOrganizationId() {
+        return organizationId;
     }
 
-    public void setGroupId(Long groupId) {
-        this.groupId = groupId;
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
     }
 
     public String getName() {
@@ -51,14 +49,6 @@ public class GroupParam {
 
     public void setDescription(String description) {
         this.description = description == null ? null : description.trim();
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
     }
 
     public Long getParentId() {

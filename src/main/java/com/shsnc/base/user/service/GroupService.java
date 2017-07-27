@@ -1,212 +1,118 @@
 package com.shsnc.base.user.service;
 
-import com.shsnc.base.user.config.UserConstant;
+import com.shsnc.base.user.bean.GroupCondition;
 import com.shsnc.base.user.mapper.GroupModelMapper;
-import com.shsnc.base.user.mapper.GroupStructureModelMapper;
-import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
-import com.shsnc.base.user.model.ExtendPropertyModel;
-import com.shsnc.base.user.model.GroupCondition;
 import com.shsnc.base.user.model.GroupModel;
-import com.shsnc.base.user.support.Assert;
-import com.shsnc.base.user.support.helper.BeanHelper;
+import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 /**
- * Created by houguangqiang on 2017/6/7.
+ * 用户组业务类
+ * @author houguangqiang
+ * @date 2017-07-26
+ * @since 1.0
  */
 @Service
 public class GroupService {
 
     @Autowired
     private GroupModelMapper groupModelMapper;
-    @Autowired
-    private GroupStructureModelMapper groupStructureModelMapper;
-    @Autowired
-    private UserInfoGroupRelationModelMapper userInfoGroupRelationModelMapper;
 
     /**
-     * 新增用户组
-     * @param groupModel 用户组model
-     * @param parentId 上级用户组，没有则为null
-     * @return 返回新增记录id
-     * @throws BizException 业务异常
+     * 获取所有用户组
+     * @return 返回用户组列表
      */
-    public Long addGroup(GroupModel groupModel,Long parentId) throws BizException {
-        Assert.notNull(groupModel);
-        checkName(groupModel);
-        checkCode(groupModel);
-        if(parentId != null){
-            GroupModel parentGroup = groupModelMapper.selectByPrimaryKey(parentId);
-            Assert.notNull(parentGroup, "上级用户组id不存在！");
-        }
-        if(!Integer.valueOf(UserConstant.GROUP_STATUS_DISABLED).equals(groupModel.getStatus())){
-            groupModel.setStatus(UserConstant.GROUP_STATUS_ENABLED);
-        }
-        // 添加组信息
-        groupModelMapper.insertSelective(groupModel);
-
-        // 添加组结构关系
-        groupStructureModelMapper.insertGroupStructure(groupModel.getGroupId(),parentId);
-
-        return groupModel.getGroupId();
+    public List<GroupModel> getGroupList() {
+        return groupModelMapper.selectAll();
     }
 
     /**
-     * 更新用户组信息
-     * @param groupModel 用户组model
-     * @param parentId 上级用户组，不改变则为null
-     * @return 如果有记录更细返回true，否则返回false
-     * @throws BizException 业务异常
-     */
-    public boolean updateGroup(GroupModel groupModel,Long parentId) throws BizException {
-        Assert.notNull(groupModel);
-        Assert.notNull(groupModel.getGroupId());
-        checkName(groupModel);
-        checkCode(groupModel);
-        GroupModel dbGroupModel = groupModelMapper.selectByPrimaryKey(groupModel.getGroupId());
-        Assert.notNull(dbGroupModel,"用户组id不存在！");
-
-        // 新增节点信息
-        BeanHelper.populateNullProperties(dbGroupModel, groupModel);
-        groupModelMapper.updateByPrimaryKeySelective(groupModel);
-
-        // 更新父节点关系
-        if(parentId != null){
-            Long dbParentId = groupStructureModelMapper.getParentIdByGroupId(groupModel.getGroupId());
-            if(parentId != dbParentId){
-                // 断开与所有祖先节点的关系
-                if(dbParentId != null){
-                    groupStructureModelMapper.deleteOldRelation(groupModel.getGroupId());
-                }
-                // 连接与新的父节点的关系
-                groupStructureModelMapper.insertNewRelation(groupModel.getGroupId(), parentId);
-            }
-        }
-        return true;
-    }
-
-    /**
-     * 只删除当前用户组，所有后代节点相对根节点的层数都会少一，即所有子节点向根节点方向移动一层
+     * 根据id获取用户组信息
      * @param groupId 用户组id
-     * @return 如果有记录更细返回true，否则返回false
+     * @return 用户组model
      */
-    public boolean deleteGroup(Long groupId) throws BizException {
-        Assert.notNull(groupId,"用户组id不能为空！");
-        GroupModel dbGroupModel = groupModelMapper.selectByPrimaryKey(groupId);
-        Assert.notNull(dbGroupModel,"用户组id不存在！");
-        // 删除与用户的关系
-        userInfoGroupRelationModelMapper.deleteByGroupId(groupId);
-        // 更新要删除节点的后代节点与祖先节点的层级减去1
-        groupStructureModelMapper.updateChildrenLevel(groupId);
-        // 删除用户组
-        groupModelMapper.deleteByPrimaryKey(groupId);
-        // 删除节点关系
-        groupStructureModelMapper.deleteGroupStructure(groupId);
-
-        return true;
-    }
-
-    /**
-     * 删除用户组以及它的所有后台节点
-     * @param groupId 用户组id
-     * @return 如果有记录更细返回true，否则返回false
-     */
-    public boolean deleteGroupTree(Long groupId) throws BizException {
-        Assert.notNull(groupId,"用户组id不能为空！");
-        GroupModel dbGroupModel = groupModelMapper.selectByPrimaryKey(groupId);
-        Assert.notNull(dbGroupModel,"用户组id不存在！");
-        // 删除用户组以及它的所有后台节点
-        groupModelMapper.deleteGroupAndChildren(groupId);
-        // 删除用户组与用户的关系
-        userInfoGroupRelationModelMapper.deleteWithChildrenByGroupId(groupId);
-        // 删除节点关系
-        groupStructureModelMapper.deleteGroupAndChildrenRelation(groupId);
-        return true;
-    }
-
-    private void checkName(GroupModel groupModel) throws BizException {
-        Long groupId = groupModel.getGroupId();
-        String name = groupModel.getName();
-        if(groupId == null){
-            Assert.notNull(name, "用户组名称不能为空！");
-        }
-    }
-
-    private void checkCode(GroupModel groupModel) throws BizException {
-        Long groupId = groupModel.getGroupId();
-        String code = groupModel.getCode();
-        if(groupId == null){
-            Assert.notNull(code, "用户组编码不能为空！");
-        }
-        if (code != null){
-            GroupModel exist = new GroupModel();
-            exist.setCode(code);
-            exist = groupModelMapper.selectOneGroup(exist);
-            Assert.isTrue(exist == null || exist.getGroupId().equals(groupId), "用户组编码已经存在！");
-        }
-    }
-
-    public GroupModel exitsGroup(GroupModel groupModel){
-        return groupModelMapper.selectOneGroup(groupModel);
-    }
-
-    public boolean exitsByGroupIds(List<Long> groupIds){
-        if(CollectionUtils.isEmpty(groupIds)){
-            return true;
-        }
-        List<Long> dbGroupIds = groupModelMapper.getGroupIdsByGroupIds(new ArrayList<>(new HashSet<>(groupIds)));
-        return dbGroupIds.size() == groupIds.size();
-    }
-
-    /**
-     * 根据用户id返回用户拥有的用户组
-     * @param userId 用户id
-     * @return 用于拥有的组列表
-     * @throws BizException 业务异常
-     */
-    public List<GroupModel> getGroupsByUserId(Long userId) throws BizException {
-        Assert.notNull(userId,"用户id不能为空！");
-        return groupModelMapper.getGroupsByUserId(userId);
-    }
-
-    /**
-     * 根据用户id返回用户拥有的用户组id已经所有的后代用户组id
-     * @param userId 用户id
-     * @return 用于拥有的组id已经所有后代用户组id列表
-     * @throws BizException 业务异常
-     */
-    public List<Long> getAllGroupIdsByUserId(Long userId) throws BizException {
-        Assert.notNull(userId,"用户id不能为空！");
-        return groupModelMapper.getAllGroupIdsByUserId(userId);
-    }
-
-
     public GroupModel getGroup(Long groupId) throws BizException {
-        Assert.notNull(groupId, "用户组id不能为空！");
-        GroupModel groupModel = groupModelMapper.selectByPrimaryKey(groupId);
-        groupModel.setParentId(groupStructureModelMapper.getParentIdByGroupId(groupId));
-        return groupModel;
+        BizAssert.notNull(groupId, "用户组id不能为空！");
+        return groupModelMapper.selectByPrimaryKey(groupId);
     }
 
+    /**
+     * 用户组分页查询
+     * @param condition 查询条件
+     * @param pagination 分页对象
+     * @return 分页信息
+     */
     public QueryData getGroupPage(GroupCondition condition, Pagination pagination) {
         QueryData queryData = new QueryData(pagination);
         int totalCount = groupModelMapper.getTotalCountByCondition(condition);
         queryData.setRowCount(totalCount);
-        List<ExtendPropertyModel> list = groupModelMapper.getPageByCondition(condition, pagination);
+        List<GroupModel> list = groupModelMapper.getPageByCondition(condition, pagination);
         queryData.setRecords(list);
         return queryData;
     }
 
-    public List<GroupModel> getNodeList(Long parentId) {
-        return  groupModelMapper.getGroupNodeList(parentId);
+    /**
+     * 新增用户组
+     * @param group 用户组
+     * @return 返回新增记录id
+     */
+    public Long addGroup(GroupModel group) throws BizException {
+        group.setCode(UUID.randomUUID().toString());
+        checkInput(group);
+        groupModelMapper.insert(group);
+        return group.getGroupId();
+    }
+
+    /**
+     * 更新用户组
+     * @param group 用户组
+     * @return 如果有记录更细返回true，否则返回false
+     */
+    public boolean updateGroup(GroupModel group) throws BizException {
+        BizAssert.notNull(group.getGroupId(), "用户组id不能为空！");
+        checkInput(group);
+        return groupModelMapper.updateByPrimaryKeySelective(group) > 0;
+    }
+
+    /**
+     * 根据id删除用户组
+     * @param groupId 用户组id
+     * @return 如果有记录更细返回true，否则返回false
+     */
+    public boolean deleteGroup(Long groupId) throws BizException {
+        BizAssert.notNull(groupId, "用户组id不能为空！");
+        return groupModelMapper.deleteByPrimaryKey(groupId) > 0;
+    }
+
+    /**
+     * 根据id集合批量删除用户组
+     * @param groupIds 用户组id的集合
+     * @return 如果有记录更细返回true，否则返回false
+     */
+    public boolean batchDeleteGroup(List<Long> groupIds) throws BizException {
+        BizAssert.notEmpty(groupIds, "用户组id不能为空！");
+        return groupModelMapper.deleteByGroupIds(groupIds);
+    }
+
+    private void checkInput(GroupModel group) throws BizException {
+        Long groupId = group.getGroupId();
+        String name = group.getName();
+        BizAssert.hasLength(name, "用户组名称不能为空！");
+        if (groupId == null) {
+            BizAssert.hasLength(group.getCode(), "用户组编码不能为空！");
+        }
+        if (name != null) {
+            GroupModel exist = new GroupModel();
+            exist.setName(name);
+            exist = groupModelMapper.selectOne(exist);
+            BizAssert.isTrue(exist == null || exist.getGroupId().equals(groupId), String.format("用户组【%s】已经存在！", name));
+        }
     }
 }
