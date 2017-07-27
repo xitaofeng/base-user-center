@@ -26,11 +26,11 @@
             <artifactId>base-api-core</artifactId>
             <version>${base-api-core.version}</version>
         </dependency>
-        <!-- commons -->
-<!--        <dependency>
-            <groupId>base-common</groupId>
+        <dependency>
+            <groupId>com.shsnc</groupId>
             <artifactId>base-common</artifactId>
-        </dependency>-->
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
@@ -150,6 +150,7 @@
                     <include>jdbc.properties</include>
                     <include>logback.xml</include>
                     <include>redis.properties</include>
+                    <include>module.properties</include>
                 </includes>
             </resource>
         </resources>
@@ -182,6 +183,7 @@
                         <exclude>jdbc.properties</exclude>
                         <exclude>logback.xml</exclude>
                         <exclude>redis.properties</exclude>
+                        <exclude>module.properties</exclude>
                     </excludes>
                     <archive>
                         <!-- 程序入口，即main函数 -->

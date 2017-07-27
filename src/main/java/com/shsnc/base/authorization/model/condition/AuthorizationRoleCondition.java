@@ -1,5 +1,7 @@
 package com.shsnc.base.authorization.model.condition;
 
+import java.util.List;
+
 /**
  * 权限角色查询对象
  * Created by Elena on 2017/6/20.
@@ -15,6 +17,16 @@ public class AuthorizationRoleCondition {
     private String roleCode;
 
     private Long userId;
+
+    private List<Long> roleIds;
+
+    public List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    public void setRoleIds(List<Long> roleIds) {
+        this.roleIds = roleIds;
+    }
 
     public Long getUserId() {
         return userId;

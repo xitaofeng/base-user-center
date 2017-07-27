@@ -38,10 +38,10 @@ public class AuthorizationResourcePropertyService {
         if (authorizationResourcePropertyModel != null) {
 
             if (authorizationResourcePropertyModel.getParentId() == null)
-                authorizationResourcePropertyModel.setParentId(new Long(0));
+                authorizationResourcePropertyModel.setParentId(0l);
 
             //验证资源属性是否存在
-            if(!CollectionUtils.isEmpty(authorizationResourcePropertyModelMapper.getCountByResourceTypeAndPropertyValue(authorizationResourcePropertyModel.getResourceType(),authorizationResourcePropertyModel.getPropertyValue()))){
+            if(!CollectionUtils.isEmpty(authorizationResourcePropertyModelMapper.getCountByResourceTypeCodeAndPropertyValue(authorizationResourcePropertyModel.getResourceTypeCode(),authorizationResourcePropertyModel.getPropertyValue()))){
                throw new  BizException(String.format("资源类型[%s]下属性[%s]已经存在",authorizationResourcePropertyModel.getResourceTypeName(),authorizationResourcePropertyModel.getPropertyName()));
             }
 
@@ -89,8 +89,8 @@ public class AuthorizationResourcePropertyService {
      */
     private void checkDataExist(AuthorizationResourcePropertyModel authorizationResourcePropertyModel,AuthorizationResourcePropertyModel editAuthorizationRoleModel) throws BizException {
         //如果
-        if(!(editAuthorizationRoleModel.getResourceType() == authorizationResourcePropertyModel.getResourceType() && editAuthorizationRoleModel.getPropertyValue() == authorizationResourcePropertyModel.getPropertyValue())){
-            List<AuthorizationResourcePropertyModel> list = authorizationResourcePropertyModelMapper.getCountByResourceTypeAndPropertyValue(authorizationResourcePropertyModel.getResourceType(),authorizationResourcePropertyModel.getPropertyValue());
+        if(!(editAuthorizationRoleModel.getResourceTypeCode() == authorizationResourcePropertyModel.getResourceTypeCode() && editAuthorizationRoleModel.getPropertyValue() == authorizationResourcePropertyModel.getPropertyValue())){
+            List<AuthorizationResourcePropertyModel> list = authorizationResourcePropertyModelMapper.getCountByResourceTypeCodeAndPropertyValue(authorizationResourcePropertyModel.getResourceTypeCode(),authorizationResourcePropertyModel.getPropertyValue());
             if(!CollectionUtils.isEmpty(list)){
                 throw new  BizException(String.format("资源类型[%s]下属性[%s]已经存在",authorizationResourcePropertyModel.getResourceTypeName(),authorizationResourcePropertyModel.getPropertyName()));
             }

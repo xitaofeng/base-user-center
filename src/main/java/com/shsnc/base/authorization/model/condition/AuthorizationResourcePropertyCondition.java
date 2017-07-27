@@ -9,11 +9,19 @@ public class AuthorizationResourcePropertyCondition {
 
     private Integer propertyValue;
 
-    private Integer resourceType;
+    private String resourceTypeCode;
 
     private String resourceTypeName;
 
     private Long parentId;
+
+    public String getResourceTypeCode() {
+        return resourceTypeCode;
+    }
+
+    public void setResourceTypeCode(String resourceTypeCode) {
+        this.resourceTypeCode = resourceTypeCode;
+    }
 
     public String getPropertyName() {
         return propertyName;
@@ -29,14 +37,6 @@ public class AuthorizationResourcePropertyCondition {
 
     public void setPropertyValue(Integer propertyValue) {
         this.propertyValue = propertyValue;
-    }
-
-    public Integer getResourceType() {
-        return resourceType;
-    }
-
-    public void setResourceType(Integer resourceType) {
-        this.resourceType = resourceType;
     }
 
     public String getResourceTypeName() {

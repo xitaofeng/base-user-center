@@ -18,21 +18,21 @@
         INSERT INTO
         <include refid="tableName"/>
         (
-        resource_type,
+        resource_type_code,
         resource_id,
         property_id,
         auth_type,
         auth_value
         )
         VALUES
-        (#{item.resourceType},#{item.resourceId},#{item.propertyId},#{item.authType},#{item.authValue})
+        (#{item.resourceTypeCode},#{item.resourceId},#{item.propertyId},#{item.authType},#{item.authValue})
     </insert>
 
     <insert id="addBatchAuthorizationResourceAuthModel">
         INSERT INTO
         <include refid="tableName"/>
         (
-        resource_type,
+        resource_type_code,
         resource_id,
         property_id,
         auth_type,
@@ -40,7 +40,7 @@
         )
         VALUES
         <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.resourceType},#{item.resourceId},#{item.propertyId},#{item.authType},#{item.authValue})
+            (#{item.resourceTypeCode},#{item.resourceId},#{item.propertyId},#{item.authType},#{item.authValue})
         </foreach>
     </insert>
 
@@ -48,7 +48,7 @@
         DELETE FROM
         <include refid="tableName"/>
         WHERE 1 = 1
-        AND resource_type = #{resourceType}
+        AND resource_type_code = #{resourceTypeCode}
         AND resource_id = #{resourceId}
         AND auth_type = #{authType}
         AND auth_value = #{authValue}
@@ -56,7 +56,7 @@
 
     <select id="getUserDataAuthorization" resultType="com.shsnc.base.authorization.bean.UserDataAuthorization">
         SELECT
-        a.resource_type resourceType,
+        a.resource_type_code resourceTypeCode,
         a.resource_id resourceId,
         GROUP_CONCAT(p.property_value SEPARATOR ',') propertyValues
         FROM

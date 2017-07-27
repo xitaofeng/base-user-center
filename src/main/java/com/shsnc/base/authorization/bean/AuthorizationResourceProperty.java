@@ -20,12 +20,20 @@ public class AuthorizationResourceProperty implements Serializable {
     private String propertyValue;
 
     @NotNull(groups = {ValidationType.Add.class})
-    private Integer resourceType;
+    private String resourceTypeCode;
 
     @NotNull(groups = {ValidationType.Add.class})
     private String resourceTypeName;
 
     private Long parentId;
+
+    public String getResourceTypeCode() {
+        return resourceTypeCode;
+    }
+
+    public void setResourceTypeCode(String resourceTypeCode) {
+        this.resourceTypeCode = resourceTypeCode;
+    }
 
     public Long getPropertyId() {
         return propertyId;
@@ -49,14 +57,6 @@ public class AuthorizationResourceProperty implements Serializable {
 
     public void setPropertyValue(String propertyValue) {
         this.propertyValue = propertyValue;
-    }
-
-    public Integer getResourceType() {
-        return resourceType;
-    }
-
-    public void setResourceType(Integer resourceType) {
-        this.resourceType = resourceType;
     }
 
     public String getResourceTypeName() {

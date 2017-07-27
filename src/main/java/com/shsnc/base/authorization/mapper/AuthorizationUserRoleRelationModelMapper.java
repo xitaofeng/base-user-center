@@ -16,28 +16,28 @@ public interface AuthorizationUserRoleRelationModelMapper {
      * @param authorizationUserRoleRelationModels
      * @return
      */
-    public Integer batchAddAuthorizationUserRoleRelationModel(List<AuthorizationUserRoleRelationModel> authorizationUserRoleRelationModels);
+    Integer batchAddAuthorizationUserRoleRelationModel(List<AuthorizationUserRoleRelationModel> authorizationUserRoleRelationModels);
 
     /**
      * 根据用户ID获取角色id
      * @param userId
      * @return
      */
-    public List<Long> getRoleIdByUserId(@Param("userId") Long userId);
+    List<Long> getRoleIdByUserId(@Param("userId") Long userId);
 
     /**
      * 根据角色id获取用户ID
      * @param roleId
      * @return
      */
-    public List<Long> getUserIdByRoleId(@Param("roleId") Long roleId);
+    List<Long> getUserIdByRoleId(@Param("roleId") Long roleId);
 
     /**
      * 根据角色id获取用户ID
      * @param roleIds
      * @return
      */
-    public List<Long> getUserIdByRoleIds(List<Long> roleIds);
+    List<Long> getUserIdByRoleIds(List<Long> roleIds);
 
 
     /**
@@ -45,7 +45,7 @@ public interface AuthorizationUserRoleRelationModelMapper {
      * @param userId
      * @return
      */
-    public Long deleteAuthorizationUserRoleRelationModelByUserId(@Param("userId") Long userId);
+    Long deleteAuthorizationUserRoleRelationModelByUserId(@Param("userId") Long userId);
 
 
     /**
@@ -53,7 +53,7 @@ public interface AuthorizationUserRoleRelationModelMapper {
      * @param roleId
      * @return
      */
-    public Long deleteAuthorizationUserRoleRelationModelByRoleId(@Param("roleId") Long roleId);
+    Long deleteAuthorizationUserRoleRelationModelByRoleId(@Param("roleId") Long roleId);
 
     /**
      *
@@ -61,5 +61,5 @@ public interface AuthorizationUserRoleRelationModelMapper {
      * @param code
      * @return
      */
-    public Integer getCountByUserIdAndRoleCode(@Param("userId") Long userId,@Param("roleCode") String code);
+    Integer getCountByUserIdAndRoleCode(@Param("userId") Long userId,@Param("roleCode") String code);
 }
