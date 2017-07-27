@@ -70,10 +70,10 @@ public class PassportHandler implements RequestHandler{
                     serverMsg = errorMsg;
                 } else {
                     String userId = userInfoModel.getUserId().toString();
-                    String uuid = ServerConfig.getIsSingleLogin() ? TokenHelper.encodeUID(userId) : TokenHelper.generateUUID();
+                    String uuid = ServerConfig.isOnlyCheck() || ServerConfig.isDevModel() ? TokenHelper.encodeUID(userId) : TokenHelper.generateUUID();
                     String token = null;
                     try {
-                        token = SimpleTokenProvider.generateToken(userId, uuid);
+                        token = SimpleTokenProvider.generateToken(userId, uuid, ServerConfig.isDevModel());
                     } catch (Exception e) {
                         errorMsg = "服务器异常！生成token失败";
                         serverMsg = "用户登陆生成token异常";

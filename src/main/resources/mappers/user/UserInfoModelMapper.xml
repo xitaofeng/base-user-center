@@ -257,6 +257,23 @@
         </foreach>
     </select>
 
+    <sql id="pageSql">
+        <if test="pagination != null" >
+            LIMIT #{pagination.start}, #{pagination.pagesize}
+        </if>
+    </sql>
+
+    <sql id="orderSql">
+        <if test="pagination != null">
+            <if test="pagination.sorting != null">
+                ORDER BY ${pagination.sorting}
+            </if>
+            <if test="pagination.sorting == null">
+                ORDER BY user_id DESC
+            </if>
+        </if>
+    </sql>
+
     <sql id="conditionSql">
         <where>
             is_delete = 1
@@ -291,7 +308,7 @@
             <include refid="BaseColumn"/>
         FROM user_info
         <include refid="conditionSql"/>
-        <include refid="Sql.orderSql"/>
-        <include refid="Sql.pageSql"/>
+        <include refid="orderSql"/>
+        <include refid="pageSql"/>
     </select>
 </mapper>

@@ -20,6 +20,8 @@ public class UserInfoParam {
     private String email;
     private String mobile;
     private Integer status;
+    @NotNull(groups = {ValidationType.Add.class})
+    private Long organizationId;
     private List<Long> groupIds;
     private List<ExtendPropertyValue> extendPropertyValues;
     private List<Long> roleIds;
@@ -63,6 +65,14 @@ public class UserInfoParam {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
     }
 
     public List<Long> getGroupIds() {

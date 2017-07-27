@@ -1,18 +1,9 @@
 package com.shsnc.base.user.bean;
 
-public class Group {
+public class GroupCondition {
 
-    private Long groupId;
     private String name;
     private String code;
-
-    public Long getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(Long groupId) {
-        this.groupId = groupId;
-    }
 
     public String getName() {
         return name;

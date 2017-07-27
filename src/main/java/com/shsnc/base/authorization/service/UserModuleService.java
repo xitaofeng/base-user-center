@@ -2,7 +2,7 @@ package com.shsnc.base.authorization.service;
 
 import com.shsnc.base.authorization.mapper.AuthorizationGroupRoleRelationModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
-import com.shsnc.base.user.service.GroupService;
+import com.shsnc.base.user.service.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class UserModuleService {
     private AuthorizationGroupRoleRelationModelMapper authorizationGroupRoleRelationModelMapper;
 
     @Autowired
-    private GroupService groupService;
+    private OrganizationService groupService;
 
     /**
      * 获取用户角色列表

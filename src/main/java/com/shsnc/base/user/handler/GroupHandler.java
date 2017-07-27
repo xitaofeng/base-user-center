@@ -2,18 +2,19 @@ package com.shsnc.base.user.handler;
 
 import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.annotation.Authentication;
+import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
 import com.shsnc.base.user.bean.Group;
-import com.shsnc.base.user.bean.GroupParam;
-import com.shsnc.base.user.model.GroupCondition;
+import com.shsnc.base.user.bean.GroupCondition;
 import com.shsnc.base.user.model.GroupModel;
 import com.shsnc.base.user.service.GroupService;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,67 +22,73 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * Created by houguangqiang on 2017/6/9.
+ *
+ *
+ * @author houguangqiang
+ * @since 1.0
+ * @date 2017-07-26
  */
 @Component
 @RequestMapper("/user/group")
+@LoginRequired
 public class GroupHandler implements RequestHandler {
 
     @Autowired
     private GroupService groupService;
 
-    private String[][] fieldMapping = {{"name","name"},{"code","code"},{"status","status"}};
-
-    @RequestMapper("/getPage")
-    @Authentication("BASE_USER_GROUP_GET_PAGE")
-    public QueryData getPage(GroupCondition condition, Pagination pagination){
-        pagination.buildSort(fieldMapping);
-        QueryData queryData = groupService.getGroupPage(condition,pagination);
-        return queryData.convert(Group.class);
+    @RequestMapper("/getList")
+    @Authentication("BASE_USER_GROUP_GET_LIST")
+    public List<Group> getList(){
+        List<GroupModel> groupList = groupService.getGroupList();
+        return JsonUtil.convert(groupList, List.class, Group.class) ;
     }
+
+    private static final String[][] mapping = {{"name","name"}};
 
     @RequestMapper("/getObject")
     @Validate
     @Authentication("BASE_USER_GROUP_GET_OBJECT")
-    public Group getObjet(@NotNull Long groupId) throws BizException {
+    public Group getObject(@NotNull Long groupId) throws BizException {
         GroupModel groupModel = groupService.getGroup(groupId);
         return JsonUtil.convert(groupModel, Group.class);
     }
 
-    @RequestMapper("/getNodeList")
-    @Authentication("BASE_USER_GROUP_GET_NODE_LIST")
-    public List<Group> getNodeList(Long parentId){
-        List<GroupModel> groupModels = groupService.getNodeList(parentId);
-        return JsonUtil.convert(groupModels, List.class, Group.class);
+    @RequestMapper("/getPage")
+    @Authentication("BASE_USER_GROUP_GET_PAGE")
+    public QueryData getPage(GroupCondition condition, Pagination pagination){
+        pagination.buildSort(mapping);
+        QueryData queryData = groupService.getGroupPage(condition, pagination);
+        return queryData.convert(Group.class);
     }
 
 
     @RequestMapper("/add")
-    @Authentication("BASE_USER_GROUP_ADD")
     @Validate(groups = ValidationType.Add.class)
-    public Long add(GroupParam group) throws BizException {
-        GroupModel groupModel = JsonUtil.convert(group, GroupModel.class);
-        return groupService.addGroup(groupModel, group.getParentId());
+    @Authentication("BASE_USER_GROUP_ADD")
+    public Long add(Group group) throws BizException {
+        GroupModel groupModel = JsonUtil.convert(group,GroupModel.class);
+        return groupService.addGroup(groupModel);
     }
 
     @RequestMapper("/update")
-    @Authentication("BASE_USER_GROUP_UPDATE")
     @Validate(groups = ValidationType.Update.class)
-    public boolean update(GroupParam group) throws BizException {
-        GroupModel groupModel = JsonUtil.convert(group, GroupModel.class);
-        return groupService.updateGroup(groupModel, group.getParentId());
+    @Authentication("BASE_USER_GROUP_UPDATE")
+    public boolean update(Group group) throws BizException {
+        GroupModel groupModel = JsonUtil.convert(group,GroupModel.class);
+        return groupService.updateGroup(groupModel);
     }
 
     @RequestMapper("/delete")
+    @Validate
     @Authentication("BASE_USER_GROUP_DELETE")
     public boolean delete(@NotNull Long groupId) throws BizException {
         return groupService.deleteGroup(groupId);
     }
 
-    @RequestMapper("/deleteTree")
-    @Authentication("BASE_USER_GROUP_DELETE_TREE")
-    public boolean deleteTree(@NotNull Long groupId) throws BizException {
-        return groupService.deleteGroupTree(groupId);
+    @RequestMapper("/batchDelete")
+    @Validate
+    @Authentication("BASE_USER_GROUP_BATCH_DELETE")
+    public boolean batchDelete(@NotEmpty List<Long> groupIds) throws BizException {
+        return groupService.batchDeleteGroup(groupIds);
     }
-
 }

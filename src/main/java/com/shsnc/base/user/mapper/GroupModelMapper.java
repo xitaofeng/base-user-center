@@ -1,7 +1,6 @@
 package com.shsnc.base.user.mapper;
 
-import com.shsnc.base.user.model.ExtendPropertyModel;
-import com.shsnc.base.user.model.GroupCondition;
+import com.shsnc.base.user.bean.GroupCondition;
 import com.shsnc.base.user.model.GroupModel;
 import com.shsnc.base.util.sql.Pagination;
 import org.apache.ibatis.annotations.Param;
@@ -10,7 +9,6 @@ import java.util.Collection;
 import java.util.List;
 
 public interface GroupModelMapper {
-
     int deleteByPrimaryKey(Long groupId);
 
     int insert(GroupModel record);
@@ -23,20 +21,17 @@ public interface GroupModelMapper {
 
     int updateByPrimaryKey(GroupModel record);
 
-    GroupModel selectOneGroup(GroupModel groupModel);
-
-    List<Long> getGroupIdsByGroupIds(@Param("groupIds") Collection<Long> groupIds);
-
-    int deleteGroupAndChildren(Long groupId);
-
-    List<GroupModel> getGroupsByUserId(Long userId);
+    List<GroupModel> selectAll();
 
     int getTotalCountByCondition(@Param("condition") GroupCondition condition);
 
-    List<ExtendPropertyModel> getPageByCondition(@Param("condition") GroupCondition condition, @Param("pagination") Pagination pagination);
+    List<GroupModel> getPageByCondition(@Param("condition") GroupCondition condition, @Param("pagination") Pagination pagination);
 
-    List<GroupModel> getGroupNodeList(@Param("parentId") Long parentId);
+    boolean deleteByGroupIds(@Param("groupIds") List<Long> groupIds);
 
-    List<Long> getAllGroupIdsByUserId(Long userId);
+    GroupModel selectOne(GroupModel group);
 
+    List<Long> getGroupIdsByGroupIds(@Param("groupIds") List<Long> groupIds);
+
+    List<GroupModel> getByGroupIds(@Param("groupIds") Collection<Long> groupIds);
 }

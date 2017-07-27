@@ -20,13 +20,9 @@ public interface UserInfoGroupRelationModelMapper {
 
     int insertRelationList(@Param("userInfoGroupRelationModels") List<UserInfoGroupRelationModel> userInfoGroupRelationModels);
 
-    List<Long> getGroupIdsByUserId(Long userId);
-
     int deleteByUserId(Long userId);
 
-    List<Long> getUserIdsByGroupId(Long groupId);
+    List<Long> getGroupIdsByUserId(Long userId);
 
-    int deleteByGroupId(Long groupId);
-
-    int deleteWithChildrenByGroupId(Long groupId);
+    List<UserInfoGroupRelationModel> getByUserIds(@Param("userIds") List<Long> userIds);
 }
