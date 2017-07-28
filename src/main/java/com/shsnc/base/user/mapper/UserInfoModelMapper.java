@@ -34,4 +34,7 @@ public interface UserInfoModelMapper {
 
     List<UserInfoModel> getPageByCondition(@Param("condition") UserInfoCondition condition, @Param("pagination") Pagination pagination);
 
+    List<UserInfoModel> getListByCondition(@Param("condition")UserInfoCondition condition);
+
+    List<UserInfoModel> getByUserIds(@Param("userIds") Collection<Long> userIds);
 }

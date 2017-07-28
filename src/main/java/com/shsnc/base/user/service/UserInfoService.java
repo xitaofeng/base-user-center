@@ -2,6 +2,7 @@ package com.shsnc.base.user.service;
 
 import com.shsnc.base.authorization.service.AssignService;
 import com.shsnc.base.user.bean.Group;
+import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.mapper.*;
 import com.shsnc.base.user.model.*;
@@ -419,4 +420,19 @@ public class UserInfoService {
         return userInfoModels;
     }
 
+    /**
+     * 移动用户到指定组织部门
+     * @param userIds
+     * @param organizationId
+     * @return
+     */
+    public boolean moveToOrganization(List<Long> userIds, Long organizationId) throws BizException {
+        return userInfoOrganizationRelationService.batchUpdateUserToOrganizationRelation(userIds, organizationId);
+    }
+
+    public List<UserInfoModel> findUsers(UserInfoCondition condition) {
+        List<UserInfoModel> userInfoModels = userInfoModelMapper.getListByCondition(condition);
+        selectOrganization(userInfoModels);
+        return userInfoModels;
+    }
 }

@@ -1,5 +1,7 @@
 package com.shsnc.base.user.model;
 
+import java.util.List;
+
 public class GroupModel {
     
     /**
@@ -16,6 +18,9 @@ public class GroupModel {
      * 用户组编码
      */
     private String code;
+
+    private List<UserInfoModel> users;
+
 
     /**
      * 自增主键
@@ -57,5 +62,13 @@ public class GroupModel {
      */
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public List<UserInfoModel> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<UserInfoModel> users) {
+        this.users = users;
     }
 }

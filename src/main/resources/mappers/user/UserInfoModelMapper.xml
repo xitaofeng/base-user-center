@@ -293,6 +293,13 @@
                 <if test="condition.status != null">
                     AND status=#{condition.status}
                 </if>
+                <if test="condition.organizationId != null">
+                    AND organization_id IN (
+                        SELECT descendant_id
+                        FROM user_organization_structure
+                        WHERE ancestor_id=#{condition.organizationId}
+                    )
+                </if>
             </if>
         </where>
     </sql>
@@ -305,10 +312,34 @@
     </select>
     <select id="getPageByCondition" resultMap="BaseResultMap">
         SELECT
-            <include refid="BaseColumn"/>
-        FROM user_info
+            ui.*
+        FROM user_info ui
+        <if test="condition != null and condition.organizationId != null">
+            LEFT JOIN user_info_organization_relation uo ON ui.user_id=uo.user_id
+        </if>
         <include refid="conditionSql"/>
         <include refid="orderSql"/>
         <include refid="pageSql"/>
+    </select>
+
+    <select id="getListByCondition" resultMap="BaseResultMap">
+        SELECT
+            ui.*
+        FROM user_info ui
+        <if test="condition != null and condition.organizationId != null">
+            LEFT JOIN user_info_organization_relation uo ON ui.user_id=uo.user_id
+        </if>
+        <include refid="conditionSql"/>
+    </select>
+    <select id="getByUserIds" resultMap="BaseResultMap">
+        SELECT
+          <include refid="BaseColumn"/>
+        FROM user_info
+        <where>
+            is_delete = 1 AND user_id IN
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
+        </where>
     </select>
 </mapper>

@@ -2,16 +2,24 @@ package com.shsnc.base.user.service;
 
 import com.shsnc.base.user.bean.GroupCondition;
 import com.shsnc.base.user.mapper.GroupModelMapper;
+import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
+import com.shsnc.base.user.mapper.UserInfoModelMapper;
 import com.shsnc.base.user.model.GroupModel;
+import com.shsnc.base.user.model.UserInfoGroupRelationModel;
+import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.util.BizAssert;
+import com.shsnc.base.util.bean.RelationMap;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * 用户组业务类
@@ -24,6 +32,12 @@ public class GroupService {
 
     @Autowired
     private GroupModelMapper groupModelMapper;
+    @Autowired
+    private UserInfoGroupRelationService userInfoGroupRelationService;
+    @Autowired
+    private UserInfoGroupRelationModelMapper userInfoGroupRelationModelMapper;
+    @Autowired
+    private UserInfoModelMapper userInfoModelMapper;
 
     /**
      * 获取所有用户组
@@ -54,10 +68,31 @@ public class GroupService {
         int totalCount = groupModelMapper.getTotalCountByCondition(condition);
         queryData.setRowCount(totalCount);
         List<GroupModel> list = groupModelMapper.getPageByCondition(condition, pagination);
+        selectUsers(list);
         queryData.setRecords(list);
         return queryData;
     }
 
+    public void selectUsers(List<GroupModel> groupModels) {
+        if (CollectionUtils.isEmpty(groupModels)) {
+            return;
+        }
+        List<Long> groupIds = groupModels.stream().map(GroupModel::getGroupId).collect(Collectors.toList());
+        if (!groupIds.isEmpty()) {
+            List<UserInfoGroupRelationModel> relations = userInfoGroupRelationModelMapper.getByGroupids(groupIds);
+            RelationMap relationMap = new RelationMap();
+            for (UserInfoGroupRelationModel relation : relations) {
+                relationMap.addRelation(relation.getRelationId(),relation.getUserId());
+            }
+            if (relationMap.hasRelatedIds()) {
+                List<UserInfoModel> userInfoModels = userInfoModelMapper.getByUserIds(relationMap.getRelatedIds());
+                Map<Long, UserInfoModel> userInfoModelMap = userInfoModels.stream().collect(Collectors.toMap(UserInfoModel::getUserId, x -> x, (oldValue, newValue)->oldValue));
+                for (GroupModel groupModel : groupModels) {
+                    groupModel.setUsers(relationMap.getRelatedObjects(groupModel.getGroupId(),userInfoModelMap));
+                }
+            }
+        }
+    }
     /**
      * 新增用户组
      * @param group 用户组
@@ -114,5 +149,15 @@ public class GroupService {
             exist = groupModelMapper.selectOne(exist);
             BizAssert.isTrue(exist == null || exist.getGroupId().equals(groupId), String.format("用户组【%s】已经存在！", name));
         }
+    }
+
+    /**
+     * 给用户组分配用户
+     * @param groupId 用户组id
+     * @param userIds 用户id列表
+     * @return
+     */
+    public boolean assignUsers(Long groupId, List<Long> userIds) throws BizException {
+        return userInfoGroupRelationService.batchUpdateGroupUserInfoRelation(groupId, userIds);
     }
 }

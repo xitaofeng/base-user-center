@@ -14,7 +14,7 @@ public class UserInfoCondition {
 
     private Integer status;
 
-    private Long createTime;
+    private Long organizationId;
 
     public Long getUserId() {
         return userId;
@@ -64,11 +64,11 @@ public class UserInfoCondition {
         this.status = status;
     }
 
-    public Long getCreateTime() {
-        return createTime;
+    public Long getOrganizationId() {
+        return organizationId;
     }
 
-    public void setCreateTime(Long createTime) {
-        this.createTime = createTime;
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
     }
 }
