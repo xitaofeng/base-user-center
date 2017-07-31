@@ -14,7 +14,7 @@ public class InternalUserInfo {
     private String alias;
     private String mobile;
     private String email;
-    private Integer internal;
+    private Boolean admin;
     private Integer status;
     private List<Long> groupIds;
 
@@ -58,12 +58,12 @@ public class InternalUserInfo {
         this.email = email;
     }
 
-    public Integer getInternal() {
-        return internal;
+    public Boolean isAdmin() {
+        return admin;
     }
 
-    public void setInternal(Integer internal) {
-        this.internal = internal;
+    public void setAdmin(Boolean admin) {
+        this.admin = admin;
     }
 
     public Integer getStatus() {
