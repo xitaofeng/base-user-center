@@ -3,7 +3,7 @@ package com.shsnc.base.user.handler;
 import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
-import com.shsnc.base.user.bean.UserInfo;
+import com.shsnc.base.user.bean.InternalUserInfo;
 import com.shsnc.base.user.config.ServerConfig;
 import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.model.UserInfoModel;
@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 
 /**
  * Created by houguangqiang on 2017/6/11.
@@ -32,7 +33,7 @@ public class InternalHandler implements RequestHandler {
 
     @RequestMapper("/authenticate")
     @Validate
-    public UserInfo authenticate(@NotNull String token) throws BizException {
+    public InternalUserInfo authenticate(@NotNull String token) throws BizException {
         String errorMsg = null;
         String[] result = null;
         try {
@@ -45,12 +46,10 @@ public class InternalHandler implements RequestHandler {
                     boolean success =  serverToken != null && serverToken.equals(token);
                     if(success){
                         RedisUtil.setFieldValue(UserConstant.REDIS_LOGIN_KEY, result[1], token, ServerConfig.getSessionTime());
-                        String userInfoJson = RedisUtil.getFieldValue(UserConstant.REDIS_USER_INFO_KEY, result[0]);
-                        if(userInfoJson != null){
-                            return JsonUtil.jsonToObject(userInfoJson, UserInfo.class);
-                        }
                         UserInfoModel userInfo = userInfoService.getUserInfo(Long.valueOf(result[0]));
-                        return JsonUtil.convert(userInfo, UserInfo.class);
+                        userInfoService.selectGroups(Collections.singletonList(userInfo));
+                        InternalUserInfo internalUserInfo = JsonUtil.convert(userInfo, InternalUserInfo.class);
+                        return internalUserInfo;
                     }
                 } catch (Exception e) {
                     errorMsg = "服务器异常！";
