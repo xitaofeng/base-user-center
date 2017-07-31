@@ -122,5 +122,15 @@
           group_id = #{groupId,jdbcType=BIGINT}
         WHERE relation_id = #{relationId,jdbcType=BIGINT}
     </update>
+
+    <select id="getUserIdsByGroupIds" resultType="java.lang.Long">
+        SELECT
+        DISTINCT user_id
+        FROM user_info_group_relation
+        WHERE group_id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
+    </select>
       
 </mapper>

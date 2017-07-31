@@ -16,7 +16,7 @@ public class DataAuthorization implements Serializable {
     @NotNull(groups = ValidationType.Add.class)
     private Long resourceId;
 
-    private List<DataAuthorizationRole> authRoleList;
+    private List<DataAuthorizationUserGroup> authUserGroupList;
 
     private List<DataAuthorizationUser> authUserList;
 
@@ -24,16 +24,26 @@ public class DataAuthorization implements Serializable {
         return resourceId;
     }
 
+    public boolean isAdmin;
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
+
+    public List<DataAuthorizationUserGroup> getAuthUserGroupList() {
+        return authUserGroupList;
+    }
+
+    public void setAuthUserGroupList(List<DataAuthorizationUserGroup> authUserGroupList) {
+        this.authUserGroupList = authUserGroupList;
+    }
+
     public void setResourceId(Long resourceId) {
         this.resourceId = resourceId;
-    }
-
-    public List<DataAuthorizationRole> getAuthRoleList() {
-        return authRoleList;
-    }
-
-    public void setAuthRoleList(List<DataAuthorizationRole> authRoleList) {
-        this.authRoleList = authRoleList;
     }
 
     public List<DataAuthorizationUser> getAuthUserList() {

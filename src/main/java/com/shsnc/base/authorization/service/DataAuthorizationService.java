@@ -1,10 +1,7 @@
 package com.shsnc.base.authorization.service;
 
 import com.shsnc.api.core.validation.ValidationType;
-import com.shsnc.base.authorization.bean.DataAuthorization;
-import com.shsnc.base.authorization.bean.DataAuthorizationRole;
-import com.shsnc.base.authorization.bean.DataAuthorizationUser;
-import com.shsnc.base.authorization.bean.UserDataAuthorization;
+import com.shsnc.base.authorization.bean.*;
 import com.shsnc.base.authorization.config.AuthorizationUtil;
 import com.shsnc.base.authorization.config.BeanUtils;
 import com.shsnc.base.authorization.config.RedisConstants;
@@ -12,6 +9,7 @@ import com.shsnc.base.authorization.mapper.AuthorizationResourceAuthModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationResourceAuthModel;
 import com.shsnc.base.authorization.model.AuthorizationResourceAuthModel.EnumAuthType;
+import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.RedisUtil;
 import com.shsnc.base.util.StringUtil;
@@ -47,6 +45,9 @@ public class DataAuthorizationService {
     @Autowired
     private AuthorizationUserRoleRelationModelMapper authorizationUserRoleRelationModelMapper;
 
+    @Autowired
+    private UserInfoGroupRelationModelMapper userInfoGroupRelationModelMapper;
+
     /**
      * 用户授权
      *
@@ -73,22 +74,22 @@ public class DataAuthorizationService {
     /**
      * 角色授权
      *
-     * @param resourceTypeCode 资源类型
+     * @param resourceTypeCode  资源类型
      * @param resourceId
-     * @param authRoleList
+     * @param authUserGroupList
      * @return
      */
     @Transactional
-    public List<AuthorizationResourceAuthModel> roleAuth(String resourceTypeCode, Long resourceId, List<DataAuthorizationRole> authRoleList) throws BizException {
-        if (CollectionUtils.isEmpty(authRoleList)) {
-            throw new BizException("选择授权的角色");
+    public List<AuthorizationResourceAuthModel> userGroupAuth(String resourceTypeCode, Long resourceId, List<DataAuthorizationUserGroup> authUserGroupList) throws BizException {
+        if (CollectionUtils.isEmpty(authUserGroupList)) {
+            throw new BizException("选择授权的组");
         }
 
         List<AuthorizationResourceAuthModel> authorizationResourceAuthModels = new ArrayList<>();
-        for (DataAuthorizationRole dataAuthorizationRole : authRoleList) {
-            Long roleId = dataAuthorizationRole.getRoleId();
-            List<Long> propertyIdList = dataAuthorizationRole.getPropertyIdList();
-            authorizationResourceAuthModels.addAll(buildAuthorizationResourceAuthModel(resourceTypeCode, resourceId, EnumAuthType.ROLE, roleId, propertyIdList));
+        for (DataAuthorizationUserGroup dataAuthorizationUserGroup : authUserGroupList) {
+            Long groupId = dataAuthorizationUserGroup.getGroupId();
+            List<Long> propertyIdList = dataAuthorizationUserGroup.getPropertyIdList();
+            authorizationResourceAuthModels.addAll(buildAuthorizationResourceAuthModel(resourceTypeCode, resourceId, EnumAuthType.GROUP, groupId, propertyIdList));
         }
         return authorizationResourceAuthModels;
     }
@@ -109,7 +110,7 @@ public class DataAuthorizationService {
         List<AuthorizationResourceAuthModel> authorizationResourceAuthModels = new ArrayList<>();
         for (DataAuthorization dataAuthorization : dataAuthorizationList) {
             Long resourceId = dataAuthorization.getResourceId();
-            List<DataAuthorizationRole> authRoleList = dataAuthorization.getAuthRoleList();
+            List<DataAuthorizationUserGroup> authUserGroupList = dataAuthorization.getAuthUserGroupList();
             List<DataAuthorizationUser> authUserList = dataAuthorization.getAuthUserList();
 
             //构建 用户数据授权对象
@@ -117,9 +118,9 @@ public class DataAuthorizationService {
                 authorizationResourceAuthModels.addAll(userAuth(resourceTypeCode, resourceId, authUserList));
             }
 
-            //构建 角色数据授权对象
-            if (!CollectionUtils.isEmpty(authRoleList)) {
-                authorizationResourceAuthModels.addAll(roleAuth(resourceTypeCode, resourceId, authRoleList));
+            //构建 用户数据授权对象
+            if (!CollectionUtils.isEmpty(authUserGroupList)) {
+                authorizationResourceAuthModels.addAll(userGroupAuth(resourceTypeCode, resourceId, authUserGroupList));
             }
         }
 
@@ -131,6 +132,7 @@ public class DataAuthorizationService {
             //插入成功 - 清理redis缓存
             Set<Long> userIdList = new HashSet<>();
             List<Long> roleIdList = new ArrayList<>();
+            List<Long> userGroupIdList = new ArrayList<>();
             for (AuthorizationResourceAuthModel authorizationResourceAuthModel : authorizationResourceAuthModels) {
                 Integer authType = authorizationResourceAuthModel.getAuthType();
                 Long authValue = authorizationResourceAuthModel.getAuthValue();
@@ -140,12 +142,24 @@ public class DataAuthorizationService {
                 if (EnumAuthType.ROLE.getValue() == authType) {
                     roleIdList.add(authValue);
                 }
+                if (EnumAuthType.GROUP.getValue() == authType) {
+                    userGroupIdList.add(authValue);
+                }
             }
 
+            //角色转用户
             if (!CollectionUtils.isEmpty(roleIdList)) {
                 List<Long> tempList = authorizationUserRoleRelationModelMapper.getUserIdByRoleIds(roleIdList);
-                for (Long userId : tempList) {
-                    userIdList.add(userId);
+                if(!CollectionUtils.isEmpty(tempList)) {
+                    userIdList.addAll(tempList);
+                }
+            }
+
+            //组转用户
+            if (!CollectionUtils.isEmpty(userGroupIdList)) {
+                List<Long> tempList = userInfoGroupRelationModelMapper.getUserIdsByGroupIds(userGroupIdList);
+                if(!CollectionUtils.isEmpty(tempList)) {
+                    userIdList.addAll(tempList);
                 }
             }
             AuthorizationUtil.removeUserDataAuthorization(userIdList);

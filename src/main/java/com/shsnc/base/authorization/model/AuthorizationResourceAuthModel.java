@@ -35,7 +35,9 @@ public class AuthorizationResourceAuthModel implements Serializable {
         //用户
         USER(1),
         //角色
-        ROLE(2);
+        ROLE(2),
+        //组
+        GROUP(3);
 
         private Integer value;
 
