@@ -49,7 +49,6 @@ public class InternalHandler implements RequestHandler {
                         UserInfoModel userInfo = userInfoService.getUserInfo(Long.valueOf(result[0]));
                         userInfoService.selectGroups(Collections.singletonList(userInfo));
                         InternalUserInfo internalUserInfo = JsonUtil.convert(userInfo, InternalUserInfo.class);
-                        internalUserInfo.setAdmin(userInfo.getInternal().equals(UserConstant.USER_INTERNAL_TRUE));
                         return internalUserInfo;
                     }
                 } catch (Exception e) {
