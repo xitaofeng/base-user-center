@@ -226,4 +226,14 @@
             #{organizationId}
         </foreach>
     </select>
+    <select id="getOrganizationTree" resultMap="BaseResultMap">
+        SELECT o.*, op.ancestor_id parent_id
+        FROM user_organization o
+            <if test="parentId != null">
+            JOIN user_organization_structure os
+                ON o.organization_id=os.descendant_id AND os.ancestor_id=#{parentId}
+            </if>
+            LEFT JOIN (SELECT * FROM user_organization_structure WHERE LEVEL=1) op
+                ON o.organization_id=op.descendant_id
+    </select>
 </mapper>

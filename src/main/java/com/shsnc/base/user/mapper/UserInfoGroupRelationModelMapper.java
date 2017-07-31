@@ -25,4 +25,10 @@ public interface UserInfoGroupRelationModelMapper {
     List<Long> getGroupIdsByUserId(Long userId);
 
     List<UserInfoGroupRelationModel> getByUserIds(@Param("userIds") List<Long> userIds);
+
+    int deleteByGroupId(Long groupId);
+
+    List<Long> getUserIdsByGroupId(Long groupId);
+
+    List<UserInfoGroupRelationModel> getByGroupids(@Param("groupIds") List<Long> groupIds);
 }

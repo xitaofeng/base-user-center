@@ -38,6 +38,14 @@
         DELETE FROM user_info_organization_relation WHERE organization_id IN (SELECT descendant_id FROM user_organization_structure WHERE ancestor_id=#{organizationId})
     </delete>
 
+    <delete id="deleteByUserIds">
+        DELETE FROM user_info_organization_relation
+        WHERE user_id IN
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+    </delete>
+
     <insert id="insert" useGeneratedKeys="true" keyProperty="relationId">
         INSERT INTO user_info_organization_relation (user_id, organization_id)
         VALUES (#{userId}, #{organizationId})

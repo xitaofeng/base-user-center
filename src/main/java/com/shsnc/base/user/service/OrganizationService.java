@@ -206,4 +206,7 @@ public class OrganizationService {
         return  organizationModelMapper.getOrganizationNodeList(parentId);
     }
 
+    public List<OrganizationModel> getTreeList(Long parentId) {
+        return organizationModelMapper.getOrganizationTree(parentId);
+    }
 }

@@ -6,6 +6,7 @@ import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
 import com.shsnc.base.user.bean.Organization;
+import com.shsnc.base.user.bean.OrganizationNode;
 import com.shsnc.base.user.bean.OrganizationParam;
 import com.shsnc.base.user.model.OrganizationCondition;
 import com.shsnc.base.user.model.OrganizationModel;
@@ -18,7 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 组织部门管理
@@ -59,6 +62,33 @@ public class OrganizationHandler implements RequestHandler {
         return JsonUtil.convert(organizationModels, List.class, Organization.class);
     }
 
+    @RequestMapper("/getTree")
+    @Authentication("BASE_USER_ORGANIZATION_GET_TREE")
+    public List<OrganizationNode> getTree(Long rootId){
+        List<OrganizationNode> roots = new ArrayList<>();
+        List<OrganizationModel> organizationModels = organizationService.getTreeList(rootId);
+        List<OrganizationNode> nodelList = JsonUtil.convert(organizationModels, List.class, OrganizationNode.class);
+        for (OrganizationNode child : nodelList) {
+            boolean mark = false;
+            for (OrganizationNode parent : nodelList) {
+                if(child.getParentId() != null && child.getParentId().equals(parent.getOrganizationId())){
+                    parent.addChild(child);
+                    break;
+                }
+
+            }
+            if(child.getParentId() == rootId){
+                roots.add(child);
+            }
+        }
+        return roots;
+    }
+
+
+    private void getChildren(List<OrganizationNode> parents, Map<Long, OrganizationModel> organizationModelMap) {
+
+    }
+
 
     @RequestMapper("/add")
     @Authentication("BASE_USER_ORGANIZATION_ADD")
@@ -89,5 +119,7 @@ public class OrganizationHandler implements RequestHandler {
     public boolean deleteTree(@NotNull Long organizationId) throws BizException {
         return organizationService.deleteOrganizationTree(organizationId);
     }
+
+
 
 }
