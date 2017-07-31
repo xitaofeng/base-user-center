@@ -16,7 +16,7 @@
     </resultMap>
 
     <sql id="BaseColumn">
-        property_id,resource_type,resource_type_name,property_name,property_value,parent_id
+        property_id,resource_type_code,resource_type_name,property_name,property_value,parent_id
     </sql>
 
     <!-- SQL语句格式美化，关键字用大写字母 -->
