@@ -6,6 +6,7 @@ import com.shsnc.api.core.validation.Validate;
 import com.shsnc.base.user.bean.InternalUserInfo;
 import com.shsnc.base.user.config.ServerConfig;
 import com.shsnc.base.user.config.UserConstant;
+import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.user.support.token.SimpleTokenProvider;
@@ -18,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by houguangqiang on 2017/6/11.
@@ -30,6 +31,8 @@ public class InternalHandler implements RequestHandler {
     private Logger logger = LoggerFactory.getLogger(InternalHandler.class);
     @Autowired
     private UserInfoService userInfoService;
+    @Autowired
+    private UserInfoGroupRelationModelMapper userInfoGroupRelationModelMapper;
 
     @RequestMapper("/authenticate")
     @Validate
@@ -47,9 +50,9 @@ public class InternalHandler implements RequestHandler {
                     if(success){
                         RedisUtil.setFieldValue(UserConstant.REDIS_LOGIN_KEY, result[1], token, ServerConfig.getSessionTime());
                         UserInfoModel userInfo = userInfoService.getUserInfo(Long.valueOf(result[0]));
-                        userInfoService.selectGroups(Collections.singletonList(userInfo));
+                        List<Long> groupIds = userInfoGroupRelationModelMapper.getGroupIdsByUserId(userInfo.getUserId());
                         InternalUserInfo internalUserInfo = JsonUtil.convert(userInfo, InternalUserInfo.class);
-                        internalUserInfo.setAdmin(userInfo.getInternal().equals(UserConstant.USER_INTERNAL_TRUE));
+                        internalUserInfo.setGroupIds(groupIds);
                         return internalUserInfo;
                     }
                 } catch (Exception e) {

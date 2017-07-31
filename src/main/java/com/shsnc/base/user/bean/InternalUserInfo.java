@@ -1,5 +1,7 @@
 package com.shsnc.base.user.bean;
 
+import com.shsnc.base.user.config.UserConstant;
+
 import java.util.List;
 
 /**
@@ -14,8 +16,9 @@ public class InternalUserInfo {
     private String alias;
     private String mobile;
     private String email;
-    private Boolean admin;
+    private Integer internal;
     private Integer status;
+    private boolean superAdmin;
     private List<Long> groupIds;
 
     public Long getUserId() {
@@ -58,12 +61,12 @@ public class InternalUserInfo {
         this.email = email;
     }
 
-    public Boolean isAdmin() {
-        return admin;
+    public Integer getInternal() {
+        return internal;
     }
 
-    public void setAdmin(Boolean admin) {
-        this.admin = admin;
+    public void setInternal(Integer internal) {
+        this.internal = internal;
     }
 
     public Integer getStatus() {
@@ -80,5 +83,13 @@ public class InternalUserInfo {
 
     public void setGroupIds(List<Long> groupIds) {
         this.groupIds = groupIds;
+    }
+
+    public boolean getSuperAdmin() {
+        return this.internal == UserConstant.USER_INTERNAL_TRUE;
+}
+
+    public void setSuperAdmin(Boolean superAdmin) {
+        this.superAdmin = superAdmin;
     }
 }
