@@ -27,6 +27,7 @@
         FROM user_info_group_relation
         WHERE user_id=#{userId}
     </select>
+
     <select id="getByUserIds" resultMap="BaseResultMap">
         SELECT
             <include refid="BaseColumn" />
@@ -34,6 +35,23 @@
         WHERE user_id IN
         <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
             #{userId}
+        </foreach>
+    </select>
+
+    <select id="getUserIdsByGroupId" resultType="java.lang.Long">
+        SELECT
+            user_id
+        FROM user_info_group_relation
+        WHERE group_id=#{groupId}
+    </select>
+
+    <select id="getByGroupids" resultType="com.shsnc.base.user.model.UserInfoGroupRelationModel">
+        SELECT
+            <include refid="BaseColumn" />
+        FROM user_info_group_relation
+        WHERE group_id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
         </foreach>
     </select>
 
@@ -45,6 +63,10 @@
     <delete id="deleteByUserId">
         DELETE FROM user_info_group_relation
         WHERE user_id = #{userId}
+    </delete>
+    <delete id="deleteByGroupId">
+        DELETE FROM user_info_group_relation
+        WHERE group_id = #{groupId}
     </delete>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="relationId" >

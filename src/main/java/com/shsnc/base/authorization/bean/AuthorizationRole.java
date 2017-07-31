@@ -1,10 +1,12 @@
 package com.shsnc.base.authorization.bean;
 
+import com.shsnc.api.core.UserInfo;
 import com.shsnc.api.core.validation.ValidationType;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by Elena on 2017/6/7.
@@ -30,6 +32,8 @@ public class AuthorizationRole implements Serializable {
     private Long createTime;
 
     private Integer orders;
+
+    private List<UserInfo> users;
 
     public String getRoleCode() {
         return roleCode;
@@ -85,5 +89,13 @@ public class AuthorizationRole implements Serializable {
 
     public void setOrders(Integer orders) {
         this.orders = orders;
+    }
+
+    public List<UserInfo> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<UserInfo> users) {
+        this.users = users;
     }
 }

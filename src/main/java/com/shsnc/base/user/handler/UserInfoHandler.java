@@ -52,6 +52,13 @@ public class UserInfoHandler implements RequestHandler {
         return queryData.convert(UserInfo.class);
     }
 
+    @RequestMapper("/findUsers")
+    @Authentication("BASE_USER_INFO_FIND_USERS")
+    public List<UserInfo> findUsers(UserInfoCondition condition){
+        List<UserInfoModel> users = userInfoService.findUsers(condition);
+        return JsonUtil.convert(users, List.class, UserInfo.class);
+    }
+
     @RequestMapper("/getObject")
     @Validate
     @Authentication("BASE_USER_INFO_GET_OBJECT")
@@ -128,5 +135,12 @@ public class UserInfoHandler implements RequestHandler {
     @Authentication("BASE_USER_INFO_RESET_PASSWORD")
     public boolean resetPassword(@NotNull Long userId, @NotNull String newPassword) throws BizException {
         return userInfoService.updatePassword(userId,newPassword);
+    }
+
+    @RequestMapper("/moveToOrganization")
+    @Authentication("BASE_USER_ORGANIZATION_MOVE_TO_ORGANIZATION")
+    @Validate
+    public boolean moveToOrganization(@NotNull Long userId, @NotNull Long organizationId) throws BizException {
+        return userInfoService.moveToOrganization(Collections.singletonList(userId), organizationId);
     }
 }

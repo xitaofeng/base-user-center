@@ -7,8 +7,12 @@ import com.shsnc.base.authorization.mapper.AuthorizationGroupRoleRelationModelMa
 import com.shsnc.base.authorization.mapper.AuthorizationRoleModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationRoleModel;
+import com.shsnc.base.authorization.model.AuthorizationUserRoleRelationModel;
 import com.shsnc.base.authorization.model.condition.AuthorizationRoleCondition;
+import com.shsnc.base.user.mapper.UserInfoModelMapper;
+import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.util.StringUtil;
+import com.shsnc.base.util.bean.RelationMap;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
@@ -20,6 +24,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by Elena on 2017/6/7.
@@ -35,6 +40,9 @@ public class AuthorizationRoleService {
 
     @Autowired
     private AuthorizationGroupRoleRelationModelMapper authorizationGroupRoleRelationModelMapper;
+
+    @Autowired
+    private UserInfoModelMapper userInfoModelMapper;
 
     /**
      * 添加 角色 信息
@@ -199,10 +207,31 @@ public class AuthorizationRoleService {
         int totalCount = authorizationRoleModelMapper.getTotalCountByCondition(condition);
         queryData.setRowCount(totalCount);
         List<AuthorizationRoleModel> list = authorizationRoleModelMapper.getPageByCondition(condition, pagination);
+        selectUsers(list);
         queryData.setRecords(list);
         return queryData;
     }
 
+    public void selectUsers(List<AuthorizationRoleModel> authorizationRoleModels) {
+        if (org.apache.commons.collections4.CollectionUtils.isEmpty(authorizationRoleModels)) {
+            return;
+        }
+        List<Long> roleIds = authorizationRoleModels.stream().map(AuthorizationRoleModel::getRoleId).collect(Collectors.toList());
+        if (!roleIds.isEmpty()) {
+            List<AuthorizationUserRoleRelationModel> relations = authorizationUserRoleRelationModelMapper.getByRoleIds(roleIds);
+            RelationMap relationMap = new RelationMap();
+            for (AuthorizationUserRoleRelationModel relation : relations) {
+                relationMap.addRelation(relation.getRoleId(),relation.getUserId());
+            }
+            if (relationMap.hasRelatedIds()) {
+                List<UserInfoModel> userInfoModels = userInfoModelMapper.getByUserIds(relationMap.getRelatedIds());
+                Map<Long, UserInfoModel> userInfoModelMap = userInfoModels.stream().collect(Collectors.toMap(UserInfoModel::getUserId, x -> x, (oldValue, newValue)->oldValue));
+                for (AuthorizationRoleModel authorizationRoleModel : authorizationRoleModels) {
+                    authorizationRoleModel.setUsers(relationMap.getRelatedObjects(authorizationRoleModel.getRoleId(),userInfoModelMap));
+                }
+            }
+        }
+    }
 
 
     /**

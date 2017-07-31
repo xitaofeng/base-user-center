@@ -89,6 +89,23 @@
         LIMIT 1
     </select>
 
+    <sql id="pageSql">
+        <if test="pagination != null" >
+            LIMIT #{pagination.start}, #{pagination.pagesize}
+        </if>
+    </sql>
+
+    <sql id="orderSql">
+        <if test="pagination != null">
+            <if test="pagination.sorting != null">
+                ORDER BY ${pagination.sorting}
+            </if>
+            <if test="pagination.sorting != null">
+                ORDER BY property_id DESC
+            </if>
+        </if>
+    </sql>
+
     <sql id="conditionSql">
         <where>
             <if test="condition != null">
@@ -111,8 +128,8 @@
             <include refid="BaseColumn"/>
         FROM user_extend_property
         <include refid="conditionSql"/>
-        <include refid="Sql.orderSql"/>
-        <include refid="Sql.pageSql"/>
+        <include refid="orderSql"/>
+        <include refid="pageSql"/>
     </select>
 
     <select id="getExtendPropertyList" resultMap="BaseResultMap">

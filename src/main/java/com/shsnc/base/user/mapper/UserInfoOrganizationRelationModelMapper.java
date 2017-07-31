@@ -35,4 +35,6 @@ public interface UserInfoOrganizationRelationModelMapper {
     List<UserInfoOrganizationRelationModel> getByUserIds(@Param("userIds") Collection<Long> userIds);
 
     UserInfoOrganizationRelationModel getByUserId(Long userId);
+
+    int deleteByUserIds(@Param("userIds") List<Long> userIds);
 }

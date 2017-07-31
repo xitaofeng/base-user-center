@@ -1,14 +1,14 @@
 package com.shsnc.base.user.service;
 
 import com.shsnc.base.user.mapper.OrganizationModelMapper;
-import com.shsnc.base.user.mapper.UserInfoOrganizationRelationModelMapper;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;
+import com.shsnc.base.user.mapper.UserInfoOrganizationRelationModelMapper;
 import com.shsnc.base.user.model.OrganizationModel;
-import com.shsnc.base.user.model.UserInfoOrganizationRelationModel;
 import com.shsnc.base.user.model.UserInfoModel;
+import com.shsnc.base.user.model.UserInfoOrganizationRelationModel;
 import com.shsnc.base.user.support.Assert;
+import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.config.BizException;
-import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,5 +58,27 @@ public class UserInfoOrganizationRelationService {
         }
         this.addUserInfoOrganizationRelation(userId, organizationId);
         return true;
+    }
+
+    public boolean batchUpdateUserToOrganizationRelation(List<Long> userIds, Long organizationId) throws BizException {
+        BizAssert.notEmpty(userIds, "用户id不能为空");
+        BizAssert.notNull(organizationId, "组织部门id不能为空！");
+
+        List<Long> dbUserIds = userInfoModelMapper.getUserIdsByUserIds(userIds);
+        BizAssert.isTrue(dbUserIds.size() == userIds.size(), "含有不存在的用户id");
+
+        OrganizationModel organizationModel = organizationModelMapper.selectByPrimaryKey(organizationId);
+        BizAssert.notNull(organizationModel, "组织部门id不存在！");
+
+        userInfoOrganizationRelationModelMapper.deleteByUserIds(userIds);
+
+        List<UserInfoOrganizationRelationModel> userInfoOrganizationRelationModels = new ArrayList<>();
+        for (Long userId : userIds) {
+            UserInfoOrganizationRelationModel userInfoOrganizationRelationModel = new UserInfoOrganizationRelationModel();
+            userInfoOrganizationRelationModel.setOrganizationId(organizationId);
+            userInfoOrganizationRelationModel.setUserId(userId);
+            userInfoOrganizationRelationModels.add(userInfoOrganizationRelationModel);
+        }
+        return userInfoOrganizationRelationModelMapper.insertRelationList(userInfoOrganizationRelationModels) > 0;
     }
 }

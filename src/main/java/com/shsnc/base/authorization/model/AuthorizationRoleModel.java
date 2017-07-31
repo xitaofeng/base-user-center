@@ -1,6 +1,9 @@
 package com.shsnc.base.authorization.model;
 
+import com.shsnc.base.user.model.UserInfoModel;
+
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by LuoJun on 2017/6/6.
@@ -20,6 +23,8 @@ public class AuthorizationRoleModel implements Serializable {
     private Long createTime;
 
     private Integer orders;
+
+    private List<UserInfoModel> users;
 
     public String getRoleCode() {
         return roleCode;
@@ -95,5 +100,13 @@ public class AuthorizationRoleModel implements Serializable {
 
     public void setOrders(Integer orders) {
         this.orders = orders;
+    }
+
+    public List<UserInfoModel> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<UserInfoModel> users) {
+        this.users = users;
     }
 }

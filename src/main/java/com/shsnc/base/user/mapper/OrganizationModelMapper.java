@@ -42,4 +42,6 @@ public interface OrganizationModelMapper {
     List<OrganizationModel> getOrganizationsByUserIds(@Param("userIds") Collection<Long> userIds);
 
     List<OrganizationModel> getByOrganizationIdIds(@Param("organizationIds") Collection<Long> organizationIds);
+
+    List<OrganizationModel> getOrganizationTree(Long parentId);
 }

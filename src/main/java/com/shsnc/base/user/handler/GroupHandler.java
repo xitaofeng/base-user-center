@@ -91,4 +91,11 @@ public class GroupHandler implements RequestHandler {
     public boolean batchDelete(@NotEmpty List<Long> groupIds) throws BizException {
         return groupService.batchDeleteGroup(groupIds);
     }
+
+    @RequestMapper("/assignUsers")
+    @Validate
+    @Authentication("BASE_USER_GROUP_ASSIGN_USERS")
+    public boolean assignUsers(@NotNull Long groupId, @NotEmpty List<Long> userIds) throws BizException {
+        return groupService.assignUsers(groupId, userIds);
+    }
 }
