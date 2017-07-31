@@ -62,4 +62,6 @@ public interface AuthorizationUserRoleRelationModelMapper {
      * @return
      */
     Integer getCountByUserIdAndRoleCode(@Param("userId") Long userId,@Param("roleCode") String code);
+
+    List<AuthorizationUserRoleRelationModel> getByRoleIds(@Param("roleIds") List<Long> roleIds);
 }
