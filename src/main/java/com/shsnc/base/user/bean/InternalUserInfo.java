@@ -1,5 +1,7 @@
 package com.shsnc.base.user.bean;
 
+import com.shsnc.base.user.config.UserConstant;
+
 import java.util.List;
 
 /**
@@ -16,6 +18,7 @@ public class InternalUserInfo {
     private String email;
     private Integer internal;
     private Integer status;
+    private boolean superAdmin;
     private List<Long> groupIds;
 
     public Long getUserId() {
@@ -80,5 +83,13 @@ public class InternalUserInfo {
 
     public void setGroupIds(List<Long> groupIds) {
         this.groupIds = groupIds;
+    }
+
+    public boolean getSuperAdmin() {
+        return this.internal == UserConstant.USER_INTERNAL_TRUE;
+}
+
+    public void setSuperAdmin(Boolean superAdmin) {
+        this.superAdmin = superAdmin;
     }
 }
