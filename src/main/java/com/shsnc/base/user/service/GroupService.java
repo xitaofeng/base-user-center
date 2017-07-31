@@ -82,7 +82,7 @@ public class GroupService {
             List<UserInfoGroupRelationModel> relations = userInfoGroupRelationModelMapper.getByGroupids(groupIds);
             RelationMap relationMap = new RelationMap();
             for (UserInfoGroupRelationModel relation : relations) {
-                relationMap.addRelation(relation.getRelationId(),relation.getUserId());
+                relationMap.addRelation(relation.getGroupId(),relation.getUserId());
             }
             if (relationMap.hasRelatedIds()) {
                 List<UserInfoModel> userInfoModels = userInfoModelMapper.getByUserIds(relationMap.getRelatedIds());
