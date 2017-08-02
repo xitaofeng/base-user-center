@@ -17,19 +17,22 @@ public interface AuthorizationResourceAuthModelMapper {
 
     /**
      * 删除资源数据权限
+     *
      * @param resourceTypeCode
      * @param authType
      * @param authValue
      * @param resourceId
      * @return
      */
-    Integer deleteResourceDataAuthorization(@Param("authType") Integer authType,@Param("authValue") Long authValue,@Param("resourceTypeCode") String resourceTypeCode,@Param("resourceId") Long resourceId);
+    Integer deleteResourceDataAuthorization(@Param("authType") Integer authType, @Param("authValue") Long authValue, @Param("resourceTypeCode") String resourceTypeCode, @Param("resourceId") Long resourceId);
 
     /**
      * 获取用户授权列表
+     *
      * @param userId
      * @param roleIds
+     * @param userGroupIds
      * @return
      */
-    List<UserDataAuthorization> getUserDataAuthorization(@Param("userId") Long userId,@Param("roleIds") List<Long> roleIds);
+    List<UserDataAuthorization> getUserDataAuthorization(@Param("userId") Long userId, @Param("roleIds") List<Long> roleIds, @Param("userGroupIds") List<Long> userGroupIds);
 }

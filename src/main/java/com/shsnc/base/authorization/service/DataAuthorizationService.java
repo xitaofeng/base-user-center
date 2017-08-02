@@ -150,7 +150,7 @@ public class DataAuthorizationService {
             //角色转用户
             if (!CollectionUtils.isEmpty(roleIdList)) {
                 List<Long> tempList = authorizationUserRoleRelationModelMapper.getUserIdByRoleIds(roleIdList);
-                if(!CollectionUtils.isEmpty(tempList)) {
+                if (!CollectionUtils.isEmpty(tempList)) {
                     userIdList.addAll(tempList);
                 }
             }
@@ -158,7 +158,7 @@ public class DataAuthorizationService {
             //组转用户
             if (!CollectionUtils.isEmpty(userGroupIdList)) {
                 List<Long> tempList = userInfoGroupRelationModelMapper.getUserIdsByGroupIds(userGroupIdList);
-                if(!CollectionUtils.isEmpty(tempList)) {
+                if (!CollectionUtils.isEmpty(tempList)) {
                     userIdList.addAll(tempList);
                 }
             }
@@ -177,7 +177,7 @@ public class DataAuthorizationService {
      * @param authorizationPropertyValue 权限属性值
      * @return
      */
-    public Map<Long, String> getUserAutValuehListByResourceTypeAndPropertyValue(Long userId, String resourceTypeCode, String authorizationPropertyValue) {
+    public Map<Long, String> getUserAutValueListByResourceTypeAndPropertyValue(Long userId, String resourceTypeCode, String authorizationPropertyValue) {
 
         //根据key 直接取用户对应资源的权限值 取不到加载用户权限数据
         Map<String, String> userAuthMap = RedisUtil.getMap(RedisConstants.userResourceDataAuthorizationKey(userId));
@@ -286,7 +286,7 @@ public class DataAuthorizationService {
      * @return
      */
     public Map<String, String> getDataAuthorization(Long userId) {
-        Map<String, String> dataAuthorizationMap = new HashMap<String, String>();
+        Map<String, String> dataAuthorizationMap;
         //读取redis 数据不存在 重新加载
         String resourceDataAuthorizationKey = RedisConstants.userResourceDataAuthorizationKey(userId);
         dataAuthorizationMap = RedisUtil.getMap(resourceDataAuthorizationKey);
@@ -294,9 +294,10 @@ public class DataAuthorizationService {
         if (CollectionUtils.isEmpty(dataAuthorizationMap)) {
             //加载数据 map 数据格式 Map<userId,dataAuthorizationMap>
             List<Long> roleIds = userModuleService.getRoleIdsByUserId(userId);
-            List<UserDataAuthorization> userDataAuthorizations = authorizationResourceAuthModelMapper.getUserDataAuthorization(userId, roleIds);
+            List<Long> userGroupIds = userInfoGroupRelationModelMapper.getGroupIdsByUserId(userId);
+            List<UserDataAuthorization> userDataAuthorizations = authorizationResourceAuthModelMapper.getUserDataAuthorization(userId, roleIds, userGroupIds);
 
-            HashMap<Long, String> map = new HashMap<>();
+            HashMap<Long, String> map;
             for (UserDataAuthorization userDataAuthorization : userDataAuthorizations) {
                 String resourceTypeCode = userDataAuthorization.getResourceTypeCode();
                 Long resourceId = userDataAuthorization.getResourceId();
@@ -317,10 +318,19 @@ public class DataAuthorizationService {
                 dataAuthorizationMap.put(resourceTypeCode, JsonUtil.toJsonString(map));
             }
             if (!CollectionUtils.isEmpty(dataAuthorizationMap)) {
+                System.out.println("接口有问题:" + JsonUtil.toJsonString(dataAuthorizationMap));
                 RedisUtil.saveMap(resourceDataAuthorizationKey, dataAuthorizationMap);
             }
         }
         return dataAuthorizationMap;
+    }
+
+    public static void main(String[] args) {
+        Map<String, String> dataAuthorizationMap = null;
+        if (!CollectionUtils.isEmpty(dataAuthorizationMap)) {
+            System.out.println("接口有问题:" + JsonUtil.toJsonString(dataAuthorizationMap));
+        }
+        System.out.println(!CollectionUtils.isEmpty(dataAuthorizationMap));
     }
 
 
