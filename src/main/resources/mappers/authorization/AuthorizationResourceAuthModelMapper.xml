@@ -63,10 +63,19 @@
         authorization_resource_auth a INNER JOIN authorization_resource_property p ON a.property_id = p.property_id
         WHERE
         (a.auth_type = 1 AND a.auth_value = #{userId})
+        <!-- 角色权限 -->
         <if test="roleIds != null and roleIds.size > 0">
             OR (a.auth_type = 2 AND a.auth_value IN
             <foreach collection="roleIds" item="roleId" open="(" close=")" separator=",">
                 #{roleId}
+            </foreach>
+            )
+        </if>
+        <!-- 组权限 -->
+        <if test="userGroupIds != null and userGroupIds.size > 0">
+            OR (a.auth_type = 3 AND a.auth_value IN
+            <foreach collection="userGroupIds" item="userGroupId" open="(" close=")" separator=",">
+                #{userGroupId}
             </foreach>
             )
         </if>
