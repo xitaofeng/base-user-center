@@ -31,7 +31,7 @@ public class DataAuthorizationHandler implements RequestHandler {
     @RequestMapper("")
     @Validate(groups = ValidationType.Add.class)
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_DATA")
-    public boolean auth(@NotNull String resourceTypeCode, List<DataAuthorization> dataAuthorizationList) throws BizException {
+    public boolean auth(@NotNull String resourceTypeCode,@NotEmpty List<DataAuthorization> dataAuthorizationList) throws BizException {
         return dataAuthorizationService.auth(resourceTypeCode, dataAuthorizationList);
     }
 
