@@ -31,4 +31,6 @@ public interface UserInfoGroupRelationModelMapper {
     List<Long> getUserIdsByGroupId(Long groupId);
 
     List<UserInfoGroupRelationModel> getByGroupids(@Param("groupIds") List<Long> groupIds);
+
+    List<Long> getUserIdsByGroupIds(@Param("groupIds") List<Long> groupIds);
 }

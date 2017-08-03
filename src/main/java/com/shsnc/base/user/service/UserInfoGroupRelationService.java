@@ -1,5 +1,6 @@
 package com.shsnc.base.user.service;
 
+import com.shsnc.base.authorization.config.AuthorizationUtil;
 import com.shsnc.base.user.mapper.GroupModelMapper;
 import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;
@@ -9,11 +10,14 @@ import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.config.BizException;
 import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections.SetUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author houguangqiang
@@ -31,7 +35,7 @@ public class UserInfoGroupRelationService {
     private GroupModelMapper groupModelMapper;
 
     public List<Long> batchAddUserInfoGroupRelation(Long userId, List<Long> groupIds) throws BizException {
-        BizAssert.notNull(userId,"用户id不能为空！");
+        BizAssert.notNull(userId, "用户id不能为空！");
         BizAssert.notEmpty(groupIds, "用户组id不能为空！");
         UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
         BizAssert.notNull(userInfoModel, "用户id不存在！");
@@ -39,7 +43,7 @@ public class UserInfoGroupRelationService {
         BizAssert.isTrue(dbGroupIds.size() == groupIds.size(), "含有不存在的用户组id！");
 
         List<UserInfoGroupRelationModel> userInfoGroupRelationModels = new ArrayList<>();
-        for(Long groupId : groupIds){
+        for (Long groupId : groupIds) {
             UserInfoGroupRelationModel relation = new UserInfoGroupRelationModel();
             relation.setGroupId(groupId);
             relation.setUserId(userId);
@@ -48,7 +52,7 @@ public class UserInfoGroupRelationService {
 
         userInfoGroupRelationModelMapper.insertRelationList(userInfoGroupRelationModels);
         List<Long> ids = new ArrayList<>();
-        for (UserInfoGroupRelationModel userInfoGroupRelationModel : userInfoGroupRelationModels){
+        for (UserInfoGroupRelationModel userInfoGroupRelationModel : userInfoGroupRelationModels) {
             ids.add(userInfoGroupRelationModel.getRelationId());
         }
         return ids;
@@ -59,17 +63,17 @@ public class UserInfoGroupRelationService {
         BizAssert.notNull(groupIds, "用户组id不能为空！");
         UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
         BizAssert.notNull(userInfoModel, "用户id不存在！");
-        if(groupIds.isEmpty()){
+        if (groupIds.isEmpty()) {
             return userInfoGroupRelationModelMapper.deleteByUserId(userId) > 0;
         } else {
             List<Long> dbGroupIds = userInfoGroupRelationModelMapper.getGroupIdsByUserId(userId);
             List<Long> deleteGroupIds = ListUtils.removeAll(dbGroupIds, groupIds);
-            if(!deleteGroupIds.isEmpty()){
+            if (!deleteGroupIds.isEmpty()) {
                 userInfoGroupRelationModelMapper.deleteByUserId(userId);
                 batchAddUserInfoGroupRelation(userId, groupIds);
             } else {
-                List<Long> addGroupIds = ListUtils.removeAll(groupIds,dbGroupIds);
-                if(!addGroupIds.isEmpty()){
+                List<Long> addGroupIds = ListUtils.removeAll(groupIds, dbGroupIds);
+                if (!addGroupIds.isEmpty()) {
                     batchAddUserInfoGroupRelation(userId, addGroupIds);
                 }
             }
@@ -81,13 +85,13 @@ public class UserInfoGroupRelationService {
         BizAssert.notNull(groupId, "用户组id不能为空！");
         BizAssert.notEmpty(userIds, "用户id不能为空！");
         GroupModel groupModel = groupModelMapper.selectByPrimaryKey(groupId);
-        BizAssert.notNull(groupModel, String.format("用户id【%s】不存在！",groupId));
+        BizAssert.notNull(groupModel, String.format("用户id【%s】不存在！", groupId));
         List<Long> dbUserIds = userInfoModelMapper.getUserIdsByUserIds(userIds);
         BizAssert.isTrue(userIds.size() == dbUserIds.size(), "含有不存在的用户组id");
 
 
         List<UserInfoGroupRelationModel> userInfoGroupRelationModels = new ArrayList<>();
-        for(Long userId : userIds){
+        for (Long userId : userIds) {
             UserInfoGroupRelationModel relation = new UserInfoGroupRelationModel();
             relation.setGroupId(groupId);
             relation.setUserId(userId);
@@ -96,7 +100,7 @@ public class UserInfoGroupRelationService {
 
         userInfoGroupRelationModelMapper.insertRelationList(userInfoGroupRelationModels);
         List<Long> ids = new ArrayList<>();
-        for (UserInfoGroupRelationModel userInfoGroupRelationModel : userInfoGroupRelationModels){
+        for (UserInfoGroupRelationModel userInfoGroupRelationModel : userInfoGroupRelationModels) {
             ids.add(userInfoGroupRelationModel.getRelationId());
         }
         return ids;
@@ -107,18 +111,27 @@ public class UserInfoGroupRelationService {
         BizAssert.notNull(userIds, "用户id不能为空！");
         GroupModel groupModel = groupModelMapper.selectByPrimaryKey(groupId);
         BizAssert.notNull(groupModel, "用户组id不存在！");
-        if(userIds.isEmpty()){
+        if (userIds.isEmpty()) {
             return userInfoGroupRelationModelMapper.deleteByGroupId(groupId) > 0;
         } else {
             List<Long> dbUserIds = userInfoGroupRelationModelMapper.getUserIdsByGroupId(groupId);
             List<Long> deleteUserIds = ListUtils.removeAll(dbUserIds, userIds);
-            if(!deleteUserIds.isEmpty()){
+            if (!deleteUserIds.isEmpty()) {
                 userInfoGroupRelationModelMapper.deleteByGroupId(groupId);
                 batchAddGroupUserInfoRelation(groupId, userIds);
+
+                //清理用户数据缓存
+                Set<Long> set = new HashSet<>();
+                set.addAll(userIds);//给set填充
+                AuthorizationUtil.removeUserDataAuthorization(set);
             } else {
-                List<Long> addUserIds = ListUtils.removeAll(userIds,dbUserIds);
-                if(!addUserIds.isEmpty()){
+                List<Long> addUserIds = ListUtils.removeAll(userIds, dbUserIds);
+                if (!addUserIds.isEmpty()) {
                     batchAddGroupUserInfoRelation(groupId, addUserIds);
+                    //清理用户数据缓存
+                    Set<Long> set = new HashSet<>();
+                    set.addAll(addUserIds);//给set填充
+                    AuthorizationUtil.removeUserDataAuthorization(set);
                 }
             }
         }

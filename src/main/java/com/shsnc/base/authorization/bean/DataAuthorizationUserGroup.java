@@ -8,20 +8,20 @@ import java.util.List;
 /**
  * Created by Elena on 2017/7/14.
  */
-public class DataAuthorizationRole {
+public class DataAuthorizationUserGroup {
 
     @NotEmpty(groups = ValidationType.Add.class)
-    private Long roleId;
+    private Long groupId;
 
     @NotEmpty(groups = ValidationType.Add.class)
     private List<Long> propertyIdList;
 
-    public Long getRoleId() {
-        return roleId;
+    public Long getGroupId() {
+        return groupId;
     }
 
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
     }
 
     public List<Long> getPropertyIdList() {
