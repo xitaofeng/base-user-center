@@ -1,8 +1,6 @@
 package com.shsnc.base.user.service;
 
 import com.shsnc.base.authorization.service.AssignService;
-import com.shsnc.base.user.bean.Group;
-import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.mapper.*;
 import com.shsnc.base.user.model.*;
@@ -155,7 +153,7 @@ public class UserInfoService {
         accountService.addAccount(userInfoModel);
 
         // 关联组织结构
-        userInfoOrganizationRelationService.addUserInfoOrganizationRelation(userInfoModel.getUserId(), userInfoModel.getOrganizationId());
+        userInfoOrganizationRelationService.updateUserInfoOrganizationRelation(userInfoModel.getUserId(), userInfoModel.getOrganizationId());
 
         // 关联用户组
         if(CollectionUtils.isNotEmpty(groupIds)){

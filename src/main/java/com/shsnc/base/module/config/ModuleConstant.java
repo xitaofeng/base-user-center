@@ -8,11 +8,13 @@ import java.util.ResourceBundle;
 public class ModuleConstant {
 
     // #### //
-    public static String BASE_USER_CENTER_MODULE = "";
+    public static final String BASE_USER_CENTER_MODULE;
 
-    public static String BASE_DICTIONARY_MODULE = "";
+    public static final String BASE_DICTIONARY_MODULE;
 
-    public static String BASE_RESOURCE_MODULE = "";
+    public static final String BASE_RESOURCE_MODULE;
+
+    public static final String BASE_AMP_MODULE;
 
     static {
         ResourceBundle bundle = ResourceBundle.getBundle("module");
@@ -22,5 +24,7 @@ public class ModuleConstant {
         BASE_DICTIONARY_MODULE = bundle.getString("BASE_DICTIONARY_MODULE");
 
         BASE_RESOURCE_MODULE = bundle.getString("BASE_RESOURCE_MODULE");
+
+        BASE_AMP_MODULE = bundle.getString("BASE_AMP_MODULE");
     }
 }

@@ -216,7 +216,7 @@
                         <configuration>
                             <fromDir>target/${project.artifactId}</fromDir>
                             <url>scp://root:123456@192.168.11.60/root/project/user-center</url>
-                            <excludes>config/*</excludes>
+                            <excludes>config/*, lib/*</excludes>
                             <commands>
                                 <!-- 杀死原来的进程 -->
                                 <command>pkill -f ${project.artifactId}.jar</command>
