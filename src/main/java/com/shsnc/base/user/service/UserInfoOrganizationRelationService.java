@@ -28,7 +28,7 @@ public class UserInfoOrganizationRelationService {
     @Autowired
     private OrganizationModelMapper organizationModelMapper;
 
-    public Long addUserInfoOrganizationRelation(Long userId, Long organizationId) throws BizException {
+    private Long addUserInfoOrganizationRelation(Long userId, Long organizationId) throws BizException {
         Assert.notNull(userId,"用户id不能为空！");
         Assert.notNull(organizationId, "组织部门id不能为空！");
         UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
