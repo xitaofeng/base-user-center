@@ -1,7 +1,9 @@
 package com.shsnc.base.authorization.service;
 
-import com.shsnc.api.core.validation.ValidationType;
-import com.shsnc.base.authorization.bean.*;
+import com.shsnc.base.authorization.bean.DataAuthorization;
+import com.shsnc.base.authorization.bean.DataAuthorizationUser;
+import com.shsnc.base.authorization.bean.DataAuthorizationUserGroup;
+import com.shsnc.base.authorization.bean.UserDataAuthorization;
 import com.shsnc.base.authorization.config.AuthorizationUtil;
 import com.shsnc.base.authorization.config.BeanUtils;
 import com.shsnc.base.authorization.config.RedisConstants;
@@ -9,12 +11,12 @@ import com.shsnc.base.authorization.mapper.AuthorizationResourceAuthModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationResourceAuthModel;
 import com.shsnc.base.authorization.model.AuthorizationResourceAuthModel.EnumAuthType;
+import com.shsnc.base.authorization.model.AuthorizationResourcePropertyModel;
+import com.shsnc.base.module.bean.RightsInfo;
+import com.shsnc.base.module.config.AmpRemoteService;
 import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
-import com.shsnc.base.util.JsonUtil;
-import com.shsnc.base.util.RedisUtil;
-import com.shsnc.base.util.StringUtil;
+import com.shsnc.base.util.*;
 import com.shsnc.base.util.config.BizException;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 数据权限服务
@@ -164,7 +167,42 @@ public class DataAuthorizationService {
             }
             AuthorizationUtil.removeUserDataAuthorization(userIdList);
         }
+        //-----------------同步到amp的rights表：START-------------
+        if (EnumResourceTypeCode.RESOURCE_GROUP.getValue().equals(resourceTypeCode)) {
+            List<AuthorizationResourcePropertyModel> property = authorizationResourcePropertyService.getAuthorizationResourcePropertyModelRedisList();
+            Map<Long, String> propertyMap = property.stream().collect(Collectors.toMap(AuthorizationResourcePropertyModel::getPropertyId, AuthorizationResourcePropertyModel::getPropertyValue));
+            Map<Long, Map<Long,Integer>> rights = new HashMap<>();
+            for (AuthorizationResourceAuthModel authorizationResourceAuthModel : authorizationResourceAuthModels) {
+                if (authorizationResourceAuthModel.getAuthType().equals(3)) {
+                    Long resourceId = authorizationResourceAuthModel.getResourceId();
+                    Long userGroupId = authorizationResourceAuthModel.getAuthValue();
+                    String value = propertyMap.get(authorizationResourceAuthModel.getPropertyId());
 
+                    Map<Long, Integer> userGroupPermisstion = rights.computeIfAbsent(resourceId, organizationId -> new HashMap<>());
+                    if (EnumDataAuthorization.GET.getValue().equals(value)) {
+                        userGroupPermisstion.putIfAbsent(userGroupId, 2); // 只读
+                    } else if (EnumDataAuthorization.ALL.getValue().equals(value)) {
+                        userGroupPermisstion.put(userGroupId,3); // 读写
+                    }
+                }
+
+            }
+            if (!rights.isEmpty()) {
+                for (Map.Entry<Long, Map<Long, Integer>> entry : rights.entrySet()) {
+                    Long groupId = entry.getKey();
+                    Map<Long, Integer> usergrpPermisstionMap = entry.getValue();
+                    if (!usergrpPermisstionMap.isEmpty()) {
+                        List<RightsInfo> rightsInfos = new ArrayList<>();
+                        usergrpPermisstionMap.forEach((k,v)->{
+                            rightsInfos.add(new RightsInfo(k,v));
+                        });
+                        AmpRemoteService.updateHostsGroups(groupId, rightsInfos);
+                    }
+
+                }
+            }
+        }
+        //-----------------同步到amp的rights表：END-------------
         return true;
     }
 
