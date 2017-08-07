@@ -1,9 +1,8 @@
 package com.shsnc.base.user.service;
 
-import com.shsnc.base.user.mapper.OrganizationStructureModelMapper;
 import com.shsnc.base.user.mapper.OrganizationModelMapper;
+import com.shsnc.base.user.mapper.OrganizationStructureModelMapper;
 import com.shsnc.base.user.mapper.UserInfoOrganizationRelationModelMapper;
-import com.shsnc.base.user.model.ExtendPropertyModel;
 import com.shsnc.base.user.model.OrganizationCondition;
 import com.shsnc.base.user.model.OrganizationModel;
 import com.shsnc.base.user.support.Assert;
@@ -197,7 +196,7 @@ public class OrganizationService {
         QueryData queryData = new QueryData(pagination);
         int totalCount = organizationModelMapper.getTotalCountByCondition(condition);
         queryData.setRowCount(totalCount);
-        List<ExtendPropertyModel> list = organizationModelMapper.getPageByCondition(condition, pagination);
+        List<OrganizationModel> list = organizationModelMapper.getPageByCondition(condition, pagination);
         queryData.setRecords(list);
         return queryData;
     }
