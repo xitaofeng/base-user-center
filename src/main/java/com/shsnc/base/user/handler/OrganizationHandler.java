@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 组织部门管理
@@ -82,11 +81,6 @@ public class OrganizationHandler implements RequestHandler {
             }
         }
         return roots;
-    }
-
-
-    private void getChildren(List<OrganizationNode> parents, Map<Long, OrganizationModel> organizationModelMap) {
-
     }
 
 
