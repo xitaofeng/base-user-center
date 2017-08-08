@@ -25,6 +25,15 @@
         FROM user_group_resource_group_relation
         WHERE user_group_id = #{userGroupId,jdbcType=BIGINT}
     </select>
+    <select id="getByUserGroupids" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn" />
+        FROM user_group_resource_group_relation
+        WHERE user_group_id IN
+        <foreach collection="userGroupIds" item="userGroupId" open="(" close=")" separator=",">
+            #{userGroupId,jdbcType=BIGINT}
+        </foreach>
+    </select>
 
     <delete id="deleteByPrimaryKey" >
         DELETE FROM user_group_resource_group_relation

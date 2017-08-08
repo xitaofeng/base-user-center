@@ -2,9 +2,11 @@ package com.shsnc.base.user.service;
 
 import com.shsnc.base.user.bean.GroupCondition;
 import com.shsnc.base.user.mapper.GroupModelMapper;
+import com.shsnc.base.user.mapper.UserGroupResourceGroupRelationModelMapper;
 import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;
 import com.shsnc.base.user.model.GroupModel;
+import com.shsnc.base.user.model.UserGroupResourceGroupRelationModel;
 import com.shsnc.base.user.model.UserInfoGroupRelationModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.util.BizAssert;
@@ -38,6 +40,8 @@ public class GroupService {
     private UserInfoGroupRelationModelMapper userInfoGroupRelationModelMapper;
     @Autowired
     private UserInfoModelMapper userInfoModelMapper;
+    @Autowired
+    private UserGroupResourceGroupRelationModelMapper userGroupResourceGroupRelationModelMapper;
 
     /**
      * 获取所有用户组
@@ -69,8 +73,26 @@ public class GroupService {
         queryData.setRowCount(totalCount);
         List<GroupModel> list = groupModelMapper.getPageByCondition(condition, pagination);
         selectUsers(list);
+        selectResourceGroups(list);
         queryData.setRecords(list);
         return queryData;
+    }
+
+    public void selectResourceGroups(List<GroupModel> groupModels) {
+        if (CollectionUtils.isEmpty(groupModels)) {
+            return;
+        }
+        List<Long> groupIds = groupModels.stream().map(GroupModel::getGroupId).collect(Collectors.toList());
+        if (!groupIds.isEmpty()) {
+            List<UserGroupResourceGroupRelationModel> relations = userGroupResourceGroupRelationModelMapper.getByUserGroupids(groupIds);
+            RelationMap relationMap = new RelationMap();
+            for (UserGroupResourceGroupRelationModel relation : relations) {
+                relationMap.addRelation(relation.getUserGroupId(),relation.getResourceGroupId());
+            }
+            if (relationMap.hasRelatedIds()) {
+                // TODO 调用资源服务获取资源组列表
+            }
+        }
     }
 
     public void selectUsers(List<GroupModel> groupModels) {

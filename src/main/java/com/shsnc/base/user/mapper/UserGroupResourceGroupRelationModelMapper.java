@@ -23,4 +23,6 @@ public interface UserGroupResourceGroupRelationModelMapper {
     int deleteByUserGroupId(Long userGroupId);
 
     List<Long> getResourceGroupIdsByUserGroupId(Long userGroupId);
+
+    List<UserGroupResourceGroupRelationModel> getByUserGroupids(@Param("userGroupIds") List<Long> userGroupIds);
 }
