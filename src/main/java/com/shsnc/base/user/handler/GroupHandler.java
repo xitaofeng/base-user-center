@@ -10,6 +10,7 @@ import com.shsnc.base.user.bean.Group;
 import com.shsnc.base.user.bean.GroupCondition;
 import com.shsnc.base.user.model.GroupModel;
 import com.shsnc.base.user.service.GroupService;
+import com.shsnc.base.user.service.UserGroupResourceGroupRelationService;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
@@ -35,6 +36,8 @@ public class GroupHandler implements RequestHandler {
 
     @Autowired
     private GroupService groupService;
+    @Autowired
+    private UserGroupResourceGroupRelationService userGroupResourceGroupRelationService;
 
     @RequestMapper("/getList")
     @Authentication("BASE_USER_GROUP_GET_LIST")
@@ -97,5 +100,12 @@ public class GroupHandler implements RequestHandler {
     @Authentication("BASE_USER_GROUP_ASSIGN_USERS")
     public boolean assignUsers(@NotNull Long groupId, @NotEmpty List<Long> userIds) throws BizException {
         return groupService.assignUsers(groupId, userIds);
+    }
+
+    @RequestMapper("/assignReresourceGroups")
+    @Validate
+    @Authentication("BASE_USER_GROUP_ASSIGN_RERESOURCE_GROUPS")
+    public boolean assignReresourceGroups(@NotNull Long groupId, @NotEmpty List<Long> reresourceGroupIds) throws BizException {
+        return userGroupResourceGroupRelationService.batchUpdateUserGroupResourceGroupRelation(groupId, reresourceGroupIds);
     }
 }

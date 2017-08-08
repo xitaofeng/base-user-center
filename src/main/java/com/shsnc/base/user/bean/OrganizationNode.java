@@ -15,7 +15,7 @@ public class OrganizationNode {
 
     private Long parentId;
 
-    private List<OrganizationNode> children = new ArrayList<>();
+    private List<OrganizationNode> children;
 
     public Long getOrganizationId() {
         return organizationId;
@@ -62,6 +62,9 @@ public class OrganizationNode {
     }
 
     public void addChild(OrganizationNode child) {
+        if (this.children == null) {
+            this.children = new ArrayList<>();
+        }
         this.children.add(child);
     }
 }
