@@ -1,6 +1,6 @@
 package com.shsnc.base.user.model;
 
-import com.shsnc.base.authorization.bean.AuthorizationRole;
+import com.shsnc.base.authorization.model.AuthorizationRoleModel;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class UserInfoModel {
     private List<GroupModel> groups;
 
     private List<Long> roleIds;
-    private List<AuthorizationRole> roles;
+    private List<AuthorizationRoleModel> roles;
 
     public Long getUserId() {
         return userId;
@@ -161,11 +161,11 @@ public class UserInfoModel {
         this.roleIds = roleIds;
     }
 
-    public List<AuthorizationRole> getRoles() {
+    public List<AuthorizationRoleModel> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<AuthorizationRole> roles) {
+    public void setRoles(List<AuthorizationRoleModel> roles) {
         this.roles = roles;
     }
 
