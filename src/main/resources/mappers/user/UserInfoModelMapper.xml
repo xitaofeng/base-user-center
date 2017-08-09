@@ -10,6 +10,7 @@
         <result column="mobile" jdbcType="VARCHAR" property="mobile"/>
         <result column="email" jdbcType="VARCHAR" property="email"/>
         <result column="internal" jdbcType="TINYINT" property="internal"/>
+        <result column="default_group_id" jdbcType="BIGINT" property="defaultGroupId"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="create_time" jdbcType="BIGINT" property="createTime"/>
         <result column="attempt_time" jdbcType="BIGINT" property="attemptTime"/>
@@ -25,6 +26,7 @@
         mobile,
         email,
         internal,
+        default_group_id,
         status,
         create_time,
         attempt_time,
@@ -52,6 +54,7 @@
             mobile,
             email,
             internal,
+            default_group_id,
             status,
             create_time,
             attempt_time,
@@ -65,6 +68,7 @@
             #{mobile},
             #{email},
             #{internal},
+            #{defaultGroupId}
             #{status},
             #{createTime},
             #{attemptTime},
@@ -93,6 +97,9 @@
             </if>
             <if test="internal != null">
                 internal,
+            </if>
+            <if test="defaultGroupId != null">
+                default_group_id,
             </if>
             <if test="status != null">
                 status,
@@ -131,6 +138,9 @@
             </if>
             <if test="internal != null">
                 #{internal},
+            </if>
+            <if test="defaultGroupId != null">
+                #{defaultGroupId},
             </if>
             <if test="status != null">
                 #{status},
@@ -171,6 +181,9 @@
             <if test="internal != null">
                 internal = #{internal},
             </if>
+            <if test="defaultGroupId != null">
+                default_group_id = #{defaultGroupId},
+            </if>
             <if test="status != null">
                 status = #{status},
             </if>
@@ -199,6 +212,7 @@
             mobile = #{mobile},
             email = #{email},
             internal = #{internal},
+            default_group_id = #{defaultGroupId},
             status = #{status},
             create_time = #{createTime},
             attempt_time = #{attemptTime},

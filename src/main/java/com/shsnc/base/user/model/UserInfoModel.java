@@ -33,6 +33,8 @@ public class UserInfoModel {
     private Long organizationId;
     private OrganizationModel organization;
 
+    private Long defaultGroupId;
+    private GroupModel defaultGroup;
     private List<Long> groupIds;
     private List<GroupModel> groups;
 
@@ -181,5 +183,21 @@ public class UserInfoModel {
 
     public void setGroups(List<GroupModel> groups) {
         this.groups = groups;
+    }
+
+    public Long getDefaultGroupId() {
+        return defaultGroupId;
+    }
+
+    public void setDefaultGroupId(Long defaultGroupId) {
+        this.defaultGroupId = defaultGroupId;
+    }
+
+    public GroupModel getDefaultGroup() {
+        return defaultGroup;
+    }
+
+    public void setDefaultGroup(GroupModel defaultGroup) {
+        this.defaultGroup = defaultGroup;
     }
 }

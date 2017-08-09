@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -39,6 +40,9 @@ public class ProfileHandler implements RequestHandler {
     public UserInfo getInfo() throws BizException {
         Long userId = ThreadContext.getUserInfo().getUserId();
         UserInfoModel userInfoModel = userInfoService.getUserInfo(userId);
+        List<UserInfoModel> userInfoModels = Collections.singletonList(userInfoModel);
+        userInfoService.selectGroups(userInfoModels);
+        userInfoService.selectOrganization(userInfoModels);
         return JsonUtil.convert(userInfoModel,UserInfo.class);
     }
 
@@ -62,7 +66,7 @@ public class ProfileHandler implements RequestHandler {
         if(extendPropertyValues != null){
             extendPropertyValueModels = JsonUtil.convert(extendPropertyValues, List.class, ExtendPropertyValueModel.class);
         }
-        return userInfoService.updateUserInfo(userInfoModel, null, extendPropertyValueModels, null);
+        return userInfoService.updateUserInfo(userInfoModel, extendPropertyValueModels, null);
     }
 
     @RequestMapper("/modifyPassword")
@@ -74,7 +78,7 @@ public class ProfileHandler implements RequestHandler {
             UserInfoModel passwordModel = new UserInfoModel();
             passwordModel.setUserId(userId);
             passwordModel.setPassword(SHAMaker.sha256String(newPassword));
-            userInfoService.updateUserInfo(passwordModel, null, null, null);
+            userInfoService.updateUserInfo(passwordModel, null, null);
 
         } else {
             throw new BizException("原登陆密码错误！");

@@ -92,7 +92,7 @@ public class UserInfoHandler implements RequestHandler {
         if(extendPropertyValues != null){
             extendPropertyValueModels = JsonUtil.convert(extendPropertyValues, List.class, ExtendPropertyValueModel.class);
         }
-        return userInfoService.addUserInfo(userInfoModel, userInfo.getGroupIds(), extendPropertyValueModels, userInfo.getRoleIds());
+        return userInfoService.addUserInfo(userInfoModel, extendPropertyValueModels, userInfo.getRoleIds());
     }
 
     @RequestMapper("/update")
@@ -105,7 +105,7 @@ public class UserInfoHandler implements RequestHandler {
         if(extendPropertyValues != null){
             extendPropertyValueModels = JsonUtil.convert(extendPropertyValues, List.class, ExtendPropertyValueModel.class);
         }
-        return userInfoService.updateUserInfo(userInfoModel,userInfo.getGroupIds(),extendPropertyValueModels,userInfo.getRoleIds());
+        return userInfoService.updateUserInfo(userInfoModel, extendPropertyValueModels,userInfo.getRoleIds());
     }
 
     @RequestMapper("/delete")
