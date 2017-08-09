@@ -128,6 +128,10 @@ public class UserInfoService {
                 List<GroupModel> groupModels = groupModelMapper.getByGroupIds(relationMap.getRelatedIds());
                 Map<Long, GroupModel> groupModelMap = groupModels.stream().collect(Collectors.toMap(GroupModel::getGroupId, x -> x, (oldValue, newValue)->oldValue));
                 for (UserInfoModel userInfoModel : userInfoModels) {
+                    Long defaultGroupId = userInfoModel.getDefaultGroupId();
+                    if (defaultGroupId != null) {
+                        userInfoModel.setDefaultGroup(groupModelMap.get(defaultGroupId));
+                    }
                     userInfoModel.setGroups(relationMap.getRelatedObjects(userInfoModel.getUserId(),groupModelMap));
                 }
             }
@@ -137,12 +141,11 @@ public class UserInfoService {
     /**
      * 新增用户信息
      * @param userInfoModel 用户信息
-     * @param groupIds 用户组id集合，用户可以属于多个用户组
      * @param extendPropertyValues 用户扩展属性值
      * @return
      * @throws BizException
      */
-    public Long addUserInfo(UserInfoModel userInfoModel, List<Long> groupIds, List<ExtendPropertyValueModel> extendPropertyValues, List<Long> roleIds) throws BizException {
+    public Long addUserInfo(UserInfoModel userInfoModel, List<ExtendPropertyValueModel> extendPropertyValues, List<Long> roleIds) throws BizException {
         // 数据校验以及设置默认值
         checkAdd(userInfoModel);
 
@@ -156,9 +159,7 @@ public class UserInfoService {
         userInfoOrganizationRelationService.updateUserInfoOrganizationRelation(userInfoModel.getUserId(), userInfoModel.getOrganizationId());
 
         // 关联用户组
-        if(CollectionUtils.isNotEmpty(groupIds)){
-            userInfoGroupRelationService.batchAddUserInfoGroupRelation(userInfoModel.getUserId(), groupIds );
-        }
+        userInfoGroupRelationService.batchAddUserInfoGroupRelation(userInfoModel.getUserId(), userInfoModel.getGroupIds() );
 
         // 添加扩展属性
         Long userId = userInfoModel.getUserId();
@@ -176,7 +177,7 @@ public class UserInfoService {
         return userId;
     }
 
-    public boolean updateUserInfo(UserInfoModel userInfoModel, List<Long> groupIds, List<ExtendPropertyValueModel> extendPropertyValues, List<Long> roleIds) throws BizException {
+    public boolean updateUserInfo(UserInfoModel userInfoModel, List<ExtendPropertyValueModel> extendPropertyValues, List<Long> roleIds) throws BizException {
         Assert.notNull(userInfoModel);
 
         // 数据校验以及设置默认值
@@ -194,6 +195,7 @@ public class UserInfoService {
         }
 
         // 更新与用户组的关系
+        List<Long> groupIds = userInfoModel.getGroupIds();
         if(groupIds != null){
             userInfoGroupRelationService.batchUpdateUserInfoGroupRelation(userInfoModel.getUserId(), groupIds);
         }
@@ -274,9 +276,13 @@ public class UserInfoService {
         userInfoModel.setAttemptTime(0L);
         userInfoModel.setCreateTime(new Date().getTime());
         Long organizationId = userInfoModel.getOrganizationId();
-        BizAssert.notNull(organizationId, "用户所属组织id不能为空！");
+        BizAssert.notNull(organizationId, "用户所属组织不能为空！");
         OrganizationModel organizationModel = organizationModelMapper.selectByPrimaryKey(organizationId);
         BizAssert.notNull(organizationModel, String.format("用户所属组织id【%s】不存在！", organizationId));
+
+        BizAssert.notNull(userInfoModel.getDefaultGroupId(), "所属默认用户组不能为空！");
+        BizAssert.notEmpty(userInfoModel.getGroupIds(), "管辖用户组不能为空！");
+        BizAssert.isTrue(userInfoModel.getGroupIds().contains(userInfoModel.getDefaultGroupId()),"管辖用户组必须包含所属默认用户组");
     }
 
     /**
@@ -312,6 +318,17 @@ public class UserInfoService {
         userInfoModel.setCreateTime(null);
         userInfoModel.setInternal(null);
         userInfoModel.setIsDelete(null);
+
+        List<Long> groupIds = userInfoModel.getGroupIds();
+        Long defaultGroupId = userInfoModel.getDefaultGroupId();
+        if (defaultGroupId != null) {
+            BizAssert.notEmpty(groupIds, "管辖用户组不能为空！");
+            BizAssert.isTrue(groupIds.contains(defaultGroupId), "管辖用户组必须包含所属默认用户组！");
+        } else if(groupIds != null){
+            BizAssert.notEmpty(groupIds, "管辖用户组不能为空！");
+            BizAssert.notNull(defaultGroupId, "默认用户组不能为空！");
+            BizAssert.isTrue(groupIds.contains(defaultGroupId), "管辖用户组必须包含所属默认用户组！");
+        }
     }
 
     /**

@@ -17,6 +17,7 @@ public class UserInfo {
     private Integer internal;
     private Integer status;
     private Organization organization;
+    private Group defaultGroup;
     private List<Group> groups;
     private List<AuthorizationRole> roles;
 
@@ -98,5 +99,13 @@ public class UserInfo {
 
     public void setRoles(List<AuthorizationRole> roles) {
         this.roles = roles;
+    }
+
+    public Group getDefaultGroup() {
+        return defaultGroup;
+    }
+
+    public void setDefaultGroup(Group defaultGroup) {
+        this.defaultGroup = defaultGroup;
     }
 }

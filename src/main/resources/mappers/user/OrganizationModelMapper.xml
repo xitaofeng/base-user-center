@@ -203,18 +203,14 @@
     <select id="getOrganizationNodeList" resultMap="BaseResultMap">
         SELECT ug.*,ugs.ancestor_id parent_id
         FROM user_organization ug
-        JOIN (
+        LEFT JOIN (
             SELECT ancestor_id,descendant_id
             FROM user_organization_structure
             WHERE level=1
         ) ugs ON ug.organization_id=ugs.descendant_id
         <where>
-            <if test="parentId != null">
-                ugs.ancestor_id=#{parentId}
-            </if>
+            ugs.ancestor_id=#{parentId}
         </where>
-
-
     </select>
     <select id="getAllOrganizationIdsByUserId" resultType="java.lang.Long">
         SELECT DISTINCT ugs.descendant_id
