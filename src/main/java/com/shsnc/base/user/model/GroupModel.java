@@ -1,5 +1,7 @@
 package com.shsnc.base.user.model;
 
+import com.shsnc.base.module.bean.ResourceGroupInfo;
+
 import java.util.List;
 
 public class GroupModel {
@@ -20,6 +22,7 @@ public class GroupModel {
     private String code;
 
     private List<UserInfoModel> users;
+    private List<ResourceGroupInfo> resourceGroups;
 
 
     /**
@@ -70,5 +73,13 @@ public class GroupModel {
 
     public void setUsers(List<UserInfoModel> users) {
         this.users = users;
+    }
+
+    public List<ResourceGroupInfo> getResourceGroups() {
+        return resourceGroups;
+    }
+
+    public void setResourceGroups(List<ResourceGroupInfo> resourceGroups) {
+        this.resourceGroups = resourceGroups;
     }
 }

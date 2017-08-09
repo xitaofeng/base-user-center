@@ -1,5 +1,7 @@
 package com.shsnc.base.user.bean;
 
+import com.shsnc.base.module.bean.ResourceGroupInfo;
+
 import java.util.List;
 
 public class Group {
@@ -8,6 +10,7 @@ public class Group {
     private String name;
     private String code;
     private List<UserInfo> users;
+    private List<ResourceGroupInfo> resourceGroups;
 
     public Long getGroupId() {
         return groupId;
@@ -39,5 +42,13 @@ public class Group {
 
     public void setUsers(List<UserInfo> users) {
         this.users = users;
+    }
+
+    public List<ResourceGroupInfo> getResourceGroups() {
+        return resourceGroups;
+    }
+
+    public void setResourceGroups(List<ResourceGroupInfo> resourceGroups) {
+        this.resourceGroups = resourceGroups;
     }
 }
