@@ -1,19 +1,21 @@
 package com.shsnc.base.module.config;
 
 import com.shsnc.api.core.ThreadContext;
-import com.shsnc.base.api.constant.BaseDictionaryConstant;
 import com.shsnc.base.api.constant.BaseResourceConstant;
-import com.shsnc.base.module.base.dictionary.DictionaryMapInfo;
 import com.shsnc.base.module.base.resource.ResourceInfo;
+import com.shsnc.base.module.bean.ResourceGroupInfo;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.api.ApiClient;
 import com.shsnc.base.util.api.ApiResult;
 import com.shsnc.base.util.config.BizException;
+import com.shsnc.base.util.config.MessageCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,6 +25,9 @@ public class BaseResourceService {
 
     public static Logger LOG = LoggerFactory.getLogger(BaseResourceService.class);
 
+    private static final String ERROR_MESSAGE = "请求资源服务异常!";
+
+    private static final String GET_RESOURCE_GROUPS_BY_RESOURCE_GROUPIDS ="/resource/internal/resource/group/list/resourceGroupIds";
     /**
      * 根据resourceCode 获取对象
      *
@@ -46,5 +51,31 @@ public class BaseResourceService {
         }
         return null;
     }
+
+    public static List<ResourceGroupInfo> getResourceGroupsByResourceGroupIds(List<Long> resourceGroupIds) throws BizException {
+        Map<String,Object> params = new HashMap<>();
+        params.put("resourceGroupIds", resourceGroupIds);
+        ApiResult<List> result = null;
+        try {
+            result = ApiClient.request(ModuleConstant.BASE_RESOURCE_MODULE + GET_RESOURCE_GROUPS_BY_RESOURCE_GROUPIDS, params, List.class, ThreadContext.getClientInfo().getToken());
+        } catch (IOException e) {
+            LOG.error(ERROR_MESSAGE, e);
+            throw new BizException(ERROR_MESSAGE);
+        }
+        if (result == null) {
+            if (LOG.isErrorEnabled()) {
+                LOG.error(String.format("%s 没有任何响应！", ERROR_MESSAGE));
+            }
+            throw new BizException(ERROR_MESSAGE);
+        } else if (result.getMessageCode() == MessageCode.RESP_OK.getMsgCode()) {
+            if (result.getData() != null) {
+                return JsonUtil.convert(result.getData(), List.class, ResourceGroupInfo.class);
+            }
+        } else {
+            throw new BizException(result.getMessage());
+        }
+        return new ArrayList<>();
+    }
+
 
 }
