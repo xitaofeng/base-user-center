@@ -4,6 +4,8 @@ import com.shsnc.base.authorization.config.DataAuthorization;
 import com.shsnc.base.authorization.config.DataOperation;
 import com.shsnc.base.authorization.model.AuthorizationRightsModel;
 import com.shsnc.base.authorization.service.AuthorizationRightsService;
+import com.shsnc.base.module.bean.ResourceGroupInfo;
+import com.shsnc.base.module.config.BaseResourceService;
 import com.shsnc.base.user.bean.GroupCondition;
 import com.shsnc.base.user.mapper.GroupModelMapper;
 import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
@@ -20,6 +22,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -92,7 +95,11 @@ public class GroupService {
                 relationMap.addRelation(relation.getGroupId(),relation.getObjectId());
             }
             if (relationMap.hasRelatedIds()) {
-                // TODO 调用资源服务获取资源组列表
+                List<ResourceGroupInfo> resourceGroupInfos = BaseResourceService.getResourceGroupsByResourceGroupIds(new ArrayList<>(relationMap.getRelatedIds()));
+                Map<Long, ResourceGroupInfo> resourceGroupInfoMap = resourceGroupInfos.stream().collect(Collectors.toMap(ResourceGroupInfo::getGroupId, v -> v));
+                for (GroupModel groupModel : groupModels) {
+                    groupModel.setResourceGroups(relationMap.getRelatedObjects(groupModel.getGroupId(), resourceGroupInfoMap));
+                }
             }
         }
     }
