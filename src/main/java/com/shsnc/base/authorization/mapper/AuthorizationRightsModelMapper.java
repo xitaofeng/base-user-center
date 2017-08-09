@@ -29,15 +29,15 @@ public interface AuthorizationRightsModelMapper {
 
     List<Long> getObjectIdsByGroupIds(@Param("groupIds") List<Long> groupIds, @Param("dataObject") DataObject dataObject);
 
-    int getPermissionByObjectId(@Param("objectId") Long objectId, @Param("dataObject") DataObject dataObject);
+    List<Integer> getPermissionByObjectId(@Param("objectId") Long objectId, @Param("dataObject") DataObject dataObject, @Param("groupIds") List<Long> groupIds);
 
     int clearByGroupId(Long groupId);
 
     int clearByGroupIds(@Param("groupIds") List<Long> groupIds);
 
-    List<AuthorizationRightsModel> getByObjectId(@Param("objectId") Long objectId, @Param("dataObject") DataObject dataObject);
+    List<AuthorizationRightsModel> getByObjectId(@Param("objectId") Long objectId, @Param("dataObject") DataObject dataObject, @Param("groupIds") List<Long> groupIds);
 
-    List<AuthorizationRightsModel> getByObjectIds(@Param("objectIds") List<Long> objectIds, @Param("dataObject") DataObject dataObject);
+    List<AuthorizationRightsModel> getByObjectIds(@Param("objectIds") List<Long> objectIds, @Param("dataObject") DataObject dataObject, @Param("groupIds") List<Long> groupIds);
 
     int deleteByGroupId(@Param("groupId") Long groupId, @Param("dataObject") DataObject dataObject);
 }
