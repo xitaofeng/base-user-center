@@ -5,6 +5,7 @@ import com.shsnc.base.authorization.model.condition.AuthorizationRoleCondition;
 import com.shsnc.base.util.sql.Pagination;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -93,4 +94,5 @@ public interface AuthorizationRoleModelMapper {
      */
     List<AuthorizationRoleModel> getPageByCondition(@Param("condition") AuthorizationRoleCondition condition, @Param("pagination") Pagination pagination);
 
+    List<AuthorizationRoleModel> getByRoleIds(@Param("roleIds") Collection<Long> roleIds);
 }

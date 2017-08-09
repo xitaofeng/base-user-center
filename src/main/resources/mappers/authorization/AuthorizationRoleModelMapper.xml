@@ -173,5 +173,15 @@
         <include refid="orderSql"/>
         <include refid="pageSql"/>
     </select>
+    <select id="getByRoleIds" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumn"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE role_id IN
+        <foreach collection="roleIds" item="roleId" open="(" close=")" separator=",">
+            #{roleId}
+        </foreach>
+    </select>
 
 </mapper>

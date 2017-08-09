@@ -87,4 +87,13 @@
         </foreach>
     </select>
 
+    <select id="getByUserIds" resultMap="BaseResultMap">
+        SELECT *
+        FROM authorization_user_role_relation
+        WHERE user_id IN
+        <foreach collection="userIds" item="userId" index="index" separator="," open="(" close=")">
+            #{userId}
+        </foreach>
+    </select>
+
 </mapper>

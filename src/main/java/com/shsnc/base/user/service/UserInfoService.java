@@ -1,5 +1,9 @@
 package com.shsnc.base.user.service;
 
+import com.shsnc.base.authorization.mapper.AuthorizationRoleModelMapper;
+import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
+import com.shsnc.base.authorization.model.AuthorizationRoleModel;
+import com.shsnc.base.authorization.model.AuthorizationUserRoleRelationModel;
 import com.shsnc.base.authorization.service.AssignService;
 import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.mapper.*;
@@ -51,7 +55,9 @@ public class UserInfoService {
     private AssignService assignService;
 
     @Autowired
-    private OrganizationService organizationService;
+    private AuthorizationRoleModelMapper authorizationRoleModelMapper;
+    @Autowired
+    private AuthorizationUserRoleRelationModelMapper authorizationUserRoleRelationModelMapper;
 
     public List<UserInfoModel> getUserInfoList(UserInfoModel userInfoModel){
         return userInfoModelMapper.findUserInfoList(userInfoModel);
@@ -88,7 +94,18 @@ public class UserInfoService {
         }
         List<Long> userIds = userInfoModels.stream().map(UserInfoModel::getUserId).collect(Collectors.toList());
         if (!userIds.isEmpty()) {
-
+            List<AuthorizationUserRoleRelationModel> relations = authorizationUserRoleRelationModelMapper.getByUserIds(userIds);
+            RelationMap relationMap = new RelationMap();
+            for (AuthorizationUserRoleRelationModel relation : relations) {
+                relationMap.addRelation(relation.getUserId(),relation.getRoleId());
+            }
+            if (relationMap.hasRelatedIds()) {
+                List<AuthorizationRoleModel> authorizationRoleModels = authorizationRoleModelMapper.getByRoleIds(relationMap.getRelatedIds());
+                Map<Long, AuthorizationRoleModel> authorizationRoleModelMap = authorizationRoleModels.stream().collect(Collectors.toMap(AuthorizationRoleModel::getRoleId, x -> x, (oldValue, newValue)->oldValue));
+                for (UserInfoModel userInfoModel : userInfoModels) {
+                    userInfoModel.setRoles(relationMap.getRelatedObjects(userInfoModel.getUserId(), authorizationRoleModelMap));
+                }
+            }
         }
     }
 
