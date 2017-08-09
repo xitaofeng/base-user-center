@@ -53,6 +53,12 @@
                 <if test="condition.code != null and condition.code != ''">
                     AND INSTR(code,#{condition.code})>0
                 </if>
+                <if test="condition.checkPermission">
+                    AND group_id IN
+                    <foreach collection="condition.objectIds" open="(" close=")" separator=",">
+                        #{objectId}
+                    </foreach>
+                </if>
             </if>
         </where>
     </sql>
@@ -106,6 +112,13 @@
         <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
             #{groupId}
         </foreach>
+    </select>
+
+    <select id="getListByCondition" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn" />
+        FROM user_group
+        <include refid="conditionSql"/>
     </select>
 
     <delete id="deleteByPrimaryKey" >

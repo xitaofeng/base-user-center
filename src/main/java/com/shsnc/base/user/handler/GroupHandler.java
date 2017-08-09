@@ -1,6 +1,7 @@
 package com.shsnc.base.user.handler;
 
 import com.shsnc.api.core.RequestHandler;
+import com.shsnc.api.core.ThreadContext;
 import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
@@ -10,6 +11,7 @@ import com.shsnc.base.user.bean.Group;
 import com.shsnc.base.user.bean.GroupCondition;
 import com.shsnc.base.user.model.GroupModel;
 import com.shsnc.base.user.service.GroupService;
+import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,8 +42,17 @@ public class GroupHandler implements RequestHandler {
 
     @RequestMapper("/getList")
     @Authentication("BASE_USER_GROUP_GET_LIST")
-    public List<Group> getList(){
-        List<GroupModel> groupList = groupService.getGroupList();
+    public List<Group> getList(GroupCondition condition){
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            if (!groupIds.isEmpty()) {
+                condition.setCheckPermission(true);
+                condition.setObjectIds(groupIds);
+            } else {
+                return new ArrayList<>();
+            }
+        }
+        List<GroupModel> groupList = groupService.getGroupList(condition);
         return JsonUtil.convert(groupList, List.class, Group.class) ;
     }
 
@@ -50,6 +62,14 @@ public class GroupHandler implements RequestHandler {
     @Validate
     @Authentication("BASE_USER_GROUP_GET_OBJECT")
     public Group getObject(@NotNull Long groupId) throws BizException {
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            if (!groupIds.isEmpty()) {
+                BizAssert.isTrue(groupIds.contains(groupId), "没有权限");
+            } else {
+                return null;
+            }
+        }
         GroupModel groupModel = groupService.getGroup(groupId);
         return JsonUtil.convert(groupModel, Group.class);
     }
@@ -57,6 +77,15 @@ public class GroupHandler implements RequestHandler {
     @RequestMapper("/getPage")
     @Authentication("BASE_USER_GROUP_GET_PAGE")
     public QueryData getPage(GroupCondition condition, Pagination pagination) throws BizException {
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            if (!groupIds.isEmpty()) {
+                condition.setCheckPermission(true);
+                condition.setObjectIds(groupIds);
+            } else {
+                return new QueryData(pagination);
+            }
+        }
         pagination.buildSort(mapping);
         QueryData queryData = groupService.getGroupPage(condition, pagination);
         return queryData.convert(Group.class);
@@ -75,6 +104,10 @@ public class GroupHandler implements RequestHandler {
     @Validate(groups = ValidationType.Update.class)
     @Authentication("BASE_USER_GROUP_UPDATE")
     public boolean update(Group group) throws BizException {
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            BizAssert.isTrue(groupIds.contains(group.getGroupId()), "权限不足");
+        }
         GroupModel groupModel = JsonUtil.convert(group,GroupModel.class);
         return groupService.updateGroup(groupModel);
     }
@@ -83,6 +116,10 @@ public class GroupHandler implements RequestHandler {
     @Validate
     @Authentication("BASE_USER_GROUP_DELETE")
     public boolean delete(@NotNull Long groupId) throws BizException {
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            BizAssert.isTrue(groupIds.contains(groupId), "权限不足");
+        }
         return groupService.deleteGroup(groupId);
     }
 
@@ -90,6 +127,10 @@ public class GroupHandler implements RequestHandler {
     @Validate
     @Authentication("BASE_USER_GROUP_BATCH_DELETE")
     public boolean batchDelete(@NotEmpty List<Long> groupIds) throws BizException {
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> currentGroupIds = ThreadContext.getUserInfo().getGroupIds();
+            BizAssert.isTrue(currentGroupIds.containsAll(groupIds), "权限不足");
+        }
         return groupService.batchDeleteGroup(groupIds);
     }
 
@@ -97,6 +138,10 @@ public class GroupHandler implements RequestHandler {
     @Validate
     @Authentication("BASE_USER_GROUP_ASSIGN_USERS")
     public boolean assignUsers(@NotNull Long groupId, @NotEmpty List<Long> userIds) throws BizException {
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            BizAssert.isTrue(groupIds.contains(groupId), "权限不足");
+        }
         return groupService.assignUsers(groupId, userIds);
     }
 
@@ -104,6 +149,10 @@ public class GroupHandler implements RequestHandler {
     @Validate
     @Authentication("BASE_USER_GROUP_ASSIGN_RERESOURCE_GROUPS")
     public boolean assignReresourceGroups(@NotNull Long groupId, @NotEmpty List<Long> reresourceGroupIds) throws BizException {
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            BizAssert.isTrue(groupIds.contains(groupId), "权限不足");
+        }
         return groupService.assignReresourceGroups(groupId, reresourceGroupIds);
     }
 }

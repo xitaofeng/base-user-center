@@ -1,7 +1,9 @@
 package com.shsnc.base.user.service;
 
+import com.shsnc.api.core.ThreadContext;
 import com.shsnc.base.authorization.config.DataObject;
 import com.shsnc.base.authorization.config.DataOperation;
+import com.shsnc.base.authorization.mapper.AuthorizationRightsModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationRightsModel;
 import com.shsnc.base.authorization.service.AuthorizationRightsService;
 import com.shsnc.base.module.bean.ResourceGroupInfo;
@@ -47,13 +49,15 @@ public class GroupService {
     private UserInfoModelMapper userInfoModelMapper;
     @Autowired
     private AuthorizationRightsService authorizationRightsService;
+    @Autowired
+    private AuthorizationRightsModelMapper authorizationRightsModelMapper;
 
     /**
      * 获取所有用户组
      * @return 返回用户组列表
      */
-    public List<GroupModel> getGroupList() {
-        return groupModelMapper.selectAll();
+    public List<GroupModel> getGroupList(GroupCondition condition) {
+        return groupModelMapper.getListByCondition(condition);
     }
 
     /**
@@ -89,7 +93,7 @@ public class GroupService {
         }
         List<Long> groupIds = groupModels.stream().map(GroupModel::getGroupId).collect(Collectors.toList());
         if (!groupIds.isEmpty()) {
-            List<AuthorizationRightsModel> relations = authorizationRightsService.getRightsByGroupIds(DataObject.RESOURCE_GROUP, groupIds);
+            List<AuthorizationRightsModel> relations = authorizationRightsModelMapper.getByGroupIds(groupIds, DataObject.RESOURCE_GROUP);
             RelationMap relationMap = new RelationMap();
             for (AuthorizationRightsModel relation : relations) {
                 relationMap.addRelation(relation.getGroupId(),relation.getObjectId());
@@ -133,6 +137,12 @@ public class GroupService {
         group.setCode(UUID.randomUUID().toString());
         checkInput(group);
         groupModelMapper.insert(group);
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            UserInfoGroupRelationModel userInfoGroupRelationModel = new UserInfoGroupRelationModel();
+            userInfoGroupRelationModel.setGroupId(group.getGroupId());
+            userInfoGroupRelationModel.setUserId(ThreadContext.getUserInfo().getUserId());
+            userInfoGroupRelationModelMapper.insert(userInfoGroupRelationModel);
+        }
         return group.getGroupId();
     }
 
