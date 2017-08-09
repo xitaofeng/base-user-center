@@ -1,6 +1,6 @@
 package com.shsnc.base.authorization.mapper;
 
-import com.shsnc.base.authorization.config.DataAuthorization;
+import com.shsnc.base.authorization.config.DataObject;
 import com.shsnc.base.authorization.model.AuthorizationRightsModel;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,23 +21,23 @@ public interface AuthorizationRightsModelMapper {
 
     int insertList(@Param("authorizationRightsModels") List<AuthorizationRightsModel> authorizationRightsModels);
 
-    int deleteByObjectId(@Param("objectId") Long objectId, @Param("dataAuthorization") DataAuthorization dataAuthorization);
+    int deleteByObjectId(@Param("objectId") Long objectId, @Param("dataObject") DataObject dataObject);
 
-    int deleteByObjectIds(@Param("objectIds") List<Long> objectIds, @Param("dataAuthorization") DataAuthorization dataAuthorization);
+    int deleteByObjectIds(@Param("objectIds") List<Long> objectIds, @Param("dataObject") DataObject dataObject);
 
-    List<AuthorizationRightsModel> getByGroupIds(@Param("groupIds") List<Long> groupIds, @Param("dataAuthorization") DataAuthorization dataAuthorization);
+    List<AuthorizationRightsModel> getByGroupIds(@Param("groupIds") List<Long> groupIds, @Param("dataObject") DataObject dataObject);
 
-    List<Long> getObjectIdsByGroupIds(@Param("groupIds") List<Long> groupIds, @Param("dataAuthorization") DataAuthorization dataAuthorization);
+    List<Long> getObjectIdsByGroupIds(@Param("groupIds") List<Long> groupIds, @Param("dataObject") DataObject dataObject);
 
-    int getPermissionByObjectId(@Param("objectId") Long objectId, @Param("dataAuthorization") DataAuthorization dataAuthorization);
+    int getPermissionByObjectId(@Param("objectId") Long objectId, @Param("dataObject") DataObject dataObject);
 
     int clearByGroupId(Long groupId);
 
     int clearByGroupIds(@Param("groupIds") List<Long> groupIds);
 
-    List<AuthorizationRightsModel> getByObjectId(@Param("objectId") Long objectId, @Param("dataAuthorization") DataAuthorization dataAuthorization);
+    List<AuthorizationRightsModel> getByObjectId(@Param("objectId") Long objectId, @Param("dataObject") DataObject dataObject);
 
-    List<AuthorizationRightsModel> getByObjectIds(@Param("objectIds") List<Long> objectIds, @Param("dataAuthorization") DataAuthorization dataAuthorization);
+    List<AuthorizationRightsModel> getByObjectIds(@Param("objectIds") List<Long> objectIds, @Param("dataObject") DataObject dataObject);
 
-    int deleteByGroupId(@Param("groupId") Long groupId, @Param("dataAuthorization") DataAuthorization dataAuthorization);
+    int deleteByGroupId(@Param("groupId") Long groupId, @Param("dataObject") DataObject dataObject);
 }

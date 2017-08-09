@@ -5,7 +5,7 @@ package com.shsnc.base.authorization.config;
  * @date 2017-08-08
  * @since 1.0
  */
-public enum DataAuthorization {
+public enum DataObject {
 
     RESOURCE_GROUP(1, "资源组"),
     SCRIPT(2, "脚本"),
@@ -16,7 +16,7 @@ public enum DataAuthorization {
     private int type;
     private String description;
 
-    private DataAuthorization(int type, String description){
+    private DataObject(int type, String description){
         this.type = type;
         this.description = description;
     }

@@ -1,6 +1,6 @@
 package com.shsnc.base.authorization.service;
 
-import com.shsnc.base.authorization.config.DataAuthorization;
+import com.shsnc.base.authorization.config.DataObject;
 import com.shsnc.base.authorization.config.DataOperation;
 import com.shsnc.base.authorization.mapper.AuthorizationRightsModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationRightsModel;
@@ -40,30 +40,30 @@ public class AuthorizationRightsService {
 
     /**
      * 更新对象授权
-     * @param dataAuthorization 对象类型
+     * @param dataObject 对象类型
      * @param objectId 对象id
      * @param groupIds 用户组id列表
      * @param dataOperation 操作类型
      */
     @Transactional(rollbackFor = Exception.class)
-    public void authorize(DataAuthorization dataAuthorization, Long objectId, List<Long> groupIds, DataOperation dataOperation) throws BizException {
-        authorize(dataAuthorization, objectId, groupIds, dataOperation.getValue());
+    public void authorize(DataObject dataObject, Long objectId, List<Long> groupIds, DataOperation dataOperation) throws BizException {
+        authorize(dataObject, objectId, groupIds, dataOperation.getValue());
     }
 
     /**
      * 更新对象授权
-     * @param dataAuthorization 对象类型
+     * @param dataObject 对象类型
      * @param objectId 对象id
      * @param groupIds 用户组id列表
      * @param permission 权限值
      */
     @Transactional(rollbackFor = Exception.class)
-    public void authorize(DataAuthorization dataAuthorization, Long objectId, List<Long> groupIds, int permission) throws BizException {
-        BizAssert.notNull(dataAuthorization, "对象类型不能为空！");
-        BizAssert.notNull(objectId, String.format("【%s】的id不能为空！", dataAuthorization.getDescription()));
+    public void authorize(DataObject dataObject, Long objectId, List<Long> groupIds, int permission) throws BizException {
+        BizAssert.notNull(dataObject, "对象类型不能为空！");
+        BizAssert.notNull(objectId, String.format("【%s】的id不能为空！", dataObject.getDescription()));
         BizAssert.notNull(groupIds, "用户组id不能为空！");
 
-        authorizationRightsModelMapper.deleteByObjectId(objectId, dataAuthorization);
+        authorizationRightsModelMapper.deleteByObjectId(objectId, dataObject);
         if (!groupIds.isEmpty()) {
             List<GroupModel> dbGroupModels = groupModelMapper.getByGroupIds(groupIds);
             List<AuthorizationRightsModel> authorizationRightsModels = new ArrayList<>();
@@ -71,8 +71,8 @@ public class AuthorizationRightsService {
                 AuthorizationRightsModel authorizationRightsModel = new AuthorizationRightsModel();
                 authorizationRightsModel.setGroupId(dbGroupModel.getGroupId());
                 authorizationRightsModel.setObjectId(objectId);
-                authorizationRightsModel.setObjectType(dataAuthorization.getType());
-                authorizationRightsModel.setObjectTypeCode(dataAuthorization.toString());
+                authorizationRightsModel.setObjectType(dataObject.getType());
+                authorizationRightsModel.setObjectTypeCode(dataObject.toString());
                 authorizationRightsModel.setPermission(permission);
                 authorizationRightsModels.add(authorizationRightsModel);
             }
@@ -84,29 +84,29 @@ public class AuthorizationRightsService {
 
     /**
      * 更新对象授权
-     * @param dataAuthorization 对象类型
+     * @param dataObject 对象类型
      * @param objectIds 对象id列表
      * @param groupId 用户组id
      * @param dataOperation 操作类型
      */
     @Transactional(rollbackFor = Exception.class)
-    public void authorize(DataAuthorization dataAuthorization, List<Long> objectIds, Long groupId, DataOperation dataOperation) throws BizException {
-        authorize(dataAuthorization, objectIds, groupId, dataOperation.getValue());
+    public void authorize(DataObject dataObject, List<Long> objectIds, Long groupId, DataOperation dataOperation) throws BizException {
+        authorize(dataObject, objectIds, groupId, dataOperation.getValue());
     }
 
     /**
      * 更新对象授权
-     * @param dataAuthorization 对象类型
+     * @param dataObject 对象类型
      * @param objectIds 对象id列表
      * @param groupId 用户组id
      * @param permission 权限值
      */
     @Transactional(rollbackFor = Exception.class)
-    public void authorize(DataAuthorization dataAuthorization, List<Long> objectIds, Long groupId, int permission) throws BizException {
-        BizAssert.notNull(dataAuthorization, "对象类型不能为空！");
-        BizAssert.notEmpty(objectIds, String.format("【%s】的id不能为空！", dataAuthorization.getDescription()));
+    public void authorize(DataObject dataObject, List<Long> objectIds, Long groupId, int permission) throws BizException {
+        BizAssert.notNull(dataObject, "对象类型不能为空！");
+        BizAssert.notEmpty(objectIds, String.format("【%s】的id不能为空！", dataObject.getDescription()));
         BizAssert.notNull(groupId, "用户组id不能为空！");
-        authorizationRightsModelMapper.deleteByGroupId(groupId, dataAuthorization);
+        authorizationRightsModelMapper.deleteByGroupId(groupId, dataObject);
         GroupModel dbGroupModel = groupModelMapper.selectByPrimaryKey(groupId);
         BizAssert.notNull(dbGroupModel, String.format("用户组id【%s】不存在！",groupId));
         List<AuthorizationRightsModel> authorizationRightsModels = new ArrayList<>();
@@ -114,8 +114,8 @@ public class AuthorizationRightsService {
             AuthorizationRightsModel authorizationRightsModel = new AuthorizationRightsModel();
             authorizationRightsModel.setGroupId(groupId);
             authorizationRightsModel.setObjectId(objectId);
-            authorizationRightsModel.setObjectType(dataAuthorization.getType());
-            authorizationRightsModel.setObjectTypeCode(dataAuthorization.toString());
+            authorizationRightsModel.setObjectType(dataObject.getType());
+            authorizationRightsModel.setObjectTypeCode(dataObject.toString());
             authorizationRightsModel.setPermission(permission);
             authorizationRightsModels.add(authorizationRightsModel);
         }
@@ -124,76 +124,76 @@ public class AuthorizationRightsService {
         }
     }
 
-    public List<AuthorizationRightsModel> getRightsByUserId(DataAuthorization dataAuthorization, Long userId) throws BizException {
-        BizAssert.notNull(dataAuthorization, "对象类型不能为空！");
+    public List<AuthorizationRightsModel> getRightsByUserId(DataObject dataObject, Long userId) throws BizException {
+        BizAssert.notNull(dataObject, "对象类型不能为空！");
         BizAssert.notNull(userId, "用户id不能为空！");
         List<Long> groupIds = userInfoGroupRelationModelMapper.getGroupIdsByUserId(userId);
         if (!groupIds.isEmpty()) {
-            return authorizationRightsModelMapper.getByGroupIds(groupIds, dataAuthorization);
+            return authorizationRightsModelMapper.getByGroupIds(groupIds, dataObject);
         }
         return new ArrayList<>();
     }
 
-    public List<AuthorizationRightsModel> getRightsByObjectIds(DataAuthorization dataAuthorization, List<Long> objectIds) throws BizException {
-        BizAssert.notNull(dataAuthorization, "对象类型不能为空！");
-        BizAssert.notEmpty(objectIds, String.format("【%s】的id不能为空！", dataAuthorization.getDescription()));
-        return authorizationRightsModelMapper.getByObjectIds(objectIds, dataAuthorization);
+    public List<AuthorizationRightsModel> getRightsByObjectIds(DataObject dataObject, List<Long> objectIds) throws BizException {
+        BizAssert.notNull(dataObject, "对象类型不能为空！");
+        BizAssert.notEmpty(objectIds, String.format("【%s】的id不能为空！", dataObject.getDescription()));
+        return authorizationRightsModelMapper.getByObjectIds(objectIds, dataObject);
     }
 
-    public List<AuthorizationRightsModel> getRightsByGroupIds(DataAuthorization dataAuthorization, List<Long> groupIds) throws BizException {
-        BizAssert.notNull(dataAuthorization, "对象类型不能为空！");
+    public List<AuthorizationRightsModel> getRightsByGroupIds(DataObject dataObject, List<Long> groupIds) throws BizException {
+        BizAssert.notNull(dataObject, "对象类型不能为空！");
         BizAssert.notEmpty(groupIds, "用户组id不能为空！");
-        return authorizationRightsModelMapper.getByGroupIds(groupIds, dataAuthorization);
+        return authorizationRightsModelMapper.getByGroupIds(groupIds, dataObject);
     }
 
     /**
      * 获取某个用户拥有的某类数据的所有id
-     * @param dataAuthorization 对象类型
+     * @param dataObject 对象类型
      * @param userId 用户id
      * @return 对象id列表
      */
-    public List<Long> getObjectIdsByUserId(DataAuthorization dataAuthorization, Long userId) throws BizException {
-        BizAssert.notNull(dataAuthorization, "对象类型不能为空！");
+    public List<Long> getObjectIdsByUserId(DataObject dataObject, Long userId) throws BizException {
+        BizAssert.notNull(dataObject, "对象类型不能为空！");
         BizAssert.notNull(userId, "用户id不能为空！");
         List<Long> groupIds = userInfoGroupRelationModelMapper.getGroupIdsByUserId(userId);
         if (!groupIds.isEmpty()) {
-            return authorizationRightsModelMapper.getObjectIdsByGroupIds(groupIds, dataAuthorization);
+            return authorizationRightsModelMapper.getObjectIdsByGroupIds(groupIds, dataObject);
         }
         return new ArrayList<>();
     }
 
     /**
      * 获取某个对象的权限值
-     * @param dataAuthorization 对象类型
+     * @param dataObject 对象类型
      * @param objectId 对象id
      * @return 权限值
      */
-    public int getPermissionByObjectId(DataAuthorization dataAuthorization, Long objectId) throws BizException {
-        BizAssert.notNull(dataAuthorization, "对象类型不能为空！");
-        BizAssert.notNull(objectId, String.format("【%s】的id不能为空！", dataAuthorization.getDescription()));
-        return authorizationRightsModelMapper.getPermissionByObjectId(objectId, dataAuthorization);
+    public int getPermissionByObjectId(DataObject dataObject, Long objectId) throws BizException {
+        BizAssert.notNull(dataObject, "对象类型不能为空！");
+        BizAssert.notNull(objectId, String.format("【%s】的id不能为空！", dataObject.getDescription()));
+        return authorizationRightsModelMapper.getPermissionByObjectId(objectId, dataObject);
     }
 
     /**
      * 移除多个对象的权限值
-     * @param dataAuthorization 对象类型
+     * @param dataObject 对象类型
      * @param objectIds 对象id的列表
      */
-    public void deleteByObjectIds(DataAuthorization dataAuthorization, List<Long> objectIds) throws BizException {
-        BizAssert.notNull(dataAuthorization, "对象类型不能为空！");
-        BizAssert.notEmpty(objectIds, String.format("【%s】的id不能为空！", dataAuthorization.getDescription()));
-        authorizationRightsModelMapper.deleteByObjectIds(objectIds, dataAuthorization);
+    public void deleteByObjectIds(DataObject dataObject, List<Long> objectIds) throws BizException {
+        BizAssert.notNull(dataObject, "对象类型不能为空！");
+        BizAssert.notEmpty(objectIds, String.format("【%s】的id不能为空！", dataObject.getDescription()));
+        authorizationRightsModelMapper.deleteByObjectIds(objectIds, dataObject);
     }
 
     /**
      * 移除某个对象的权限值
-     * @param dataAuthorization 对象类型
+     * @param dataObject 对象类型
      * @param objectId 对象id
      */
-    public void deleteByObjectId(DataAuthorization dataAuthorization, Long objectId) throws BizException {
-        BizAssert.notNull(dataAuthorization, "对象类型不能为空！");
-        BizAssert.notNull(objectId, String.format("【%s】的id不能为空！", dataAuthorization.getDescription()));
-        authorizationRightsModelMapper.deleteByObjectId(objectId, dataAuthorization);
+    public void deleteByObjectId(DataObject dataObject, Long objectId) throws BizException {
+        BizAssert.notNull(dataObject, "对象类型不能为空！");
+        BizAssert.notNull(objectId, String.format("【%s】的id不能为空！", dataObject.getDescription()));
+        authorizationRightsModelMapper.deleteByObjectId(objectId, dataObject);
     }
 
     /**

@@ -1,6 +1,6 @@
 package com.shsnc.base.user.service;
 
-import com.shsnc.base.authorization.config.DataAuthorization;
+import com.shsnc.base.authorization.config.DataObject;
 import com.shsnc.base.authorization.config.DataOperation;
 import com.shsnc.base.authorization.model.AuthorizationRightsModel;
 import com.shsnc.base.authorization.service.AuthorizationRightsService;
@@ -89,7 +89,7 @@ public class GroupService {
         }
         List<Long> groupIds = groupModels.stream().map(GroupModel::getGroupId).collect(Collectors.toList());
         if (!groupIds.isEmpty()) {
-            List<AuthorizationRightsModel> relations = authorizationRightsService.getRightsByGroupIds(DataAuthorization.RESOURCE_GROUP, groupIds);
+            List<AuthorizationRightsModel> relations = authorizationRightsService.getRightsByGroupIds(DataObject.RESOURCE_GROUP, groupIds);
             RelationMap relationMap = new RelationMap();
             for (AuthorizationRightsModel relation : relations) {
                 relationMap.addRelation(relation.getGroupId(),relation.getObjectId());
@@ -199,7 +199,7 @@ public class GroupService {
      * @return
      */
     public boolean assignReresourceGroups(Long groupId, List<Long> reresourceGroupIds) throws BizException {
-        authorizationRightsService.authorize(DataAuthorization.RESOURCE_GROUP, reresourceGroupIds, groupId, DataOperation.ALL);
+        authorizationRightsService.authorize(DataObject.RESOURCE_GROUP, reresourceGroupIds, groupId, DataOperation.ALL);
         return true;
     }
 }
