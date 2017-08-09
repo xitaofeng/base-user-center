@@ -76,7 +76,7 @@ public class OrganizationHandler implements RequestHandler {
                 }
 
             }
-            if(child.getParentId().equals(rootId)){
+            if(child.getParentId() == rootId){
                 roots.add(child);
             }
         }
