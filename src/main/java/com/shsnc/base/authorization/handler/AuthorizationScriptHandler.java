@@ -35,7 +35,6 @@ public class AuthorizationScriptHandler implements RequestHandler {
      */
     @RequestMapper("/addRights")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_SCRIPT_ADD_RIGHTS")
     public boolean addRights(@NotNull Long scriptId, @NotNull List<Long> groupIds) throws BaseException {
         authorizationRightsService.authorize(DataObject.SCRIPT ,scriptId, groupIds, DataOperation.ALL, false);
         return true;
@@ -46,7 +45,6 @@ public class AuthorizationScriptHandler implements RequestHandler {
      */
     @RequestMapper("/updateRights")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_SCRIPT_UPDATE_RIGHTS")
     public boolean updateRights(@NotNull Long scriptId, @NotNull List<Long> groupIds) throws BaseException {
         authorizationRightsService.authorize(DataObject.SCRIPT ,scriptId, groupIds, DataOperation.ALL, true);
         return true;
@@ -57,7 +55,6 @@ public class AuthorizationScriptHandler implements RequestHandler {
      */
     @RequestMapper("/removeRights")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_SCRIPT_REMOVE_RIGHTS")
     public boolean removeRights(@NotNull Long scriptId) throws BaseException {
         authorizationRightsService.deleteByObjectId(DataObject.SCRIPT, scriptId);
         return true;
@@ -65,21 +62,18 @@ public class AuthorizationScriptHandler implements RequestHandler {
 
     @RequestMapper("/checkOne")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_SCRIPT_CHECK_ONE")
     public boolean checkOne(@NotNull Long orchestrationId){
         return authorizationRightsService.checkPermisson(DataObject.SCRIPT, orchestrationId, DataOperation.ALL);
     }
 
     @RequestMapper("/checkMany")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_SCRIPT_CHECK_Many")
     public boolean checkMany(@NotEmpty List<Long> orchestrationIds){
         return authorizationRightsService.checkPermisson(DataObject.SCRIPT, orchestrationIds, DataOperation.ALL);
     }
 
     @RequestMapper("/getAllIds")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_SCRIPT_GET_ALL_IDS")
     public List<Long> getAllIds() throws BizException {
         return authorizationRightsService.getObjectIds(DataObject.SCRIPT, DataOperation.ALL);
     }

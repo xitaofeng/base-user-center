@@ -35,7 +35,6 @@ public class AuthorizationResourceGroupHandler implements RequestHandler {
      */
     @RequestMapper("/addRights")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_GROUP_ADD_RIGHTS")
     public boolean addRights(@NotNull Long resourceGroupId, @NotNull List<Long> groupIds) throws BaseException {
         authorizationRightsService.authorize(DataObject.RESOURCE_GROUP, resourceGroupId, groupIds, DataOperation.ALL, false);
         return true;
@@ -46,7 +45,6 @@ public class AuthorizationResourceGroupHandler implements RequestHandler {
      */
     @RequestMapper("/updateRights")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_GROUP_UPDATE_RIGHTS")
     public boolean updateRights(@NotNull Long resourceGroupId, @NotNull List<Long> groupIds) throws BaseException {
         authorizationRightsService.authorize(DataObject.RESOURCE_GROUP, resourceGroupId, groupIds, DataOperation.ALL, true);
         return true;
@@ -57,7 +55,6 @@ public class AuthorizationResourceGroupHandler implements RequestHandler {
      */
     @RequestMapper("/removeRights")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_GROUP_REMOVE_RIGHTS")
     public boolean removeRights(@NotNull Long resourceGroupId) throws BaseException {
         authorizationRightsService.deleteByObjectId(DataObject.RESOURCE_GROUP, resourceGroupId);
         return true;
@@ -65,21 +62,18 @@ public class AuthorizationResourceGroupHandler implements RequestHandler {
 
     @RequestMapper("/checkOne")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_GROUP_CHECK_ONE")
     public boolean checkOne(@NotNull Long resourceGroupId){
         return authorizationRightsService.checkPermisson(DataObject.RESOURCE_GROUP, resourceGroupId, DataOperation.ALL);
     }
 
     @RequestMapper("/checkMany")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_GROUP_CHECK_Many")
     public boolean checkMany(@NotEmpty List<Long> resourceGroupIds){
         return authorizationRightsService.checkPermisson(DataObject.RESOURCE_GROUP, resourceGroupIds, DataOperation.ALL);
     }
 
     @RequestMapper("/getAllIds")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_GROUP_GET_ALL_IDS")
     public List<Long> getAllIds() throws BizException {
         return authorizationRightsService.getObjectIds(DataObject.RESOURCE_GROUP, DataOperation.ALL);
     }

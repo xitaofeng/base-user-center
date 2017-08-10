@@ -1,7 +1,6 @@
 package com.shsnc.base.authorization.handler;
 
 import com.shsnc.api.core.RequestHandler;
-import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
@@ -35,7 +34,6 @@ public class AuthorizationOrchestrationHandler implements RequestHandler {
      */
     @RequestMapper("/addRights")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ORCHESTRATION_ADD_RIGHTS")
     public boolean addRights(@NotNull Long orchestrationId, @NotNull List<Long> groupIds) throws BaseException {
         authorizationRightsService.authorize(DataObject.ORCHESTRATION,orchestrationId, groupIds, DataOperation.ALL, false);
         return true;
@@ -46,7 +44,6 @@ public class AuthorizationOrchestrationHandler implements RequestHandler {
      */
     @RequestMapper("/updateRights")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ORCHESTRATION_UPDATE_RIGHTS")
     public boolean updateRights(@NotNull Long orchestrationId, @NotNull List<Long> groupIds) throws BaseException {
         authorizationRightsService.authorize(DataObject.ORCHESTRATION,orchestrationId, groupIds, DataOperation.ALL, true);
         return true;
@@ -57,7 +54,6 @@ public class AuthorizationOrchestrationHandler implements RequestHandler {
      */
     @RequestMapper("/removeRights")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ORCHESTRATION_REMOVE_RIGHTS")
     public boolean removeRights(@NotNull Long orchestrationId) throws BaseException {
         authorizationRightsService.deleteByObjectId(DataObject.ORCHESTRATION, orchestrationId);
         return true;
@@ -65,21 +61,18 @@ public class AuthorizationOrchestrationHandler implements RequestHandler {
 
     @RequestMapper("/checkOne")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ORCHESTRATION_CHECK_ONE")
     public boolean checkOne(@NotNull Long orchestrationId){
         return authorizationRightsService.checkPermisson(DataObject.ORCHESTRATION, orchestrationId, DataOperation.ALL);
     }
 
     @RequestMapper("/checkMany")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ORCHESTRATION_CHECK_Many")
     public boolean checkMany(@NotEmpty List<Long> orchestrationIds){
         return authorizationRightsService.checkPermisson(DataObject.ORCHESTRATION, orchestrationIds, DataOperation.ALL);
     }
 
     @RequestMapper("/getAllIds")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ORCHESTRATION_GET_ALL_IDS")
     public List<Long> getAllIds() throws BizException {
         return authorizationRightsService.getObjectIds(DataObject.ORCHESTRATION, DataOperation.ALL);
     }
