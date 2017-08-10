@@ -40,4 +40,6 @@ public interface AuthorizationRightsModelMapper {
     List<AuthorizationRightsModel> getByObjectIds(@Param("objectIds") List<Long> objectIds, @Param("dataObject") DataObject dataObject, @Param("groupIds") List<Long> groupIds);
 
     int deleteByGroupId(@Param("groupId") Long groupId, @Param("dataObject") DataObject dataObject);
+
+    List<AuthorizationRightsModel> fetchByObjectId(@Param("objectId") Long objectId, @Param("dataObject") DataObject dataObject);
 }

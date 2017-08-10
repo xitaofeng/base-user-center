@@ -81,6 +81,13 @@
         </foreach>
     </select>
 
+    <select id="fetchByObjectId" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM authorization_rights
+        WHERE object_type = #{dataObject.type} AND object_id = #{objectId}
+    </select>
+
     <delete id="deleteByPrimaryKey" >
         DELETE FROM authorization_rights
         WHERE right_id = #{rightId,jdbcType=BIGINT}

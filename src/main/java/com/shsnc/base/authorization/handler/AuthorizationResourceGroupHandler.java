@@ -1,13 +1,15 @@
 package com.shsnc.base.authorization.handler;
 
 import com.shsnc.api.core.RequestHandler;
-import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.base.authorization.config.DataObject;
 import com.shsnc.base.authorization.config.DataOperation;
 import com.shsnc.base.authorization.service.AuthorizationRightsService;
+import com.shsnc.base.user.bean.Group;
+import com.shsnc.base.user.model.GroupModel;
+import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -78,4 +80,10 @@ public class AuthorizationResourceGroupHandler implements RequestHandler {
         return authorizationRightsService.getObjectIds(DataObject.RESOURCE_GROUP, DataOperation.ALL);
     }
 
+    @RequestMapper("/getGroups")
+    @Validate
+    public List<Group> getGroups(Long resourceGroupId) throws BaseException {
+        List<GroupModel> groupModels = authorizationRightsService.getGroupsByObjectId(DataObject.RESOURCE_GROUP, resourceGroupId);
+        return JsonUtil.convert(groupModels, List.class, Group.class);
+    }
 }

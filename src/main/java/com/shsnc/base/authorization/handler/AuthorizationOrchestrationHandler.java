@@ -7,6 +7,9 @@ import com.shsnc.api.core.validation.Validate;
 import com.shsnc.base.authorization.config.DataObject;
 import com.shsnc.base.authorization.config.DataOperation;
 import com.shsnc.base.authorization.service.AuthorizationRightsService;
+import com.shsnc.base.user.bean.Group;
+import com.shsnc.base.user.model.GroupModel;
+import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -75,6 +78,13 @@ public class AuthorizationOrchestrationHandler implements RequestHandler {
     @Validate
     public List<Long> getAllIds() throws BizException {
         return authorizationRightsService.getObjectIds(DataObject.ORCHESTRATION, DataOperation.ALL);
+    }
+
+    @RequestMapper("/getGroups")
+    @Validate
+    public List<Group> getGroups(Long orchestrationId) throws BaseException {
+        List<GroupModel> groupModels = authorizationRightsService.getGroupsByObjectId(DataObject.ORCHESTRATION, orchestrationId);
+        return JsonUtil.convert(groupModels, List.class, Group.class);
     }
 
 }

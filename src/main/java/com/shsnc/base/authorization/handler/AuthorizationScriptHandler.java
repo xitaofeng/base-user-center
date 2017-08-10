@@ -1,13 +1,15 @@
 package com.shsnc.base.authorization.handler;
 
 import com.shsnc.api.core.RequestHandler;
-import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.base.authorization.config.DataObject;
 import com.shsnc.base.authorization.config.DataOperation;
 import com.shsnc.base.authorization.service.AuthorizationRightsService;
+import com.shsnc.base.user.bean.Group;
+import com.shsnc.base.user.model.GroupModel;
+import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -62,19 +64,27 @@ public class AuthorizationScriptHandler implements RequestHandler {
 
     @RequestMapper("/checkOne")
     @Validate
-    public boolean checkOne(@NotNull Long orchestrationId){
-        return authorizationRightsService.checkPermisson(DataObject.SCRIPT, orchestrationId, DataOperation.ALL);
+    public boolean checkOne(@NotNull Long scriptId){
+        return authorizationRightsService.checkPermisson(DataObject.SCRIPT, scriptId, DataOperation.ALL);
     }
 
     @RequestMapper("/checkMany")
     @Validate
-    public boolean checkMany(@NotEmpty List<Long> orchestrationIds){
-        return authorizationRightsService.checkPermisson(DataObject.SCRIPT, orchestrationIds, DataOperation.ALL);
+    public boolean checkMany(@NotEmpty List<Long> scriptIds){
+        return authorizationRightsService.checkPermisson(DataObject.SCRIPT, scriptIds, DataOperation.ALL);
     }
 
     @RequestMapper("/getAllIds")
     @Validate
     public List<Long> getAllIds() throws BizException {
         return authorizationRightsService.getObjectIds(DataObject.SCRIPT, DataOperation.ALL);
+    }
+
+
+    @RequestMapper("/getGroups")
+    @Validate
+    public List<Group> getGroups(Long scriptId) throws BaseException {
+        List<GroupModel> groupModels = authorizationRightsService.getGroupsByObjectId(DataObject.SCRIPT, scriptId);
+        return JsonUtil.convert(groupModels, List.class, Group.class);
     }
 }

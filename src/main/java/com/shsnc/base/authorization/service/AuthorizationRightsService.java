@@ -369,4 +369,14 @@ public class AuthorizationRightsService {
         authorizationRightsModelMapper.clearByGroupIds(groupIds);
     }
 
+    public List<GroupModel> getGroupsByObjectId(DataObject dataObject, Long objectId) throws BaseException {
+        BizAssert.notNull(dataObject, "对象类型不能为空！");
+        BizAssert.notNull(objectId, String.format("【%s】的id不能为空！", dataObject.getDescription()));
+        List<AuthorizationRightsModel> rights = authorizationRightsModelMapper.fetchByObjectId(objectId, dataObject);
+        List<Long> groupIds = rights.stream().map(AuthorizationRightsModel::getGroupId).distinct().collect(Collectors.toList());
+        if (groupIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return groupModelMapper.getByGroupIds(groupIds);
+    }
 }
