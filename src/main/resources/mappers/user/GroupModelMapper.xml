@@ -108,6 +108,13 @@
         </foreach>
     </select>
 
+    <select id="getListByCondition" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn" />
+        FROM user_group
+        <include refid="conditionSql"/>
+    </select>
+
     <delete id="deleteByPrimaryKey" >
         DELETE FROM user_group
         WHERE group_id = #{groupId,jdbcType=BIGINT}

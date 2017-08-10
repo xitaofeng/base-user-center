@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by houguangqiang on 2017/6/9.
@@ -42,9 +43,9 @@ public class PassportHandler implements RequestHandler{
     @Autowired
     private AccountService accountService;
     @Autowired
-    private LoginHistoryService loginHistoryService;
-    @Autowired
     private UserInfoService userInfoService;
+    @Autowired
+    private LoginHistoryService loginHistoryService;
 
     @RequestMapper("/login")
     @Validate
@@ -84,7 +85,9 @@ public class PassportHandler implements RequestHandler{
                         logger.error(serverMsg, e);
                     }
                     if (token != null) {
-                        userInfoService.selectGroups(Collections.singletonList(userInfoModel));
+                        List<UserInfoModel> userInfoModelList = Collections.singletonList(userInfoModel);
+                        userInfoService.selectOrganization(userInfoModelList);
+                        userInfoService.selectGroups(userInfoModelList);
                         UserInfo userInfo = JsonUtil.convert(userInfoModel, UserInfo.class);
                         loginResult.setUserInfo(userInfo);
                         Certification certification = new Certification(token);

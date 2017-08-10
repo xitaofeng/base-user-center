@@ -34,4 +34,6 @@ public interface GroupModelMapper {
     List<Long> getGroupIdsByGroupIds(@Param("groupIds") List<Long> groupIds);
 
     List<GroupModel> getByGroupIds(@Param("groupIds") Collection<Long> groupIds);
+
+    List<GroupModel> getListByCondition(@Param("condition") GroupCondition condition);
 }

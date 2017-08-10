@@ -1,7 +1,8 @@
 package com.shsnc.base.user.service;
 
-import com.shsnc.base.authorization.config.DataAuthorization;
+import com.shsnc.base.authorization.config.DataObject;
 import com.shsnc.base.authorization.config.DataOperation;
+import com.shsnc.base.authorization.mapper.AuthorizationRightsModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationRightsModel;
 import com.shsnc.base.authorization.service.AuthorizationRightsService;
 import com.shsnc.base.module.bean.ResourceGroupInfo;
@@ -15,6 +16,7 @@ import com.shsnc.base.user.model.UserInfoGroupRelationModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.bean.RelationMap;
+import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
@@ -47,13 +49,15 @@ public class GroupService {
     private UserInfoModelMapper userInfoModelMapper;
     @Autowired
     private AuthorizationRightsService authorizationRightsService;
+    @Autowired
+    private AuthorizationRightsModelMapper authorizationRightsModelMapper;
 
     /**
      * 获取所有用户组
      * @return 返回用户组列表
      */
-    public List<GroupModel> getGroupList() {
-        return groupModelMapper.selectAll();
+    public List<GroupModel> getGroupList(GroupCondition condition) {
+        return groupModelMapper.getListByCondition(condition);
     }
 
     /**
@@ -89,7 +93,7 @@ public class GroupService {
         }
         List<Long> groupIds = groupModels.stream().map(GroupModel::getGroupId).collect(Collectors.toList());
         if (!groupIds.isEmpty()) {
-            List<AuthorizationRightsModel> relations = authorizationRightsService.getRightsByGroupIds(DataAuthorization.RESOURCE_GROUP, groupIds);
+            List<AuthorizationRightsModel> relations = authorizationRightsModelMapper.getByGroupIds(groupIds, DataObject.RESOURCE_GROUP);
             RelationMap relationMap = new RelationMap();
             for (AuthorizationRightsModel relation : relations) {
                 relationMap.addRelation(relation.getGroupId(),relation.getObjectId());
@@ -198,8 +202,8 @@ public class GroupService {
      * @param reresourceGroupIds 资源组id
      * @return
      */
-    public boolean assignReresourceGroups(Long groupId, List<Long> reresourceGroupIds) throws BizException {
-        authorizationRightsService.authorize(DataAuthorization.RESOURCE_GROUP, reresourceGroupIds, groupId, DataOperation.ALL);
+    public boolean assignReresourceGroups(Long groupId, List<Long> reresourceGroupIds) throws BaseException {
+        authorizationRightsService.authorize(DataObject.RESOURCE_GROUP, reresourceGroupIds, groupId, DataOperation.ALL, true);
         return true;
     }
 }

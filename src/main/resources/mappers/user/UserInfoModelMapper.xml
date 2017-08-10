@@ -68,7 +68,7 @@
             #{mobile},
             #{email},
             #{internal},
-            #{defaultGroupId}
+            #{defaultGroupId},
             #{status},
             #{createTime},
             #{attemptTime},

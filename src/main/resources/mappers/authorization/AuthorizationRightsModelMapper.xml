@@ -31,7 +31,7 @@
         SELECT
             <include refid="BaseColumn" />
         FROM authorization_rights
-        WHERE object_type = #{dataAuthorization.type} AND group_id IN
+        WHERE object_type = #{dataObject.type} AND group_id IN
         <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
             #{groupId}
         </foreach>
@@ -40,7 +40,7 @@
     <select id="getObjectIdsByGroupIds" resultType="java.lang.Long">
         SELECT DISTINCT object_id
         FROM authorization_rights
-        WHERE object_type = #{dataAuthorization.type} AND group_id IN
+        WHERE object_type = #{dataObject.type} AND group_id IN
         <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
             #{groupId}
         </foreach>
@@ -49,23 +49,35 @@
     <select id="getPermissionByObjectId" resultType="java.lang.Integer">
         SELECT permission
         FROM authorization_rights
-        WHERE object_type = #{dataAuthorization.type} AND object_id = #{objectId}
+        WHERE object_type = #{dataObject.type} AND object_id = #{objectId}
+        AND group_Id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
     </select>
 
     <select id="getByObjectId" resultMap="BaseResultMap">
         SELECT
             <include refid="BaseColumn"/>
         FROM authorization_rights
-        WHERE object_type = #{dataAuthorization.type} AND object_id = #{objectId}
+        WHERE object_type = #{dataObject.type} AND object_id = #{objectId}
+        AND group_Id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
     </select>
 
     <select id="getByObjectIds" resultMap="BaseResultMap">
         SELECT
             <include refid="BaseColumn"/>
         FROM authorization_rights
-        WHERE object_type = #{dataAuthorization.type} AND object_id IN
+        WHERE object_type = #{dataObject.type} AND object_id IN
         <foreach collection="objectIds" item="objectId" open="(" close=")" separator=",">
             #{objectId}
+        </foreach>
+        AND group_Id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
         </foreach>
     </select>
 
@@ -76,12 +88,12 @@
 
     <delete id="deleteByObjectId">
         DELETE FROM authorization_rights
-        WHERE object_type = #{dataAuthorization.type} AND object_id = #{objectId}
+        WHERE object_type = #{dataObject.type} AND object_id = #{objectId}
     </delete>
 
     <delete id="deleteByObjectIds">
         DELETE FROM authorization_rights
-        WHERE object_type = #{dataAuthorization.type} AND object_id IN
+        WHERE object_type = #{dataObject.type} AND object_id IN
         <foreach collection="objectIds" item="objectId" open="(" close=")" separator=",">
             #{objectId}
         </foreach>
@@ -101,7 +113,7 @@
 
     <delete id="deleteByGroupId">
         DELETE FROM authorization_rights
-        WHERE object_type = #{dataAuthorization.type} AND group_id = #{groupId}
+        WHERE object_type = #{dataObject.type} AND group_id = #{groupId}
     </delete>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="rightId" >
