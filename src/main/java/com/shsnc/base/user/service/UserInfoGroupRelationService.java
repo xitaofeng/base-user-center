@@ -10,7 +10,6 @@ import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.config.BizException;
 import org.apache.commons.collections.ListUtils;
-import org.apache.commons.collections.SetUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -138,4 +137,10 @@ public class UserInfoGroupRelationService {
         return true;
     }
 
+    public List<Long> getUserIdsByGroupIds(List<Long> groupIds) {
+        if (groupIds == null && groupIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return userInfoGroupRelationModelMapper.getUserIdsByGroupIds(groupIds);
+    }
 }
