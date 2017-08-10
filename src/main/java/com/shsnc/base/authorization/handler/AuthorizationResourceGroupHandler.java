@@ -31,7 +31,7 @@ public class AuthorizationResourceGroupHandler implements RequestHandler {
     private AuthorizationRightsService authorizationRightsService;
 
     /**
-     * 授权编排
+     * 新增授权
      */
     @RequestMapper("/addRights")
     @Validate
@@ -40,14 +40,26 @@ public class AuthorizationResourceGroupHandler implements RequestHandler {
         authorizationRightsService.authorize(DataObject.RESOURCE_GROUP, resourceGroupId, groupIds, DataOperation.ALL, false);
         return true;
     }
+
     /**
-     * 授权编排
+     * 更新授权
      */
     @RequestMapper("/updateRights")
     @Validate
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_GROUP_UPDATE_RIGHTS")
     public boolean updateRights(@NotNull Long resourceGroupId, @NotNull List<Long> groupIds) throws BaseException {
         authorizationRightsService.authorize(DataObject.RESOURCE_GROUP, resourceGroupId, groupIds, DataOperation.ALL, true);
+        return true;
+    }
+
+    /**
+     * 移除授权
+     */
+    @RequestMapper("/removeRights")
+    @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_RESOURCE_GROUP_REMOVE_RIGHTS")
+    public boolean removeRights(@NotNull Long resourceGroupId) throws BaseException {
+        authorizationRightsService.deleteByObjectId(DataObject.RESOURCE_GROUP, resourceGroupId);
         return true;
     }
 

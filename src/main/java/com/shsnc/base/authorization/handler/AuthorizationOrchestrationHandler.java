@@ -31,7 +31,7 @@ public class AuthorizationOrchestrationHandler implements RequestHandler {
     private AuthorizationRightsService authorizationRightsService;
 
     /**
-     * 授权编排
+     * 新增编排
      */
     @RequestMapper("/addRights")
     @Validate
@@ -40,14 +40,26 @@ public class AuthorizationOrchestrationHandler implements RequestHandler {
         authorizationRightsService.authorize(DataObject.ORCHESTRATION,orchestrationId, groupIds, DataOperation.ALL, false);
         return true;
     }
+
     /**
-     * 授权编排
+     * 更新授权
      */
     @RequestMapper("/updateRights")
     @Validate
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_ORCHESTRATION_UPDATE_RIGHTS")
     public boolean updateRights(@NotNull Long orchestrationId, @NotNull List<Long> groupIds) throws BaseException {
         authorizationRightsService.authorize(DataObject.ORCHESTRATION,orchestrationId, groupIds, DataOperation.ALL, true);
+        return true;
+    }
+
+    /**
+     * 移除授权
+     */
+    @RequestMapper("/removeRights")
+    @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ORCHESTRATION_REMOVE_RIGHTS")
+    public boolean removeRights(@NotNull Long orchestrationId) throws BaseException {
+        authorizationRightsService.deleteByObjectId(DataObject.ORCHESTRATION, orchestrationId);
         return true;
     }
 
