@@ -33,11 +33,22 @@ public class AuthorizationScriptHandler implements RequestHandler {
     /**
      * 授权脚本
      */
-    @RequestMapper("/authorize")
+    @RequestMapper("/addRights")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_SCRIPT_AUTHORIZE")
-    public boolean authorize(@NotNull Long scriptId, @NotNull List<Long> groupIds) throws BaseException {
-        authorizationRightsService.authorize(DataObject.SCRIPT ,scriptId, groupIds, DataOperation.ALL);
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ADD_RIGHTS")
+    public boolean addRights(@NotNull Long scriptId, @NotNull List<Long> groupIds) throws BaseException {
+        authorizationRightsService.authorize(DataObject.SCRIPT ,scriptId, groupIds, DataOperation.ALL, false);
+        return true;
+    }
+
+    /**
+     * 授权脚本
+     */
+    @RequestMapper("/updateRights")
+    @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_UPDATE_RIGHTS")
+    public boolean updateRights(@NotNull Long scriptId, @NotNull List<Long> groupIds) throws BaseException {
+        authorizationRightsService.authorize(DataObject.SCRIPT ,scriptId, groupIds, DataOperation.ALL, true);
         return true;
     }
 

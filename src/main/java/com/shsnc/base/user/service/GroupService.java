@@ -1,6 +1,5 @@
 package com.shsnc.base.user.service;
 
-import com.shsnc.api.core.ThreadContext;
 import com.shsnc.base.authorization.config.DataObject;
 import com.shsnc.base.authorization.config.DataOperation;
 import com.shsnc.base.authorization.mapper.AuthorizationRightsModelMapper;
@@ -17,6 +16,7 @@ import com.shsnc.base.user.model.UserInfoGroupRelationModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.bean.RelationMap;
+import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
@@ -137,12 +137,6 @@ public class GroupService {
         group.setCode(UUID.randomUUID().toString());
         checkInput(group);
         groupModelMapper.insert(group);
-        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
-            UserInfoGroupRelationModel userInfoGroupRelationModel = new UserInfoGroupRelationModel();
-            userInfoGroupRelationModel.setGroupId(group.getGroupId());
-            userInfoGroupRelationModel.setUserId(ThreadContext.getUserInfo().getUserId());
-            userInfoGroupRelationModelMapper.insert(userInfoGroupRelationModel);
-        }
         return group.getGroupId();
     }
 
@@ -208,8 +202,8 @@ public class GroupService {
      * @param reresourceGroupIds 资源组id
      * @return
      */
-    public boolean assignReresourceGroups(Long groupId, List<Long> reresourceGroupIds) throws BizException {
-        authorizationRightsService.authorize(DataObject.RESOURCE_GROUP, reresourceGroupIds, groupId, DataOperation.ALL);
+    public boolean assignReresourceGroups(Long groupId, List<Long> reresourceGroupIds) throws BaseException {
+        authorizationRightsService.authorize(DataObject.RESOURCE_GROUP, reresourceGroupIds, groupId, DataOperation.ALL, true);
         return true;
     }
 }

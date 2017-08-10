@@ -33,11 +33,21 @@ public class AuthorizationOrchestrationHandler implements RequestHandler {
     /**
      * 授权编排
      */
-    @RequestMapper("/authorize")
+    @RequestMapper("/addRights")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ORCHESTRATION_AUTHORIZE")
-    public boolean authorize(@NotNull Long orchestrationId, @NotNull List<Long> groupIds) throws BaseException {
-        authorizationRightsService.authorize(DataObject.ORCHESTRATION,orchestrationId, groupIds, DataOperation.ALL);
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ORCHESTRATION_ADD_RIGHTS")
+    public boolean addRights(@NotNull Long orchestrationId, @NotNull List<Long> groupIds) throws BaseException {
+        authorizationRightsService.authorize(DataObject.ORCHESTRATION,orchestrationId, groupIds, DataOperation.ALL, false);
+        return true;
+    }
+    /**
+     * 授权编排
+     */
+    @RequestMapper("/updateRights")
+    @Validate
+    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ORCHESTRATION_UPDATE_RIGHTS")
+    public boolean updateRights(@NotNull Long orchestrationId, @NotNull List<Long> groupIds) throws BaseException {
+        authorizationRightsService.authorize(DataObject.ORCHESTRATION,orchestrationId, groupIds, DataOperation.ALL, true);
         return true;
     }
 

@@ -43,21 +43,21 @@ public class AuthorizationRightsService {
     @Autowired
     private UserInfoGroupRelationModelMapper userInfoGroupRelationModelMapper;
 
-    private boolean checkGroupId(Long groupId) {
-        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
-            List<Long> currentGroupIds = ThreadContext.getUserInfo().getGroupIds();
-            return currentGroupIds.contains(groupId);
-        }
-        return true;
-    }
-
-    private boolean checkGroupIds(List<Long> groupIds) throws BizException {
-        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
-            List<Long> currentGroupIds = ThreadContext.getUserInfo().getGroupIds();
-            return currentGroupIds.containsAll(groupIds);
-        }
-        return true;
-    }
+//    private boolean checkGroupId(Long groupId) {
+//        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+//            List<Long> currentGroupIds = ThreadContext.getUserInfo().getGroupIds();
+//            return currentGroupIds.contains(groupId);
+//        }
+//        return true;
+//    }
+//
+//    private boolean checkGroupIds(List<Long> groupIds) throws BizException {
+//        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+//            List<Long> currentGroupIds = ThreadContext.getUserInfo().getGroupIds();
+//            return currentGroupIds.containsAll(groupIds);
+//        }
+//        return true;
+//    }
 
     /**
      * 检查是否有某个对象的某项操作的权限
@@ -149,10 +149,11 @@ public class AuthorizationRightsService {
      * @param objectId 对象id
      * @param groupIds 用户组id列表
      * @param dataOperation 操作类型
+     * @param update 是否是已存在对象的授权
      */
     @Transactional(rollbackFor = Exception.class)
-    public void authorize(DataObject dataObject, Long objectId, List<Long> groupIds, DataOperation dataOperation) throws BaseException {
-        authorize(dataObject, objectId, groupIds, dataOperation.getValue());
+    public void authorize(DataObject dataObject, Long objectId, List<Long> groupIds, DataOperation dataOperation, boolean update) throws BaseException {
+        authorize(dataObject, objectId, groupIds, dataOperation.getValue(), update);
     }
 
     /**
@@ -161,19 +162,21 @@ public class AuthorizationRightsService {
      * @param objectId 对象id
      * @param groupIds 用户组id列表
      * @param permission 权限值
+     * @param update 是否是已存在对象的授权
      */
     @Transactional(rollbackFor = Exception.class)
-    public void authorize(DataObject dataObject, Long objectId, List<Long> groupIds, int permission) throws BaseException {
+    public void authorize(DataObject dataObject, Long objectId, List<Long> groupIds, int permission, boolean update) throws BaseException {
         BizAssert.notNull(dataObject, "对象类型不能为空！");
         BizAssert.notNull(objectId, String.format("【%s】的id不能为空！", dataObject.getDescription()));
         BizAssert.notNull(groupIds, "用户组id不能为空！");
         if (!ThreadContext.getUserInfo().isSuperAdmin()) {
-            if (!checkGroupIds(groupIds) || !checkPermisson(dataObject, objectId, permission)) {
+            if ((update && !checkPermisson(dataObject, objectId, permission))) {
                 throw new BaseException(MessageCode.PERMISSION_DENIED);
             }
         }
-
-        authorizationRightsModelMapper.deleteByObjectId(objectId, dataObject);
+        if (update) {
+            authorizationRightsModelMapper.deleteByObjectId(objectId, dataObject);
+        }
         if (!groupIds.isEmpty()) {
             List<GroupModel> dbGroupModels = groupModelMapper.getByGroupIds(groupIds);
             List<AuthorizationRightsModel> authorizationRightsModels = new ArrayList<>();
@@ -198,10 +201,11 @@ public class AuthorizationRightsService {
      * @param objectIds 对象id列表
      * @param groupId 用户组id
      * @param dataOperation 操作类型
+     * @param update 是否是已存在对象的授权
      */
     @Transactional(rollbackFor = Exception.class)
-    public void authorize(DataObject dataObject, List<Long> objectIds, Long groupId, DataOperation dataOperation) throws BaseException {
-        authorize(dataObject, objectIds, groupId, dataOperation.getValue());
+    public void authorize(DataObject dataObject, List<Long> objectIds, Long groupId, DataOperation dataOperation, boolean update) throws BaseException {
+        authorize(dataObject, objectIds, groupId, dataOperation.getValue(), update);
     }
 
     /**
@@ -210,21 +214,24 @@ public class AuthorizationRightsService {
      * @param objectIds 对象id列表
      * @param groupId 用户组id
      * @param permission 权限值
+     * @param update 是否是已存在对象的授权
      */
     @Transactional(rollbackFor = Exception.class)
-    public void authorize(DataObject dataObject, List<Long> objectIds, Long groupId, int permission) throws BaseException {
+    public void authorize(DataObject dataObject, List<Long> objectIds, Long groupId, int permission, boolean update) throws BaseException {
         BizAssert.notNull(dataObject, "对象类型不能为空！");
         BizAssert.notEmpty(objectIds, String.format("【%s】的id不能为空！", dataObject.getDescription()));
         BizAssert.notNull(groupId, "用户组id不能为空！");
         GroupModel dbGroupModel = groupModelMapper.selectByPrimaryKey(groupId);
         BizAssert.notNull(dbGroupModel, String.format("用户组id【%s】不存在！",groupId));
         if (!ThreadContext.getUserInfo().isSuperAdmin()) {
-            if (!checkGroupId(groupId) || !checkPermisson(dataObject, objectIds, permission)) {
+            if (update && !checkPermisson(dataObject, objectIds, permission)) {
                 throw new BaseException(MessageCode.PERMISSION_DENIED);
             }
         }
 
-        authorizationRightsModelMapper.deleteByGroupId(groupId, dataObject);
+        if (update) {
+            authorizationRightsModelMapper.deleteByGroupId(groupId, dataObject);
+        }
         List<AuthorizationRightsModel> authorizationRightsModels = new ArrayList<>();
         for (Long objectId : objectIds) {
             AuthorizationRightsModel authorizationRightsModel = new AuthorizationRightsModel();
@@ -303,10 +310,13 @@ public class AuthorizationRightsService {
         if (ThreadContext.getUserInfo().isSuperAdmin()){
             return DataOperation.ALL.getValue();
         }
-        List<Integer> permissions = authorizationRightsModelMapper.getPermissionByObjectId(objectId, dataObject, ThreadContext.getUserInfo().getGroupIds());
         int permission = 0;
-        for (Integer p : permissions) {
-            permission = permission | p;
+        List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+        if (!groupIds.isEmpty()) {
+            List<Integer> permissions = authorizationRightsModelMapper.getPermissionByObjectId(objectId, dataObject, groupIds);
+            for (Integer p : permissions) {
+                permission = permission | p;
+            }
         }
         return permission;
     }
@@ -346,9 +356,6 @@ public class AuthorizationRightsService {
     @Transactional(rollbackFor = Exception.class)
     public void clearByGroupId(Long groupId) throws BaseException {
         BizAssert.notNull(groupId, "用户组id不能为空！");
-        if (!checkGroupId(groupId)) {
-            throw new BaseException(MessageCode.PERMISSION_DENIED);
-        }
         authorizationRightsModelMapper.clearByGroupId(groupId);
     }
 
@@ -359,9 +366,6 @@ public class AuthorizationRightsService {
     @Transactional(rollbackFor = Exception.class)
     public void clearByGroupIds(List<Long> groupIds) throws BaseException {
         BizAssert.notEmpty(groupIds, "用户组id不能为空！");
-        if (!checkGroupIds(groupIds)) {
-            throw new BaseException(MessageCode.PERMISSION_DENIED);
-        }
         authorizationRightsModelMapper.clearByGroupIds(groupIds);
     }
 
