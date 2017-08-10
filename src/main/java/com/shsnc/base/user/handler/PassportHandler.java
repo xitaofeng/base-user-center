@@ -14,7 +14,6 @@ import com.shsnc.base.user.model.LoginHistoryModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.service.AccountService;
 import com.shsnc.base.user.service.LoginHistoryService;
-import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.user.support.token.SimpleTokenProvider;
 import com.shsnc.base.user.support.token.TokenHelper;
 import com.shsnc.base.util.JsonUtil;
@@ -27,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -43,8 +41,6 @@ public class PassportHandler implements RequestHandler{
     private AccountService accountService;
     @Autowired
     private LoginHistoryService loginHistoryService;
-    @Autowired
-    private UserInfoService userInfoService;
 
     @RequestMapper("/login")
     @Validate
@@ -84,7 +80,6 @@ public class PassportHandler implements RequestHandler{
                         logger.error(serverMsg, e);
                     }
                     if (token != null) {
-                        userInfoService.selectGroups(Collections.singletonList(userInfoModel));
                         UserInfo userInfo = JsonUtil.convert(userInfoModel, UserInfo.class);
                         loginResult.setUserInfo(userInfo);
                         Certification certification = new Certification(token);
