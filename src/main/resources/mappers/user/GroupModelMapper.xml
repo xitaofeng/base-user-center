@@ -55,7 +55,7 @@
                 </if>
                 <if test="condition.checkPermission">
                     AND group_id IN
-                    <foreach collection="condition.objectIds" open="(" close=")" separator=",">
+                    <foreach collection="condition.objectIds" item="objectId" open="(" close=")" separator=",">
                         #{objectId}
                     </foreach>
                 </if>
