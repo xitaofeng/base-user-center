@@ -14,6 +14,7 @@ import com.shsnc.base.user.model.LoginHistoryModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.service.AccountService;
 import com.shsnc.base.user.service.LoginHistoryService;
+import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.user.support.token.SimpleTokenProvider;
 import com.shsnc.base.user.support.token.TokenHelper;
 import com.shsnc.base.util.JsonUtil;
@@ -26,7 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by houguangqiang on 2017/6/9.
@@ -39,6 +42,8 @@ public class PassportHandler implements RequestHandler{
 
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private UserInfoService userInfoService;
     @Autowired
     private LoginHistoryService loginHistoryService;
 
@@ -80,6 +85,9 @@ public class PassportHandler implements RequestHandler{
                         logger.error(serverMsg, e);
                     }
                     if (token != null) {
+                        List<UserInfoModel> userInfoModelList = Collections.singletonList(userInfoModel);
+                        userInfoService.selectOrganization(userInfoModelList);
+                        userInfoService.selectGroups(userInfoModelList);
                         UserInfo userInfo = JsonUtil.convert(userInfoModel, UserInfo.class);
                         loginResult.setUserInfo(userInfo);
                         Certification certification = new Certification(token);
