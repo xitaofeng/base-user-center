@@ -53,12 +53,6 @@
                 <if test="condition.code != null and condition.code != ''">
                     AND INSTR(code,#{condition.code})>0
                 </if>
-                <if test="condition.checkPermission">
-                    AND group_id IN
-                    <foreach collection="condition.objectIds" item="objectId" open="(" close=")" separator=",">
-                        #{objectId}
-                    </foreach>
-                </if>
             </if>
         </where>
     </sql>
