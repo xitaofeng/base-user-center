@@ -10,7 +10,9 @@ import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
 import com.shsnc.base.user.model.GroupModel;
 import com.shsnc.base.user.service.GroupService;
 import com.shsnc.base.util.BizAssert;
+import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
+import com.shsnc.base.util.config.MessageCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,7 +151,7 @@ public class AuthorizationRightsService {
      * @param dataOperation 操作类型
      */
     @Transactional(rollbackFor = Exception.class)
-    public void authorize(DataObject dataObject, Long objectId, List<Long> groupIds, DataOperation dataOperation) throws BizException {
+    public void authorize(DataObject dataObject, Long objectId, List<Long> groupIds, DataOperation dataOperation) throws BaseException {
         authorize(dataObject, objectId, groupIds, dataOperation.getValue());
     }
 
@@ -161,18 +163,18 @@ public class AuthorizationRightsService {
      * @param permission 权限值
      */
     @Transactional(rollbackFor = Exception.class)
-    public void authorize(DataObject dataObject, Long objectId, List<Long> groupIds, int permission) throws BizException {
+    public void authorize(DataObject dataObject, Long objectId, List<Long> groupIds, int permission) throws BaseException {
         BizAssert.notNull(dataObject, "对象类型不能为空！");
         BizAssert.notNull(objectId, String.format("【%s】的id不能为空！", dataObject.getDescription()));
         BizAssert.notNull(groupIds, "用户组id不能为空！");
         if (!ThreadContext.getUserInfo().isSuperAdmin()) {
-            BizAssert.isTrue(ThreadContext.getUserInfo().getGroupIds().contains(groupIds), String.format("没有用户组%s的操作权限",groupIds.toString()));
-            BizAssert.isTrue(checkPermisson(dataObject, objectId, permission), "权限不足");
+            if (!checkGroupIds(groupIds) || !checkPermisson(dataObject, objectId, permission)) {
+                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            }
         }
 
         authorizationRightsModelMapper.deleteByObjectId(objectId, dataObject);
         if (!groupIds.isEmpty()) {
-            BizAssert.isTrue(checkGroupIds(groupIds),"含有没有权限操作的用户组");
             List<GroupModel> dbGroupModels = groupModelMapper.getByGroupIds(groupIds);
             List<AuthorizationRightsModel> authorizationRightsModels = new ArrayList<>();
             for (GroupModel dbGroupModel : dbGroupModels) {
@@ -198,7 +200,7 @@ public class AuthorizationRightsService {
      * @param dataOperation 操作类型
      */
     @Transactional(rollbackFor = Exception.class)
-    public void authorize(DataObject dataObject, List<Long> objectIds, Long groupId, DataOperation dataOperation) throws BizException {
+    public void authorize(DataObject dataObject, List<Long> objectIds, Long groupId, DataOperation dataOperation) throws BaseException {
         authorize(dataObject, objectIds, groupId, dataOperation.getValue());
     }
 
@@ -210,19 +212,19 @@ public class AuthorizationRightsService {
      * @param permission 权限值
      */
     @Transactional(rollbackFor = Exception.class)
-    public void authorize(DataObject dataObject, List<Long> objectIds, Long groupId, int permission) throws BizException {
+    public void authorize(DataObject dataObject, List<Long> objectIds, Long groupId, int permission) throws BaseException {
         BizAssert.notNull(dataObject, "对象类型不能为空！");
         BizAssert.notEmpty(objectIds, String.format("【%s】的id不能为空！", dataObject.getDescription()));
         BizAssert.notNull(groupId, "用户组id不能为空！");
+        GroupModel dbGroupModel = groupModelMapper.selectByPrimaryKey(groupId);
+        BizAssert.notNull(dbGroupModel, String.format("用户组id【%s】不存在！",groupId));
         if (!ThreadContext.getUserInfo().isSuperAdmin()) {
-            BizAssert.isTrue(ThreadContext.getUserInfo().getGroupIds().contains(groupId), String.format("没有用户组【%s】的操作权限",groupId));
-            BizAssert.isTrue(checkPermisson(dataObject, objectIds, permission), "权限不足");
+            if (!checkGroupId(groupId) || !checkPermisson(dataObject, objectIds, permission)) {
+                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            }
         }
 
         authorizationRightsModelMapper.deleteByGroupId(groupId, dataObject);
-        GroupModel dbGroupModel = groupModelMapper.selectByPrimaryKey(groupId);
-        BizAssert.notNull(dbGroupModel, String.format("用户组id【%s】不存在！",groupId));
-        BizAssert.isTrue(checkGroupId(groupId),"含有没有权限操作的用户组");
         List<AuthorizationRightsModel> authorizationRightsModels = new ArrayList<>();
         for (Long objectId : objectIds) {
             AuthorizationRightsModel authorizationRightsModel = new AuthorizationRightsModel();
@@ -314,10 +316,12 @@ public class AuthorizationRightsService {
      * @param dataObject 对象类型
      * @param objectIds 对象id的列表
      */
-    public void deleteByObjectIds(DataObject dataObject, List<Long> objectIds) throws BizException {
+    public void deleteByObjectIds(DataObject dataObject, List<Long> objectIds) throws BaseException {
         BizAssert.notNull(dataObject, "对象类型不能为空！");
         BizAssert.notEmpty(objectIds, String.format("【%s】的id不能为空！", dataObject.getDescription()));
-        BizAssert.isTrue(checkPermisson(dataObject, objectIds, DataOperation.DELETE), "权限不足");
+        if (!checkPermisson(dataObject, objectIds, DataOperation.DELETE)) {
+            throw new BaseException(MessageCode.PERMISSION_DENIED);
+        }
         authorizationRightsModelMapper.deleteByObjectIds(objectIds, dataObject);
     }
 
@@ -326,10 +330,12 @@ public class AuthorizationRightsService {
      * @param dataObject 对象类型
      * @param objectId 对象id
      */
-    public void deleteByObjectId(DataObject dataObject, Long objectId) throws BizException {
+    public void deleteByObjectId(DataObject dataObject, Long objectId) throws BaseException {
         BizAssert.notNull(dataObject, "对象类型不能为空！");
         BizAssert.notNull(objectId, String.format("【%s】的id不能为空！", dataObject.getDescription()));
-        BizAssert.isTrue(checkPermisson(dataObject, objectId, DataOperation.DELETE), "权限不足");
+        if (!checkPermisson(dataObject, objectId, DataOperation.DELETE)) {
+            throw new BaseException(MessageCode.PERMISSION_DENIED);
+        }
         authorizationRightsModelMapper.deleteByObjectId(objectId, dataObject);
     }
 
@@ -338,9 +344,11 @@ public class AuthorizationRightsService {
      * @param groupId 用户组
      */
     @Transactional(rollbackFor = Exception.class)
-    public void clearByGroupId(Long groupId) throws BizException {
+    public void clearByGroupId(Long groupId) throws BaseException {
         BizAssert.notNull(groupId, "用户组id不能为空！");
-        BizAssert.isTrue(checkGroupId(groupId),"含有没有权限操作的用户组");
+        if (!checkGroupId(groupId)) {
+            throw new BaseException(MessageCode.PERMISSION_DENIED);
+        }
         authorizationRightsModelMapper.clearByGroupId(groupId);
     }
 
@@ -349,9 +357,11 @@ public class AuthorizationRightsService {
      * @param groupIds 用户组id的列表
      */
     @Transactional(rollbackFor = Exception.class)
-    public void clearByGroupIds(List<Long> groupIds) throws BizException {
+    public void clearByGroupIds(List<Long> groupIds) throws BaseException {
         BizAssert.notEmpty(groupIds, "用户组id不能为空！");
-        BizAssert.isTrue(checkGroupIds(groupIds),"含有没有权限操作的用户组");
+        if (!checkGroupIds(groupIds)) {
+            throw new BaseException(MessageCode.PERMISSION_DENIED);
+        }
         authorizationRightsModelMapper.clearByGroupIds(groupIds);
     }
 

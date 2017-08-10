@@ -8,6 +8,7 @@ import com.shsnc.api.core.validation.Validate;
 import com.shsnc.base.authorization.config.DataObject;
 import com.shsnc.base.authorization.config.DataOperation;
 import com.shsnc.base.authorization.service.AuthorizationRightsService;
+import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class AuthorizationScriptHandler implements RequestHandler {
     @RequestMapper("/authorize")
     @Validate
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_SCRIPT_AUTHORIZE")
-    public boolean authorize(@NotNull Long scriptId, @NotNull List<Long> groupIds) throws BizException {
+    public boolean authorize(@NotNull Long scriptId, @NotNull List<Long> groupIds) throws BaseException {
         authorizationRightsService.authorize(DataObject.SCRIPT ,scriptId, groupIds, DataOperation.ALL);
         return true;
     }
