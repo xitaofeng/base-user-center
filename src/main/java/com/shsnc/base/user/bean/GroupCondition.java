@@ -20,4 +20,5 @@ public class GroupCondition {
     public void setCode(String code) {
         this.code = code;
     }
+
 }

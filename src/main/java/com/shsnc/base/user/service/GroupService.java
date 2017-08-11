@@ -1,5 +1,12 @@
 package com.shsnc.base.user.service;
 
+import com.shsnc.base.authorization.config.DataObject;
+import com.shsnc.base.authorization.config.DataOperation;
+import com.shsnc.base.authorization.mapper.AuthorizationRightsModelMapper;
+import com.shsnc.base.authorization.model.AuthorizationRightsModel;
+import com.shsnc.base.authorization.service.AuthorizationRightsService;
+import com.shsnc.base.module.bean.ResourceGroupInfo;
+import com.shsnc.base.module.config.BaseResourceService;
 import com.shsnc.base.user.bean.GroupCondition;
 import com.shsnc.base.user.mapper.GroupModelMapper;
 import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
@@ -9,6 +16,7 @@ import com.shsnc.base.user.model.UserInfoGroupRelationModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.bean.RelationMap;
+import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
@@ -16,6 +24,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -38,13 +47,17 @@ public class GroupService {
     private UserInfoGroupRelationModelMapper userInfoGroupRelationModelMapper;
     @Autowired
     private UserInfoModelMapper userInfoModelMapper;
+    @Autowired
+    private AuthorizationRightsService authorizationRightsService;
+    @Autowired
+    private AuthorizationRightsModelMapper authorizationRightsModelMapper;
 
     /**
      * 获取所有用户组
      * @return 返回用户组列表
      */
-    public List<GroupModel> getGroupList() {
-        return groupModelMapper.selectAll();
+    public List<GroupModel> getGroupList(GroupCondition condition) {
+        return groupModelMapper.getListByCondition(condition);
     }
 
     /**
@@ -63,14 +76,36 @@ public class GroupService {
      * @param pagination 分页对象
      * @return 分页信息
      */
-    public QueryData getGroupPage(GroupCondition condition, Pagination pagination) {
+    public QueryData getGroupPage(GroupCondition condition, Pagination pagination) throws BizException {
         QueryData queryData = new QueryData(pagination);
         int totalCount = groupModelMapper.getTotalCountByCondition(condition);
         queryData.setRowCount(totalCount);
         List<GroupModel> list = groupModelMapper.getPageByCondition(condition, pagination);
         selectUsers(list);
+        selectResourceGroups(list);
         queryData.setRecords(list);
         return queryData;
+    }
+
+    public void selectResourceGroups(List<GroupModel> groupModels) throws BizException {
+        if (CollectionUtils.isEmpty(groupModels)) {
+            return;
+        }
+        List<Long> groupIds = groupModels.stream().map(GroupModel::getGroupId).collect(Collectors.toList());
+        if (!groupIds.isEmpty()) {
+            List<AuthorizationRightsModel> relations = authorizationRightsModelMapper.getByGroupIds(groupIds, DataObject.RESOURCE_GROUP);
+            RelationMap relationMap = new RelationMap();
+            for (AuthorizationRightsModel relation : relations) {
+                relationMap.addRelation(relation.getGroupId(),relation.getObjectId());
+            }
+            if (relationMap.hasRelatedIds()) {
+                List<ResourceGroupInfo> resourceGroupInfos = BaseResourceService.getResourceGroupsByResourceGroupIds(new ArrayList<>(relationMap.getRelatedIds()));
+                Map<Long, ResourceGroupInfo> resourceGroupInfoMap = resourceGroupInfos.stream().collect(Collectors.toMap(ResourceGroupInfo::getGroupId, v -> v));
+                for (GroupModel groupModel : groupModels) {
+                    groupModel.setResourceGroups(relationMap.getRelatedObjects(groupModel.getGroupId(), resourceGroupInfoMap));
+                }
+            }
+        }
     }
 
     public void selectUsers(List<GroupModel> groupModels) {
@@ -159,5 +194,16 @@ public class GroupService {
      */
     public boolean assignUsers(Long groupId, List<Long> userIds) throws BizException {
         return userInfoGroupRelationService.batchUpdateGroupUserInfoRelation(groupId, userIds);
+    }
+
+    /**
+     * 用户组关联资源组
+     * @param groupId 用户组id
+     * @param reresourceGroupIds 资源组id
+     * @return
+     */
+    public boolean assignReresourceGroups(Long groupId, List<Long> reresourceGroupIds) throws BaseException {
+        authorizationRightsService.authorize(DataObject.RESOURCE_GROUP, reresourceGroupIds, groupId, DataOperation.ALL, true);
+        return true;
     }
 }

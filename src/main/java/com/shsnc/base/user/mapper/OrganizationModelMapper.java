@@ -1,6 +1,5 @@
 package com.shsnc.base.user.mapper;
 
-import com.shsnc.base.user.model.ExtendPropertyModel;
 import com.shsnc.base.user.model.OrganizationCondition;
 import com.shsnc.base.user.model.OrganizationModel;
 import com.shsnc.base.util.sql.Pagination;
@@ -33,7 +32,7 @@ public interface OrganizationModelMapper {
 
     int getTotalCountByCondition(@Param("condition") OrganizationCondition condition);
 
-    List<ExtendPropertyModel> getPageByCondition(@Param("condition") OrganizationCondition condition, @Param("pagination") Pagination pagination);
+    List<OrganizationModel> getPageByCondition(@Param("condition") OrganizationCondition condition, @Param("pagination") Pagination pagination);
 
     List<OrganizationModel> getOrganizationNodeList(@Param("parentId") Long parentId);
 

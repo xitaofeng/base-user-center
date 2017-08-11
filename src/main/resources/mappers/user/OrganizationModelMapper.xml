@@ -165,20 +165,37 @@
                 <if test="condition.description != null and condition.description != ''">
                     AND INSTR(description,#{condition.description})>0
                 </if>
+                <if test="condition.parentId != null">
+                    <if test="condition.parentId == 0">
+                        AND ancestor_id=null
+                    </if>
+                    <if test="condition.parentId == 0">
+                        AND ancestor_id=#{parentId}
+                    </if>
+                </if>
             </if>
         </where>
     </sql>
     <select id="getTotalCountByCondition" resultType="java.lang.Integer">
         SELECT
             COUNT(1)
-        FROM
-            user_organization
+        FROM user_organization ug
+            LEFT JOIN (
+                SELECT ancestor_id,descendant_id
+                FROM user_organization_structure
+                WHERE level=1
+            ) ugs ON ug.organization_id=ugs.descendant_id
         <include refid="conditionSql"/>
     </select>
     <select id="getPageByCondition" resultMap="BaseResultMap">
         SELECT
-            <include refid="BaseColumn"/>
-        FROM user_organization
+            ug.*,ugs.ancestor_id parent_id
+        FROM user_organization ug
+        LEFT JOIN (
+            SELECT ancestor_id,descendant_id
+            FROM user_organization_structure
+            WHERE level=1
+        ) ugs ON ug.organization_id=ugs.descendant_id
         <include refid="conditionSql"/>
         <include refid="orderSql"/>
         <include refid="pageSql"/>
@@ -186,18 +203,14 @@
     <select id="getOrganizationNodeList" resultMap="BaseResultMap">
         SELECT ug.*,ugs.ancestor_id parent_id
         FROM user_organization ug
-        JOIN (
+        LEFT JOIN (
             SELECT ancestor_id,descendant_id
             FROM user_organization_structure
             WHERE level=1
         ) ugs ON ug.organization_id=ugs.descendant_id
         <where>
-            <if test="parentId != null">
-                ugs.ancestor_id=#{parentId}
-            </if>
+            ugs.ancestor_id=#{parentId}
         </where>
-
-
     </select>
     <select id="getAllOrganizationIdsByUserId" resultType="java.lang.Long">
         SELECT DISTINCT ugs.descendant_id

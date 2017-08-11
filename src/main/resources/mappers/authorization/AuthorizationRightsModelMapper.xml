@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shsnc.base.authorization.mapper.AuthorizationRightsModelMapper" >
+
+    <resultMap id="BaseResultMap" type="com.shsnc.base.authorization.model.AuthorizationRightsModel" >
+        <id column="right_id" property="rightId" jdbcType="BIGINT" />
+        <result column="object_type" property="objectType" jdbcType="TINYINT" />
+        <result column="object_type_code" property="objectTypeCode" jdbcType="VARCHAR" />
+        <result column="object_id" property="objectId" jdbcType="BIGINT" />
+        <result column="group_id" property="groupId" jdbcType="BIGINT" />
+        <result column="permission" property="permission" jdbcType="INTEGER" />
+    </resultMap>
+
+    <sql id="BaseColumn" >
+        right_id, 
+        object_type, 
+        object_type_code, 
+        object_id, 
+        group_id, 
+        permission
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
+        SELECT 
+            <include refid="BaseColumn" />
+        FROM authorization_rights
+        WHERE right_id = #{rightId,jdbcType=BIGINT}
+    </select>
+
+    <select id="getByGroupIds" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn" />
+        FROM authorization_rights
+        WHERE object_type = #{dataObject.type} AND group_id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
+    </select>
+
+    <select id="getObjectIdsByGroupIds" resultType="java.lang.Long">
+        SELECT DISTINCT object_id
+        FROM authorization_rights
+        WHERE object_type = #{dataObject.type} AND group_id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
+    </select>
+
+    <select id="getPermissionByObjectId" resultType="java.lang.Integer">
+        SELECT permission
+        FROM authorization_rights
+        WHERE object_type = #{dataObject.type} AND object_id = #{objectId}
+        AND group_Id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
+    </select>
+
+    <select id="getByObjectId" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM authorization_rights
+        WHERE object_type = #{dataObject.type} AND object_id = #{objectId}
+        AND group_Id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
+    </select>
+
+    <select id="getByObjectIds" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM authorization_rights
+        WHERE object_type = #{dataObject.type} AND object_id IN
+        <foreach collection="objectIds" item="objectId" open="(" close=")" separator=",">
+            #{objectId}
+        </foreach>
+        AND group_Id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
+    </select>
+
+    <delete id="deleteByPrimaryKey" >
+        DELETE FROM authorization_rights
+        WHERE right_id = #{rightId,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByObjectId">
+        DELETE FROM authorization_rights
+        WHERE object_type = #{dataObject.type} AND object_id = #{objectId}
+    </delete>
+
+    <delete id="deleteByObjectIds">
+        DELETE FROM authorization_rights
+        WHERE object_type = #{dataObject.type} AND object_id IN
+        <foreach collection="objectIds" item="objectId" open="(" close=")" separator=",">
+            #{objectId}
+        </foreach>
+    </delete>
+
+    <delete id="clearByGroupId">
+        DELETE FROM authorization_rights
+        WHERE group_id = #{groupId}
+    </delete>
+    <delete id="clearByGroupIds">
+        DELETE FROM authorization_rights
+        WHERE group_id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByGroupId">
+        DELETE FROM authorization_rights
+        WHERE object_type = #{dataObject.type} AND group_id = #{groupId}
+    </delete>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="rightId" >
+        INSERT INTO authorization_rights (object_type, object_type_code, object_id, 
+          group_id, permission)
+        VALUES (#{objectType,jdbcType=TINYINT}, #{objectTypeCode,jdbcType=VARCHAR}, #{objectId,jdbcType=BIGINT}, 
+          #{groupId,jdbcType=BIGINT}, #{permission,jdbcType=INTEGER})
+    </insert>
+
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="rightId" >
+        INSERT INTO authorization_rights
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="objectType != null" >
+                object_type,
+            </if>
+            <if test="objectTypeCode != null" >
+                object_type_code,
+            </if>
+            <if test="objectId != null" >
+                object_id,
+            </if>
+            <if test="groupId != null" >
+                group_id,
+            </if>
+            <if test="permission != null" >
+                permission,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="objectType != null" >
+                #{objectType,jdbcType=TINYINT},
+            </if>
+            <if test="objectTypeCode != null" >
+                #{objectTypeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="objectId != null" >
+                #{objectId,jdbcType=BIGINT},
+            </if>
+            <if test="groupId != null" >
+                #{groupId,jdbcType=BIGINT},
+            </if>
+            <if test="permission != null" >
+                #{permission,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertList">
+        INSERT INTO authorization_rights (
+            object_type,
+            object_type_code,
+            object_id,
+            group_id,
+            permission
+        )
+        VALUES (
+            <foreach collection="authorizationRightsModels" item="authorizationRightsModel" separator="),(">
+                #{authorizationRightsModel.objectType,jdbcType=TINYINT},
+                #{authorizationRightsModel.objectTypeCode,jdbcType=VARCHAR},
+                #{authorizationRightsModel.objectId,jdbcType=BIGINT},
+                #{authorizationRightsModel.groupId,jdbcType=BIGINT},
+                #{authorizationRightsModel.permission,jdbcType=INTEGER}
+            </foreach>
+        )
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" >
+        UPDATE authorization_rights
+        <set >
+            <if test="objectType != null" >
+                object_type = #{objectType,jdbcType=TINYINT},
+            </if>
+            <if test="objectTypeCode != null" >
+                object_type_code = #{objectTypeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="objectId != null" >
+                object_id = #{objectId,jdbcType=BIGINT},
+            </if>
+            <if test="groupId != null" >
+                group_id = #{groupId,jdbcType=BIGINT},
+            </if>
+            <if test="permission != null" >
+                permission = #{permission,jdbcType=INTEGER},
+            </if>
+        </set>
+        WHERE right_id = #{rightId,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" >
+        UPDATE authorization_rights
+        SET object_type = #{objectType,jdbcType=TINYINT},
+          object_type_code = #{objectTypeCode,jdbcType=VARCHAR},
+          object_id = #{objectId,jdbcType=BIGINT},
+          group_id = #{groupId,jdbcType=BIGINT},
+          permission = #{permission,jdbcType=INTEGER}
+        WHERE right_id = #{rightId,jdbcType=BIGINT}
+    </update>
+      
+</mapper>

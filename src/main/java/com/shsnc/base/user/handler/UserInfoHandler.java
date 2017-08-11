@@ -6,7 +6,6 @@ import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
-import com.shsnc.base.authorization.service.AuthorizationRoleService;
 import com.shsnc.base.user.bean.ExtendPropertyValue;
 import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.bean.UserInfoParam;
@@ -16,6 +15,7 @@ import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.service.ExtendPropertyValueService;
 import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.util.JsonUtil;
+import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
@@ -39,8 +39,6 @@ public class UserInfoHandler implements RequestHandler {
     private UserInfoService userInfoService;
     @Autowired
     private ExtendPropertyValueService extendPropertyValueService;
-    @Autowired
-    private AuthorizationRoleService authorizationRoleService;
 
     private String[][] filedMapping=  {{"userId","user_id"},{"username","username"},{"alias","alias"},{"mobile","mobile"},{"email","email"},{"status","status"}};
 
@@ -85,40 +83,40 @@ public class UserInfoHandler implements RequestHandler {
     @RequestMapper("/add")
     @Authentication("BASE_USER_INFO_ADD")
     @Validate(groups = ValidationType.Add.class)
-    public Long add(UserInfoParam userInfo) throws BizException {
+    public Long add(UserInfoParam userInfo) throws BaseException {
         UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
         List<ExtendPropertyValue> extendPropertyValues = userInfo.getExtendPropertyValues();
         List<ExtendPropertyValueModel> extendPropertyValueModels = null;
         if(extendPropertyValues != null){
             extendPropertyValueModels = JsonUtil.convert(extendPropertyValues, List.class, ExtendPropertyValueModel.class);
         }
-        return userInfoService.addUserInfo(userInfoModel, userInfo.getGroupIds(), extendPropertyValueModels, userInfo.getRoleIds());
+        return userInfoService.addUserInfo(userInfoModel, extendPropertyValueModels, userInfo.getRoleIds());
     }
 
     @RequestMapper("/update")
     @Validate(groups = ValidationType.Update.class)
     @Authentication("BASE_USER_INFO_UPDATE")
-    public boolean update(UserInfoParam userInfo) throws BizException {
+    public boolean update(UserInfoParam userInfo) throws BaseException {
         UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
         List<ExtendPropertyValue> extendPropertyValues = userInfo.getExtendPropertyValues();
         List<ExtendPropertyValueModel> extendPropertyValueModels = null;
         if(extendPropertyValues != null){
             extendPropertyValueModels = JsonUtil.convert(extendPropertyValues, List.class, ExtendPropertyValueModel.class);
         }
-        return userInfoService.updateUserInfo(userInfoModel,userInfo.getGroupIds(),extendPropertyValueModels,userInfo.getRoleIds());
+        return userInfoService.updateUserInfo(userInfoModel, extendPropertyValueModels,userInfo.getRoleIds());
     }
 
     @RequestMapper("/delete")
     @Validate
     @Authentication("BASE_USER_INFO_DELETE")
-    public boolean delete(@NotNull Long userId) throws BizException {
+    public boolean delete(@NotNull Long userId) throws BaseException {
         return userInfoService.deleteUserInfo(userId);
     }
 
     @RequestMapper("/batchDelete")
     @Validate
     @Authentication("BASE_USER_INFO_BATCH_DELETE")
-    public boolean batchDelete(@NotEmpty List<Long> userIds) throws BizException {
+    public boolean batchDelete(@NotEmpty List<Long> userIds) throws BaseException {
         return userInfoService.batchDeleteUserInfo(userIds);
     }
 
@@ -133,14 +131,14 @@ public class UserInfoHandler implements RequestHandler {
     @RequestMapper("/resetPassword")
     @Validate
     @Authentication("BASE_USER_INFO_RESET_PASSWORD")
-    public boolean resetPassword(@NotNull Long userId, @NotNull String newPassword) throws BizException {
+    public boolean resetPassword(@NotNull Long userId, @NotNull String newPassword) throws BaseException {
         return userInfoService.updatePassword(userId,newPassword);
     }
 
     @RequestMapper("/moveToOrganization")
     @Authentication("BASE_USER_ORGANIZATION_MOVE_TO_ORGANIZATION")
     @Validate
-    public boolean moveToOrganization(@NotNull Long userId, @NotNull Long organizationId) throws BizException {
+    public boolean moveToOrganization(@NotNull Long userId, @NotNull Long organizationId) throws BaseException {
         return userInfoService.moveToOrganization(Collections.singletonList(userId), organizationId);
     }
 }

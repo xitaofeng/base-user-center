@@ -1,6 +1,7 @@
 package com.shsnc.base.user.bean;
 
 import com.shsnc.api.core.validation.ValidationType;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -22,6 +23,9 @@ public class UserInfoParam {
     private Integer status;
     @NotNull(groups = {ValidationType.Add.class})
     private Long organizationId;
+    @NotNull(groups = {ValidationType.Add.class})
+    private Long defaultGroupId;
+    @NotEmpty(groups = {ValidationType.Add.class})
     private List<Long> groupIds;
     private List<ExtendPropertyValue> extendPropertyValues;
     private List<Long> roleIds;
@@ -113,5 +117,13 @@ public class UserInfoParam {
 
     public void setRoleIds(List<Long> roleIds) {
         this.roleIds = roleIds;
+    }
+
+    public Long getDefaultGroupId() {
+        return defaultGroupId;
+    }
+
+    public void setDefaultGroupId(Long defaultGroupId) {
+        this.defaultGroupId = defaultGroupId;
     }
 }
