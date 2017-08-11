@@ -1,6 +1,7 @@
 package com.shsnc.base.module.config;
 
 import com.shsnc.api.core.ThreadContext;
+import com.shsnc.api.core.config.HttpServerConfig;
 import com.shsnc.base.api.constant.BaseResourceConstant;
 import com.shsnc.base.module.base.resource.ResourceInfo;
 import com.shsnc.base.module.bean.ResourceGroupInfo;
@@ -54,7 +55,8 @@ public class BaseResourceService {
         params.put("resourceGroupIds", resourceGroupIds);
         ApiResult<List> result = null;
         try {
-            result = ApiClient.request(ModuleConstant.BASE_RESOURCE_MODULE + GET_RESOURCE_GROUPS_BY_RESOURCE_GROUPIDS, params, List.class, ThreadContext.getClientInfo().getToken());
+            result = ApiClient.requestInternal(ModuleConstant.BASE_RESOURCE_MODULE + GET_RESOURCE_GROUPS_BY_RESOURCE_GROUPIDS, params, List.class,
+                    ThreadContext.getClientInfo().getToken(), HttpServerConfig.getSignatureKey());
         } catch (IOException e) {
             LOG.error(ERROR_MESSAGE, e);
             throw new BizException(ERROR_MESSAGE);

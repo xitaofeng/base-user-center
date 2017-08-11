@@ -26,7 +26,7 @@ import java.util.List;
  */
 @Component
 @LoginRequired
-@RequestMapper("/authorization/resourceGroup")
+@RequestMapper("/authorization/internal/resourceGroup")
 public class AuthorizationResourceGroupHandler implements RequestHandler {
 
     @Autowired
