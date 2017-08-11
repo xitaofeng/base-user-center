@@ -36,7 +36,7 @@ public class UserInfoGroupRelationService {
     @Autowired
     private GroupModelMapper groupModelMapper;
 
-    public boolean batchUpdateUserInfoGroupRelation(Long userId, List<Long> groupIds) throws BaseException {
+    public boolean batchUpdateUserInfoGroupRelation(Long userId, List<Long> groupIds, boolean update) throws BaseException {
         BizAssert.notNull(userId, "用户id不能为空！");
         UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
         BizAssert.notNull(userInfoModel, String.format("用户id【%s】不存在！",userId));
@@ -51,9 +51,11 @@ public class UserInfoGroupRelationService {
             if (!currentGroupIds.containsAll(groupIds)) {
                 throw new BaseException(MessageCode.PERMISSION_DENIED);
             }
-            List<Long> dbUserIds = userInfoGroupRelationModelMapper.getUserIdsByGroupIds(currentGroupIds);
-            if (!dbUserIds.contains(userId)) {
-                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            if (update) {
+                List<Long> dbUserIds = userInfoGroupRelationModelMapper.getUserIdsByGroupIds(currentGroupIds);
+                if (!dbUserIds.contains(userId)) {
+                    throw new BaseException(MessageCode.PERMISSION_DENIED);
+                }
             }
             condition.permission(true, currentGroupIds);
         }
@@ -83,7 +85,7 @@ public class UserInfoGroupRelationService {
         return true;
     }
 
-    public void batchUpdateGroupUserInfoRelation(Long groupId, List<Long> userIds) throws BaseException {
+    public void batchUpdateGroupUserInfoRelation(Long groupId, List<Long> userIds, boolean update) throws BaseException {
         BizAssert.notNull(groupId, "用户组id不能为空！");
         BizAssert.notNull(userIds, "用户id不能为空！");
         GroupModel groupModel = groupModelMapper.selectByPrimaryKey(groupId);
@@ -99,9 +101,11 @@ public class UserInfoGroupRelationService {
             if (!groupIds.contains(groupId)) {
                 throw new BaseException(MessageCode.PERMISSION_DENIED);
             }
-            dbUserIds = userInfoGroupRelationModelMapper.getUserIdsByGroupIds(groupIds);
-            if (!dbUserIds.containsAll(userIds)) {
-                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            if (update) {
+                dbUserIds = userInfoGroupRelationModelMapper.getUserIdsByGroupIds(groupIds);
+                if (!dbUserIds.containsAll(userIds)) {
+                    throw new BaseException(MessageCode.PERMISSION_DENIED);
+                }
             }
             condition.permission(true, groupIds);
         }

@@ -244,7 +244,7 @@ public class GroupService {
      * @return
      */
     public boolean assignUsers(Long groupId, List<Long> userIds) throws BaseException {
-        userInfoGroupRelationService.batchUpdateGroupUserInfoRelation(groupId, userIds);
+        userInfoGroupRelationService.batchUpdateGroupUserInfoRelation(groupId, userIds, true);
         return true;
     }
 

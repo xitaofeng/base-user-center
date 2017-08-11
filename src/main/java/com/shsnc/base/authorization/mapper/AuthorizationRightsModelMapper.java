@@ -24,9 +24,9 @@ public interface AuthorizationRightsModelMapper {
 
     List<AuthorizationRightsModel> getRights(@Param("dataObject") DataObject dataObject, @Param("condition") Condition condition);
 
-    List<Integer> getPermissionByObjectId(@Param("dataObject") DataObject dataObject, @Param("objectId") Long objectId, @Param("condition") Condition condition);
+    List<Integer> getPermissionByObjectId(@Param("dataObject") DataObject dataObject, @Param("_objectId") Long objectId, @Param("condition") Condition condition);
 
-    List<AuthorizationRightsModel> getByObjectId(@Param("dataObject") DataObject dataObject, @Param("objectId") Long objectId, @Param("condition") Condition condition);
+    List<AuthorizationRightsModel> getByObjectId(@Param("dataObject") DataObject dataObject, @Param("_objectId") Long objectId, @Param("condition") Condition condition);
 
     List<AuthorizationRightsModel> getByObjectIds(@Param("dataObject") DataObject dataObject, @Param("objectIds") List<Long> objectIds, @Param("condition") Condition condition);
 
@@ -40,7 +40,7 @@ public interface AuthorizationRightsModelMapper {
 
     int deleteByObjectIds(@Param("dataObject") DataObject dataObject, @Param("objectIds") List<Long> objectIds);
 
-    int deleteByObjectId(@Param("dataObject") DataObject dataObject, @Param("objectId") Long objectId);
+    int deleteByObjectId(@Param("dataObject") DataObject dataObject, @Param("_objectId") Long objectId);
 
     List<Long> getNotDeletableObjectIds(@Param("dataObject") DataObject dataObject, @Param("objectIds") List<Long> objectIds);
 

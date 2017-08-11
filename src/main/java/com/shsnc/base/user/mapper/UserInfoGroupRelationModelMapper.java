@@ -24,7 +24,7 @@ public interface UserInfoGroupRelationModelMapper {
 
     List<Long> getGroupIdsByUserId(@Param("userId") Long userId, @Param("condition") Condition condition);
 
-    List<UserInfoGroupRelationModel> getByUserId(Long userId, @Param("condition") Condition condition);
+    List<UserInfoGroupRelationModel> getByUserId(@Param("userId") Long userId, @Param("condition") Condition condition);
 
     List<UserInfoGroupRelationModel> getByUserIds(@Param("userIds") List<Long> userIds, @Param("condition") Condition condition);
 

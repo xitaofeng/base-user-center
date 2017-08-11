@@ -203,7 +203,7 @@ public class UserInfoService {
         userInfoOrganizationRelationService.updateUserInfoOrganizationRelation(userInfoModel.getUserId(), userInfoModel.getOrganizationId());
 
         // 关联用户组
-        userInfoGroupRelationService.batchUpdateUserInfoGroupRelation(userInfoModel.getUserId(), userInfoModel.getGroupIds());
+        userInfoGroupRelationService.batchUpdateUserInfoGroupRelation(userInfoModel.getUserId(), userInfoModel.getGroupIds(), false);
 
         // 添加扩展属性
         Long userId = userInfoModel.getUserId();
@@ -241,7 +241,7 @@ public class UserInfoService {
         // 更新与用户组的关系
         List<Long> groupIds = userInfoModel.getGroupIds();
         if(groupIds != null){
-            userInfoGroupRelationService.batchUpdateUserInfoGroupRelation(userInfoModel.getUserId(), groupIds);
+            userInfoGroupRelationService.batchUpdateUserInfoGroupRelation(userInfoModel.getUserId(), groupIds, true);
         }
 
         // 更新用户扩展属性值
