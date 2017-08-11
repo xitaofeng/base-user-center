@@ -47,7 +47,7 @@
     <select id="getPermissionByObjectId" resultType="java.lang.Integer">
         SELECT permission
         FROM authorization_rights
-        WHERE object_type = #{dataObject.type} AND object_id = #{objectId}
+        WHERE object_type = #{dataObject.type} AND object_id = #{_objectId}
         AND group_Id IN
         <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
             #{groupId}
@@ -58,7 +58,7 @@
         SELECT
             <include refid="BaseColumn"/>
         FROM authorization_rights
-        WHERE object_type = #{dataObject.type} AND object_id = #{objectId}
+        WHERE object_type = #{dataObject.type} AND object_id = #{_objectId}
         <include refid="PermissionSql"/>
     </select>
 
@@ -159,7 +159,7 @@
 
     <delete id="deleteByObjectId">
         DELETE FROM authorization_rights
-        WHERE object_type = #{dataObject.type} AND object_id = #{objectId}
+        WHERE object_type = #{dataObject.type} AND object_id = #{_objectId}
     </delete>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="rightId" >
