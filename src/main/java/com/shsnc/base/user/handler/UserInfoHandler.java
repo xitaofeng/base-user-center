@@ -74,7 +74,7 @@ public class UserInfoHandler implements RequestHandler {
 
     @RequestMapper("/getList")
     @Validate
-    @Authentication("BASE_USER_INFO_GET_LIST")
+  /*  @Authentication("BASE_USER_INFO_GET_LIST")*/
     public List<UserInfo> getList(@NotEmpty List<Long> userIds) throws BizException {
         List<UserInfoModel> userInfoModels = userInfoService.getUserInfoListByUserIds(userIds);
         return JsonUtil.convert(userInfoModels,List.class, UserInfo.class);
