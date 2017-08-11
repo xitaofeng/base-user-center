@@ -5,6 +5,7 @@ import com.shsnc.base.authorization.config.DataObject;
 import com.shsnc.base.authorization.config.DataOperation;
 import com.shsnc.base.authorization.mapper.AuthorizationRightsModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationRightsModel;
+import com.shsnc.base.bean.Condition;
 import com.shsnc.base.user.mapper.GroupModelMapper;
 import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
 import com.shsnc.base.user.model.GroupModel;
@@ -13,15 +14,14 @@ import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.config.MessageCode;
+import org.apache.commons.collections.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -43,21 +43,21 @@ public class AuthorizationRightsService {
     @Autowired
     private UserInfoGroupRelationModelMapper userInfoGroupRelationModelMapper;
 
-//    private boolean checkGroupId(Long groupId) {
-//        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
-//            List<Long> currentGroupIds = ThreadContext.getUserInfo().getGroupIds();
-//            return currentGroupIds.contains(groupId);
-//        }
-//        return true;
-//    }
-//
-//    private boolean checkGroupIds(List<Long> groupIds) throws BizException {
-//        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
-//            List<Long> currentGroupIds = ThreadContext.getUserInfo().getGroupIds();
-//            return currentGroupIds.containsAll(groupIds);
-//        }
-//        return true;
-//    }
+    private boolean checkGroupId(Long groupId) {
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> currentGroupIds = ThreadContext.getUserInfo().getGroupIds();
+            return currentGroupIds.contains(groupId);
+        }
+        return true;
+    }
+
+    private boolean checkGroupIds(List<Long> groupIds) {
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> currentGroupIds = ThreadContext.getUserInfo().getGroupIds();
+            return currentGroupIds.containsAll(groupIds);
+        }
+        return true;
+    }
 
     /**
      * 检查是否有某个对象的某项操作的权限
@@ -85,7 +85,8 @@ public class AuthorizationRightsService {
         if (groupIds.isEmpty()) {
             return false;
         }
-        List<AuthorizationRightsModel> authorizationRightsModels = authorizationRightsModelMapper.getByObjectId(objectId, dataObject, groupIds);
+        Condition condition = new Condition(true, groupIds);
+        List<AuthorizationRightsModel> authorizationRightsModels = authorizationRightsModelMapper.getByObjectId(dataObject, objectId, condition);
         boolean result = false;
         for (AuthorizationRightsModel authorizationRightsModel : authorizationRightsModels) {
             if ((authorizationRightsModel.getPermission() & permission) == permission) {
@@ -122,7 +123,8 @@ public class AuthorizationRightsService {
         if (groupIds.isEmpty()) {
             return false;
         }
-        List<AuthorizationRightsModel> authorizationRightsModels = authorizationRightsModelMapper.getByObjectIds(objectIds, dataObject, groupIds);
+        Condition condition = new Condition(true, groupIds);
+        List<AuthorizationRightsModel> authorizationRightsModels = authorizationRightsModelMapper.getByObjectIds(dataObject, objectIds, condition);
         Set<Long> allowedObjectIds = authorizationRightsModels.stream().map(AuthorizationRightsModel::getObjectId).collect(Collectors.toSet());
         for (AuthorizationRightsModel authorizationRightsModel : authorizationRightsModels) {
             if (allowedObjectIds.contains(authorizationRightsModel.getObjectId()) &&
@@ -168,31 +170,55 @@ public class AuthorizationRightsService {
     public void authorize(DataObject dataObject, Long objectId, List<Long> groupIds, int permission, boolean update) throws BaseException {
         BizAssert.notNull(dataObject, "对象类型不能为空！");
         BizAssert.notNull(objectId, String.format("【%s】的id不能为空！", dataObject.getDescription()));
-        BizAssert.notNull(groupIds, "用户组id不能为空！");
+        BizAssert.notEmpty(groupIds, "用户组不能为空！");
+        Condition condition = new Condition();
         if (!ThreadContext.getUserInfo().isSuperAdmin()) {
-            if ((update && !checkPermisson(dataObject, objectId, permission))) {
+            if (!checkGroupIds(groupIds) || (update && !checkPermisson(dataObject, objectId, permission))) {
                 throw new BaseException(MessageCode.PERMISSION_DENIED);
             }
+            condition.permission(true, ThreadContext.getUserInfo().getGroupIds());
         }
-        if (update) {
-            authorizationRightsModelMapper.deleteByObjectId(objectId, dataObject);
+
+        List<AuthorizationRightsModel> rightsModels = authorizationRightsModelMapper.getByObjectId(dataObject, objectId, condition);
+        Map<Long,AuthorizationRightsModel> rightsMap = rightsModels.stream().collect(Collectors.toMap(AuthorizationRightsModel::getGroupId, v->v));
+        List<Long> deleteGroupIds = ListUtils.removeAll(rightsMap.keySet(), groupIds);
+        List<Long> updateGroupIds = ListUtils.retainAll(groupIds, rightsMap.keySet());
+        List<Long> addGroupIds = ListUtils.removeAll(groupIds, rightsMap.keySet());
+        // 删除
+        if (!deleteGroupIds.isEmpty()) {
+            List<Long> rightIds = new ArrayList<>();
+            for (Long deleteGroupId : deleteGroupIds) {
+                rightIds.add(rightsMap.get(deleteGroupId).getRightId());
+            }
+            authorizationRightsModelMapper.deleteByRightIds(rightIds);
         }
-        if (!groupIds.isEmpty()) {
-            List<GroupModel> dbGroupModels = groupModelMapper.getByGroupIds(groupIds);
+        // 更新
+        if (!updateGroupIds.isEmpty()) {
+            for (Long updateGroupId : updateGroupIds) {
+                AuthorizationRightsModel authorizationRightsModel = rightsMap.get(updateGroupId);
+                if (!authorizationRightsModel.getPermission().equals(permission)) {
+                    AuthorizationRightsModel updateRightsModel = new AuthorizationRightsModel();
+                    updateRightsModel.setRightId(authorizationRightsModel.getRightId());
+                    updateRightsModel.setPermission(authorizationRightsModel.getPermission());
+                    authorizationRightsModelMapper.updateByPrimaryKeySelective(authorizationRightsModel);
+                }
+            }
+        }
+        // 新增
+        if (!addGroupIds.isEmpty()) {
             List<AuthorizationRightsModel> authorizationRightsModels = new ArrayList<>();
-            for (GroupModel dbGroupModel : dbGroupModels) {
+            for (Long addGroupId : addGroupIds) {
                 AuthorizationRightsModel authorizationRightsModel = new AuthorizationRightsModel();
-                authorizationRightsModel.setGroupId(dbGroupModel.getGroupId());
+                authorizationRightsModel.setGroupId(addGroupId);
                 authorizationRightsModel.setObjectId(objectId);
                 authorizationRightsModel.setObjectType(dataObject.getType());
                 authorizationRightsModel.setObjectTypeCode(dataObject.toString());
                 authorizationRightsModel.setPermission(permission);
                 authorizationRightsModels.add(authorizationRightsModel);
             }
-            if (!authorizationRightsModels.isEmpty()) {
-                authorizationRightsModelMapper.insertList(authorizationRightsModels);
-            }
+            authorizationRightsModelMapper.insertList(authorizationRightsModels);
         }
+
     }
 
     /**
@@ -223,26 +249,57 @@ public class AuthorizationRightsService {
         BizAssert.notNull(groupId, "用户组id不能为空！");
         GroupModel dbGroupModel = groupModelMapper.selectByPrimaryKey(groupId);
         BizAssert.notNull(dbGroupModel, String.format("用户组id【%s】不存在！",groupId));
+
+        Condition condition = new Condition();
         if (!ThreadContext.getUserInfo().isSuperAdmin()) {
-            if (update && !checkPermisson(dataObject, objectIds, permission)) {
+            if (!checkGroupId(groupId) || (update && !checkPermisson(dataObject, objectIds, permission))) {
                 throw new BaseException(MessageCode.PERMISSION_DENIED);
             }
+            condition.permission(true, ThreadContext.getUserInfo().getGroupIds());
         }
 
-        if (update) {
-            authorizationRightsModelMapper.deleteByGroupId(groupId, dataObject);
+        List<AuthorizationRightsModel> rightsModels = authorizationRightsModelMapper.getByGroupId(dataObject, groupId, condition);
+        Map<Long,AuthorizationRightsModel> rightsMap = rightsModels.stream().collect(Collectors.toMap(AuthorizationRightsModel::getObjectId, v->v));
+        List<Long> deleteObjectIds = ListUtils.removeAll(rightsMap.keySet(), objectIds);
+        List<Long> updateObjectIds = ListUtils.retainAll(objectIds, rightsMap.keySet());
+        List<Long> addObjectIds = ListUtils.removeAll(objectIds, rightsMap.keySet());
+
+        // 删除
+        if (!deleteObjectIds.isEmpty()) {
+            Set<Long> deletableObjectIds = new HashSet<>(authorizationRightsModelMapper.getDeletableObjectIds(dataObject, deleteObjectIds));
+            List<Long> rightIds = new ArrayList<>();
+            for (Long deleteObjectId : deleteObjectIds) {
+                if (!deletableObjectIds.contains(deleteObjectId)) {
+                    throw new BizException(String.format("%s【%s】必须至少归属于一个用户组", dataObject.getDescription(), deleteObjectId));
+                }
+                rightIds.add(rightsMap.get(deleteObjectId).getRightId());
+            }
+            authorizationRightsModelMapper.deleteByRightIds(rightIds);
         }
-        List<AuthorizationRightsModel> authorizationRightsModels = new ArrayList<>();
-        for (Long objectId : objectIds) {
-            AuthorizationRightsModel authorizationRightsModel = new AuthorizationRightsModel();
-            authorizationRightsModel.setGroupId(groupId);
-            authorizationRightsModel.setObjectId(objectId);
-            authorizationRightsModel.setObjectType(dataObject.getType());
-            authorizationRightsModel.setObjectTypeCode(dataObject.toString());
-            authorizationRightsModel.setPermission(permission);
-            authorizationRightsModels.add(authorizationRightsModel);
+        // 更新
+        if (!updateObjectIds.isEmpty()) {
+            for (Long updateObjectId : updateObjectIds) {
+                AuthorizationRightsModel authorizationRightsModel = rightsMap.get(updateObjectId);
+                if (!authorizationRightsModel.getPermission().equals(permission)) {
+                    AuthorizationRightsModel updateRightsModel = new AuthorizationRightsModel();
+                    updateRightsModel.setRightId(authorizationRightsModel.getRightId());
+                    updateRightsModel.setPermission(authorizationRightsModel.getPermission());
+                    authorizationRightsModelMapper.updateByPrimaryKeySelective(authorizationRightsModel);
+                }
+            }
         }
-        if (!authorizationRightsModels.isEmpty()) {
+        // 新增
+        if (!addObjectIds.isEmpty()) {
+            List<AuthorizationRightsModel> authorizationRightsModels = new ArrayList<>();
+            for (Long addObjectId : addObjectIds) {
+                AuthorizationRightsModel authorizationRightsModel = new AuthorizationRightsModel();
+                authorizationRightsModel.setGroupId(addObjectId);
+                authorizationRightsModel.setObjectId(groupId);
+                authorizationRightsModel.setObjectType(dataObject.getType());
+                authorizationRightsModel.setObjectTypeCode(dataObject.toString());
+                authorizationRightsModel.setPermission(permission);
+                authorizationRightsModels.add(authorizationRightsModel);
+            }
             authorizationRightsModelMapper.insertList(authorizationRightsModels);
         }
     }
@@ -255,25 +312,25 @@ public class AuthorizationRightsService {
      */
     public List<AuthorizationRightsModel> getRights(DataObject dataObject, DataOperation dataOperation) throws BizException {
         BizAssert.notNull(dataObject, "对象类型不能为空！");
-        List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
-        if (!ThreadContext.getUserInfo().isSuperAdmin()
-                && !groupIds.isEmpty()) {
-            List<AuthorizationRightsModel> rightsModelList = authorizationRightsModelMapper.getByGroupIds(groupIds, dataObject);
-            return filterRights(rightsModelList, dataOperation);
+        Condition condition = new Condition();
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            condition.permission(true, groupIds);
         }
-        return new ArrayList<>();
+        List<AuthorizationRightsModel> rightsModelList = authorizationRightsModelMapper.getRights(dataObject, condition);
+        return filterRights(rightsModelList, dataOperation);
     }
 
     public List<AuthorizationRightsModel> getRightsByObjectIds(List<Long> objectIds, DataObject dataObject, DataOperation dataOperation) throws BizException {
         BizAssert.notNull(dataObject, "对象类型不能为空！");
         BizAssert.notEmpty(objectIds, String.format("【%s】的id不能为空！", dataObject.getDescription()));
-        List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
-        if (!ThreadContext.getUserInfo().isSuperAdmin()
-                && !groupIds.isEmpty()) {
-            List<AuthorizationRightsModel> rightsModelList =  authorizationRightsModelMapper.getByObjectIds(objectIds, dataObject, groupIds);
-            return filterRights(rightsModelList, dataOperation);
+        Condition condition = new Condition();
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            condition.permission(true, groupIds);
         }
-        return new ArrayList<>();
+        List<AuthorizationRightsModel> rightsModelList =  authorizationRightsModelMapper.getByObjectIds(dataObject, objectIds, condition);
+        return filterRights(rightsModelList, dataOperation);
     }
 
     /**
@@ -312,17 +369,15 @@ public class AuthorizationRightsService {
         }
         int permission = 0;
         List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
-        if (!groupIds.isEmpty()) {
-            List<Integer> permissions = authorizationRightsModelMapper.getPermissionByObjectId(objectId, dataObject, groupIds);
-            for (Integer p : permissions) {
-                permission = permission | p;
-            }
+        List<Integer> permissions = authorizationRightsModelMapper.getPermissionByObjectId(dataObject, objectId, new Condition(true, groupIds));
+        for (Integer p : permissions) {
+            permission = permission | p;
         }
         return permission;
     }
 
     /**
-     * 移除多个对象的权限值
+     * 删除一个对象时移除相关数据权限
      * @param dataObject 对象类型
      * @param objectIds 对象id的列表
      */
@@ -332,11 +387,11 @@ public class AuthorizationRightsService {
         if (!checkPermisson(dataObject, objectIds, DataOperation.DELETE)) {
             throw new BaseException(MessageCode.PERMISSION_DENIED);
         }
-        authorizationRightsModelMapper.deleteByObjectIds(objectIds, dataObject);
+        authorizationRightsModelMapper.deleteByObjectIds(dataObject, objectIds);
     }
 
     /**
-     * 移除某个对象的权限值
+     * 删除多个对象时移除相关数据权限
      * @param dataObject 对象类型
      * @param objectId 对象id
      */
@@ -346,33 +401,51 @@ public class AuthorizationRightsService {
         if (!checkPermisson(dataObject, objectId, DataOperation.DELETE)) {
             throw new BaseException(MessageCode.PERMISSION_DENIED);
         }
-        authorizationRightsModelMapper.deleteByObjectId(objectId, dataObject);
+        authorizationRightsModelMapper.deleteByObjectId(dataObject, objectId);
     }
 
     /**
-     * 清空某个用户组相关数据权限
-     * @param groupId 用户组
+     * 删除一个用户组时移除相关数据权限
+     * @param groupId 用户组id
      */
     @Transactional(rollbackFor = Exception.class)
-    public void clearByGroupId(Long groupId) throws BaseException {
+    public void deleteByGroupId(Long groupId) throws BaseException {
         BizAssert.notNull(groupId, "用户组id不能为空！");
-        authorizationRightsModelMapper.clearByGroupId(groupId);
+        if (!checkGroupId(groupId)) {
+            throw new BaseException(MessageCode.PERMISSION_DENIED);
+        }
+        authorizationRightsModelMapper.deleteByGroupId(groupId);
     }
 
     /**
-     * 清空多个用户组相关数据权限
+     * 删除多个用户组时移除相关数据权限
      * @param groupIds 用户组id的列表
      */
     @Transactional(rollbackFor = Exception.class)
-    public void clearByGroupIds(List<Long> groupIds) throws BaseException {
+    public void deleteByGroupIds(List<Long> groupIds) throws BaseException {
         BizAssert.notEmpty(groupIds, "用户组id不能为空！");
-        authorizationRightsModelMapper.clearByGroupIds(groupIds);
+        if (!checkGroupIds(groupIds)) {
+            throw new BaseException(MessageCode.PERMISSION_DENIED);
+        }
+        authorizationRightsModelMapper.deleteByGroupIds(groupIds);
     }
 
+    /**
+     * 获取对象关联的用户组列表
+     * @param dataObject 对象类型
+     * @param objectId 对象id
+     * @return
+     * @throws BaseException
+     */
     public List<GroupModel> getGroupsByObjectId(DataObject dataObject, Long objectId) throws BaseException {
         BizAssert.notNull(dataObject, "对象类型不能为空！");
         BizAssert.notNull(objectId, String.format("【%s】的id不能为空！", dataObject.getDescription()));
-        List<AuthorizationRightsModel> rights = authorizationRightsModelMapper.fetchByObjectId(objectId, dataObject);
+        Condition condition = new Condition();
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            condition.permission(true, groupIds);
+        }
+        List<AuthorizationRightsModel> rights = authorizationRightsModelMapper.getByObjectId(dataObject, objectId, condition);
         List<Long> groupIds = rights.stream().map(AuthorizationRightsModel::getGroupId).distinct().collect(Collectors.toList());
         if (groupIds.isEmpty()) {
             return new ArrayList<>();

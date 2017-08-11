@@ -1,5 +1,6 @@
 package com.shsnc.base.user.service;
 
+import com.shsnc.api.core.ThreadContext;
 import com.shsnc.base.authorization.mapper.AuthorizationRoleModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationRoleModel;
@@ -8,12 +9,16 @@ import com.shsnc.base.authorization.service.AssignService;
 import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.mapper.*;
 import com.shsnc.base.user.model.*;
+import com.shsnc.base.bean.Condition;
+import com.shsnc.base.user.model.condition.UserInfoCondition;
 import com.shsnc.base.user.support.Assert;
 import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.RedisUtil;
 import com.shsnc.base.util.bean.RelationMap;
+import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
+import com.shsnc.base.util.config.MessageCode;
 import com.shsnc.base.util.crypto.SHAMaker;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
@@ -21,10 +26,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -59,11 +61,19 @@ public class UserInfoService {
     @Autowired
     private AuthorizationUserRoleRelationModelMapper authorizationUserRoleRelationModelMapper;
 
-    public List<UserInfoModel> getUserInfoList(UserInfoModel userInfoModel){
-        return userInfoModelMapper.findUserInfoList(userInfoModel);
+    public UserInfoModel getUserInfo(Long userId) throws BaseException {
+        Assert.notNull(userId,"用户id不能为空！");
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            Condition condition = new Condition(true, ThreadContext.getUserInfo().getGroupIds());
+            Long dbUserId = userInfoGroupRelationModelMapper.getUserIdByUserId(userId, condition);
+            if (dbUserId == null) {
+                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            }
+        }
+        return getUserInfoByCache(userId);
     }
 
-    public UserInfoModel getUserInfo(Long userId) throws BizException {
+    public UserInfoModel getUserInfoByCache(Long userId) throws BizException {
         Assert.notNull(userId,"用户id不能为空！");
         String userInfoJson = RedisUtil.getFieldValue(UserConstant.REDIS_USER_INFO_KEY, userId.toString());
         if(userInfoJson != null){
@@ -77,6 +87,16 @@ public class UserInfoService {
     }
 
     public QueryData getUserInfoPage(UserInfoCondition condition, Pagination pagination) {
+        // 权限
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            if (!groupIds.isEmpty()) {
+                List<Long> userIds = userInfoGroupRelationModelMapper.getUserIdsByGroupIds(groupIds);
+                condition.permission(true, userIds);
+            } else {
+                return new QueryData(pagination);
+            }
+        }
         QueryData queryData = new QueryData(pagination);
         int totalCount = userInfoModelMapper.getTotalCountByCondition(condition);
         queryData.setRowCount(totalCount);
@@ -136,7 +156,12 @@ public class UserInfoService {
         }
         List<Long> userIds = userInfoModels.stream().map(UserInfoModel::getUserId).collect(Collectors.toList());
         if (!userIds.isEmpty()) {
-            List<UserInfoGroupRelationModel> relations = userInfoGroupRelationModelMapper.getByUserIds(userIds);
+            Condition condition = new Condition();
+            if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+                List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+                condition.permission(true, groupIds);
+            }
+            List<UserInfoGroupRelationModel> relations = userInfoGroupRelationModelMapper.getByUserIds(userIds, condition);
             RelationMap relationMap = new RelationMap();
             for (UserInfoGroupRelationModel relation : relations) {
                 relationMap.addRelation(relation.getUserId(),relation.getGroupId());
@@ -162,7 +187,9 @@ public class UserInfoService {
      * @return
      * @throws BizException
      */
-    public Long addUserInfo(UserInfoModel userInfoModel, List<ExtendPropertyValueModel> extendPropertyValues, List<Long> roleIds) throws BizException {
+    public Long addUserInfo(UserInfoModel userInfoModel, List<ExtendPropertyValueModel> extendPropertyValues, List<Long> roleIds) throws BaseException {
+        Assert.notNull(userInfoModel);
+
         // 数据校验以及设置默认值
         checkAdd(userInfoModel);
 
@@ -176,7 +203,7 @@ public class UserInfoService {
         userInfoOrganizationRelationService.updateUserInfoOrganizationRelation(userInfoModel.getUserId(), userInfoModel.getOrganizationId());
 
         // 关联用户组
-        userInfoGroupRelationService.batchAddUserInfoGroupRelation(userInfoModel.getUserId(), userInfoModel.getGroupIds() );
+        userInfoGroupRelationService.batchUpdateUserInfoGroupRelation(userInfoModel.getUserId(), userInfoModel.getGroupIds());
 
         // 添加扩展属性
         Long userId = userInfoModel.getUserId();
@@ -194,7 +221,7 @@ public class UserInfoService {
         return userId;
     }
 
-    public boolean updateUserInfo(UserInfoModel userInfoModel, List<ExtendPropertyValueModel> extendPropertyValues, List<Long> roleIds) throws BizException {
+    public boolean updateUserInfo(UserInfoModel userInfoModel, List<ExtendPropertyValueModel> extendPropertyValues, List<Long> roleIds) throws BaseException {
         Assert.notNull(userInfoModel);
 
         // 数据校验以及设置默认值
@@ -234,8 +261,16 @@ public class UserInfoService {
         return true;
     }
 
-    public boolean deleteUserInfo(Long userId) throws BizException {
+    public boolean deleteUserInfo(Long userId) throws BaseException {
         Assert.notNull(userId,"用户id不能为空！");
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            Condition condition = new Condition(true, groupIds);
+            Long dbUserId = userInfoGroupRelationModelMapper.getUserIdByUserId(userId, condition);
+            if (dbUserId == null) {
+                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            }
+        }
         // 逻辑删除账户信息
         UserInfoModel userInfoModel = new UserInfoModel();
         userInfoModel.setUserId(userId);
@@ -249,8 +284,16 @@ public class UserInfoService {
         return result;
     }
 
-    public boolean batchDeleteUserInfo(List<Long> userIds) throws BizException {
+    public boolean batchDeleteUserInfo(List<Long> userIds) throws BaseException {
         Assert.notEmpty(userIds,"用户id不能为空！");
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            Condition condition = new Condition(true, groupIds);
+            List<Long> dbUserIds = userInfoGroupRelationModelMapper.getUserIdsByUserIds(userIds, condition);
+            if (!dbUserIds.containsAll(userIds)) {
+                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            }
+        }
         // 逻辑删除账户信息
         UserInfoModel userInfoModel = new UserInfoModel();
         userInfoModel.setIsDelete(UserConstant.USER_DELETEED_TRUE);
@@ -276,7 +319,7 @@ public class UserInfoService {
      * @param userInfoModel 用户信息model
      * @throws BizException 业务异常
      */
-    public void checkAdd(UserInfoModel userInfoModel) throws BizException {
+    public void checkAdd(UserInfoModel userInfoModel) throws BaseException {
         checkUsername(userInfoModel);
         checkPassword(userInfoModel);
         checkMobile(userInfoModel);
@@ -300,6 +343,12 @@ public class UserInfoService {
         BizAssert.notNull(userInfoModel.getDefaultGroupId(), "所属默认用户组不能为空！");
         BizAssert.notEmpty(userInfoModel.getGroupIds(), "管辖用户组不能为空！");
         BizAssert.isTrue(userInfoModel.getGroupIds().contains(userInfoModel.getDefaultGroupId()),"管辖用户组必须包含所属默认用户组");
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            if (!groupIds.containsAll(userInfoModel.getGroupIds())) {
+                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            }
+        }
     }
 
     /**
@@ -307,13 +356,22 @@ public class UserInfoService {
      * @param userInfoModel 用户信息model
      * @throws BizException 业务异常
      */
-    private void checkUpdate(UserInfoModel userInfoModel) throws BizException {
+    private void checkUpdate(UserInfoModel userInfoModel) throws BaseException {
         Long userId = userInfoModel.getUserId();
         Assert.notNull(userId,"用户id不能为空！");
+
         UserInfoModel dbUserInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
         Assert.notNull(dbUserInfoModel,"用户id不存在！");
         Assert.isTrue(dbUserInfoModel.getInternal() == UserConstant.USER_INTERNAL_FALSE, "不能更新内部用户！");
         Assert.isTrue(dbUserInfoModel.getIsDelete() == UserConstant.USER_DELETEED_FALSE, "用户已经被删除！");
+
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            Condition condition = new Condition(true, ThreadContext.getUserInfo().getGroupIds());
+            Long dbUserId = userInfoGroupRelationModelMapper.getUserIdByUserId(userId, condition);
+            if (dbUserId == null) {
+                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            }
+        }
 
         String username = userInfoModel.getUsername();
         if(username != null && !username.equals(dbUserInfoModel.getUsername())){
@@ -341,10 +399,22 @@ public class UserInfoService {
         if (defaultGroupId != null) {
             BizAssert.notEmpty(groupIds, "管辖用户组不能为空！");
             BizAssert.isTrue(groupIds.contains(defaultGroupId), "管辖用户组必须包含所属默认用户组！");
+            if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+                List<Long> currentGroupIds = ThreadContext.getUserInfo().getGroupIds();
+                if (!currentGroupIds.containsAll(userInfoModel.getGroupIds())) {
+                    throw new BaseException(MessageCode.PERMISSION_DENIED);
+                }
+            }
         } else if(groupIds != null){
             BizAssert.notEmpty(groupIds, "管辖用户组不能为空！");
             BizAssert.notNull(defaultGroupId, "默认用户组不能为空！");
             BizAssert.isTrue(groupIds.contains(defaultGroupId), "管辖用户组必须包含所属默认用户组！");
+            if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+                List<Long> currentGroupIds = ThreadContext.getUserInfo().getGroupIds();
+                if (!currentGroupIds.containsAll(userInfoModel.getGroupIds())) {
+                    throw new BaseException(MessageCode.PERMISSION_DENIED);
+                }
+            }
         }
     }
 
@@ -427,12 +497,20 @@ public class UserInfoService {
         }
     }
 
-    public boolean updatePassword(Long userId, String newPassword) throws BizException {
+    public boolean updatePassword(Long userId, String newPassword) throws BaseException {
         Assert.notNull(userId,"用户id不能为空！");
         UserInfoModel dbUserInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
         Assert.notNull(dbUserInfoModel,"用户id不存在！");
         Assert.isTrue(dbUserInfoModel.getInternal() == UserConstant.USER_INTERNAL_FALSE, "不能更新内部用户！");
 
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            Condition condition = new Condition(true, groupIds);
+            Long dbUserId = userInfoGroupRelationModelMapper.getUserIdByUserId(userId, condition);
+            if (dbUserId == null) {
+                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            }
+        }
         UserInfoModel userInfoModel = new UserInfoModel();
         userInfoModel.setUserId(userId);
         userInfoModel.setPassword(newPassword);
@@ -440,7 +518,7 @@ public class UserInfoService {
         return userInfoModelMapper.updateByPrimaryKeySelective(userInfoModel)>0;
     }
 
-    public List<UserInfoModel> getUserInfoListByUserIds(List<Long> userIds) throws BizException {
+    public List<UserInfoModel> getUserInfoListByUserIds(List<Long> userIds) throws BaseException {
         BizAssert.notEmpty(userIds,"用户ID不能为空！");
         List<UserInfoModel> userInfoModels = new ArrayList<>();
         for (Long userId : userIds) {
@@ -463,6 +541,15 @@ public class UserInfoService {
     }
 
     public List<UserInfoModel> findUsers(UserInfoCondition condition) {
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            if (!groupIds.isEmpty()) {
+                List<Long> userIds = userInfoGroupRelationModelMapper.getUserIdsByGroupIds(groupIds);
+                condition.permission(true,userIds);
+            } else {
+                return new ArrayList<>();
+            }
+        }
         List<UserInfoModel> userInfoModels = userInfoModelMapper.getListByCondition(condition);
         selectOrganization(userInfoModels);
         return userInfoModels;

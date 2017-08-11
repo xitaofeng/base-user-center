@@ -1,23 +1,26 @@
 package com.shsnc.base.user.service;
 
+import com.shsnc.api.core.ThreadContext;
 import com.shsnc.base.authorization.config.DataObject;
 import com.shsnc.base.authorization.config.DataOperation;
 import com.shsnc.base.authorization.mapper.AuthorizationRightsModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationRightsModel;
 import com.shsnc.base.authorization.service.AuthorizationRightsService;
+import com.shsnc.base.bean.Condition;
 import com.shsnc.base.module.bean.ResourceGroupInfo;
 import com.shsnc.base.module.config.BaseResourceService;
-import com.shsnc.base.user.bean.GroupCondition;
 import com.shsnc.base.user.mapper.GroupModelMapper;
 import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;
 import com.shsnc.base.user.model.GroupModel;
 import com.shsnc.base.user.model.UserInfoGroupRelationModel;
 import com.shsnc.base.user.model.UserInfoModel;
+import com.shsnc.base.user.model.condition.GroupCondition;
 import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.bean.RelationMap;
 import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
+import com.shsnc.base.util.config.MessageCode;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
 import org.apache.commons.collections4.CollectionUtils;
@@ -57,6 +60,14 @@ public class GroupService {
      * @return 返回用户组列表
      */
     public List<GroupModel> getGroupList(GroupCondition condition) {
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            if (!groupIds.isEmpty()) {
+                condition.permission(true, groupIds);
+            } else {
+                return new ArrayList<>();
+            }
+        }
         return groupModelMapper.getListByCondition(condition);
     }
 
@@ -65,8 +76,14 @@ public class GroupService {
      * @param groupId 用户组id
      * @return 用户组model
      */
-    public GroupModel getGroup(Long groupId) throws BizException {
+    public GroupModel getGroup(Long groupId) throws BaseException {
         BizAssert.notNull(groupId, "用户组id不能为空！");
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            if (!groupIds.contains(groupId)) {
+                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            }
+        }
         return groupModelMapper.selectByPrimaryKey(groupId);
     }
 
@@ -77,6 +94,14 @@ public class GroupService {
      * @return 分页信息
      */
     public QueryData getGroupPage(GroupCondition condition, Pagination pagination) throws BizException {
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            if (!groupIds.isEmpty()) {
+                condition.permission(true, groupIds);
+            } else {
+                return new QueryData(pagination);
+            }
+        }
         QueryData queryData = new QueryData(pagination);
         int totalCount = groupModelMapper.getTotalCountByCondition(condition);
         queryData.setRowCount(totalCount);
@@ -93,7 +118,7 @@ public class GroupService {
         }
         List<Long> groupIds = groupModels.stream().map(GroupModel::getGroupId).collect(Collectors.toList());
         if (!groupIds.isEmpty()) {
-            List<AuthorizationRightsModel> relations = authorizationRightsModelMapper.getByGroupIds(groupIds, DataObject.RESOURCE_GROUP);
+            List<AuthorizationRightsModel> relations = authorizationRightsModelMapper.getByGroupIds(DataObject.RESOURCE_GROUP, groupIds);
             RelationMap relationMap = new RelationMap();
             for (AuthorizationRightsModel relation : relations) {
                 relationMap.addRelation(relation.getGroupId(),relation.getObjectId());
@@ -137,6 +162,12 @@ public class GroupService {
         group.setCode(UUID.randomUUID().toString());
         checkInput(group);
         groupModelMapper.insert(group);
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            UserInfoGroupRelationModel userInfoGroupRelationModel = new UserInfoGroupRelationModel();
+            userInfoGroupRelationModel.setGroupId(group.getGroupId());
+            userInfoGroupRelationModel.setUserId(ThreadContext.getUserInfo().getUserId());
+            userInfoGroupRelationModelMapper.insert(userInfoGroupRelationModel);
+        }
         return group.getGroupId();
     }
 
@@ -145,8 +176,14 @@ public class GroupService {
      * @param group 用户组
      * @return 如果有记录更细返回true，否则返回false
      */
-    public boolean updateGroup(GroupModel group) throws BizException {
+    public boolean updateGroup(GroupModel group) throws BaseException {
         BizAssert.notNull(group.getGroupId(), "用户组id不能为空！");
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            if (!groupIds.contains(group.getGroupId())) {
+                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            }
+        }
         checkInput(group);
         return groupModelMapper.updateByPrimaryKeySelective(group) > 0;
     }
@@ -156,8 +193,15 @@ public class GroupService {
      * @param groupId 用户组id
      * @return 如果有记录更细返回true，否则返回false
      */
-    public boolean deleteGroup(Long groupId) throws BizException {
+    public boolean deleteGroup(Long groupId) throws BaseException {
         BizAssert.notNull(groupId, "用户组id不能为空！");
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            if (!groupIds.contains(groupId)) {
+                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            }
+        }
+        userInfoGroupRelationService.deleteByGroupId(groupId);
         return groupModelMapper.deleteByPrimaryKey(groupId) > 0;
     }
 
@@ -166,8 +210,15 @@ public class GroupService {
      * @param groupIds 用户组id的集合
      * @return 如果有记录更细返回true，否则返回false
      */
-    public boolean batchDeleteGroup(List<Long> groupIds) throws BizException {
+    public boolean batchDeleteGroup(List<Long> groupIds) throws BaseException {
         BizAssert.notEmpty(groupIds, "用户组id不能为空！");
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> currentGroupIds = ThreadContext.getUserInfo().getGroupIds();
+            if (!currentGroupIds.containsAll(groupIds)) {
+                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            }
+        }
+        userInfoGroupRelationService.deleteByGroupIds(groupIds);
         return groupModelMapper.deleteByGroupIds(groupIds);
     }
 
@@ -192,8 +243,9 @@ public class GroupService {
      * @param userIds 用户id列表
      * @return
      */
-    public boolean assignUsers(Long groupId, List<Long> userIds) throws BizException {
-        return userInfoGroupRelationService.batchUpdateGroupUserInfoRelation(groupId, userIds);
+    public boolean assignUsers(Long groupId, List<Long> userIds) throws BaseException {
+        userInfoGroupRelationService.batchUpdateGroupUserInfoRelation(groupId, userIds);
+        return true;
     }
 
     /**
@@ -205,5 +257,13 @@ public class GroupService {
     public boolean assignReresourceGroups(Long groupId, List<Long> reresourceGroupIds) throws BaseException {
         authorizationRightsService.authorize(DataObject.RESOURCE_GROUP, reresourceGroupIds, groupId, DataOperation.ALL, true);
         return true;
+    }
+
+    public List<GroupModel> getGroupByUserId(Long userId, Condition condition) {
+        List<Long> groupIds = userInfoGroupRelationModelMapper.getGroupIdsByUserId(userId, condition);
+        if (!groupIds.isEmpty()) {
+            return groupModelMapper.getByGroupIds(groupIds);
+        }
+        return new ArrayList<>();
     }
 }

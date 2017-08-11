@@ -20,6 +20,15 @@
         permission
     </sql>
 
+    <sql id="PermissionSql">
+        <if test="condition != null and condition.checkPermission">
+            AND group_id IN
+            <foreach collection="condition.objectIds" item="objectId" open="(" close=")" separator=",">
+                #{objectId}
+            </foreach>
+        </if>
+    </sql>
+
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
         SELECT 
             <include refid="BaseColumn" />
@@ -27,23 +36,12 @@
         WHERE right_id = #{rightId,jdbcType=BIGINT}
     </select>
 
-    <select id="getByGroupIds" resultMap="BaseResultMap">
+    <select id="getRights" resultMap="BaseResultMap">
         SELECT
             <include refid="BaseColumn" />
         FROM authorization_rights
-        WHERE object_type = #{dataObject.type} AND group_id IN
-        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
-            #{groupId}
-        </foreach>
-    </select>
-
-    <select id="getObjectIdsByGroupIds" resultType="java.lang.Long">
-        SELECT DISTINCT object_id
-        FROM authorization_rights
-        WHERE object_type = #{dataObject.type} AND group_id IN
-        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
-            #{groupId}
-        </foreach>
+        WHERE object_type = #{dataObject.type}
+        <include refid="PermissionSql"/>
     </select>
 
     <select id="getPermissionByObjectId" resultType="java.lang.Integer">
@@ -61,10 +59,7 @@
             <include refid="BaseColumn"/>
         FROM authorization_rights
         WHERE object_type = #{dataObject.type} AND object_id = #{objectId}
-        AND group_Id IN
-        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
-            #{groupId}
-        </foreach>
+        <include refid="PermissionSql"/>
     </select>
 
     <select id="getByObjectIds" resultMap="BaseResultMap">
@@ -75,17 +70,57 @@
         <foreach collection="objectIds" item="objectId" open="(" close=")" separator=",">
             #{objectId}
         </foreach>
-        AND group_Id IN
+        <include refid="PermissionSql"/>
+    </select>
+
+    <select id="getByGroupIds" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn"/>
+        FROM authorization_rights
+        WHERE object_type = #{dataObject.type} AND group_id IN
         <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
             #{groupId}
         </foreach>
     </select>
 
-    <select id="fetchByObjectId" resultMap="BaseResultMap">
+    <select id="getByGroupId" resultMap="BaseResultMap">
         SELECT
-            <include refid="BaseColumn"/>
+        <include refid="BaseColumn"/>
         FROM authorization_rights
-        WHERE object_type = #{dataObject.type} AND object_id = #{objectId}
+        WHERE object_type = #{dataObject.type} AND group_id = ${groupId}
+    </select>
+
+    <select id="getNotDeletableObjectIds" resultType="java.lang.Long">
+        SELECT object_id
+        FROM authorization_rights
+        WHERE object_type = #{dataObject.type} AND object_id IN
+        <foreach collection="objectIds" item="objectId" open="(" close=")" separator=",">
+            #{objectId}
+        </foreach>
+        GROUP BY object_id
+        HAVING COUNT(group_id)=1
+    </select>
+
+    <select id="getDeletableObjectIds" resultType="java.lang.Long">
+        SELECT object_id
+        FROM authorization_rights
+        WHERE object_type = #{dataObject.type} AND object_id IN
+        <foreach collection="objectIds" item="objectId" open="(" close=")" separator=",">
+            #{objectId}
+        </foreach>
+        GROUP BY object_id
+        HAVING COUNT(group_id)>1
+    </select>
+
+    <select id="getNotDeletableGroupIds" resultType="java.lang.Long">
+        SELECT MIN(group_id)
+        FROM authorization_rights
+        WHERE group_id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
+        GROUP BY object_type, object_id
+        HAVING COUNT(group_id)=1
     </select>
 
     <delete id="deleteByPrimaryKey" >
@@ -93,9 +128,25 @@
         WHERE right_id = #{rightId,jdbcType=BIGINT}
     </delete>
 
-    <delete id="deleteByObjectId">
+    <delete id="deleteByGroupId">
         DELETE FROM authorization_rights
-        WHERE object_type = #{dataObject.type} AND object_id = #{objectId}
+        WHERE group_id = #{groupId}
+    </delete>
+
+    <delete id="deleteByGroupIds">
+        DELETE FROM authorization_rights
+        WHERE group_id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByRightIds">
+        DELETE FROM authorization_rights
+        WHERE right_id IN
+        <foreach collection="rightIds" item="rightIds" open="(" close=")" separator=",">
+            #{rightId}
+        </foreach>
     </delete>
 
     <delete id="deleteByObjectIds">
@@ -106,21 +157,9 @@
         </foreach>
     </delete>
 
-    <delete id="clearByGroupId">
+    <delete id="deleteByObjectId">
         DELETE FROM authorization_rights
-        WHERE group_id = #{groupId}
-    </delete>
-    <delete id="clearByGroupIds">
-        DELETE FROM authorization_rights
-        WHERE group_id IN
-        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
-            #{groupId}
-        </foreach>
-    </delete>
-
-    <delete id="deleteByGroupId">
-        DELETE FROM authorization_rights
-        WHERE object_type = #{dataObject.type} AND group_id = #{groupId}
+        WHERE object_type = #{dataObject.type} AND object_id = #{objectId}
     </delete>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="rightId" >

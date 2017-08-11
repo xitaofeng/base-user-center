@@ -8,6 +8,7 @@ import com.shsnc.base.user.config.ServerConfig;
 import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
 import com.shsnc.base.user.model.UserInfoModel;
+import com.shsnc.base.bean.Condition;
 import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.user.support.token.SimpleTokenProvider;
 import com.shsnc.base.util.JsonUtil;
@@ -49,8 +50,8 @@ public class InternalHandler implements RequestHandler {
                     boolean success =  serverToken != null && serverToken.equals(token);
                     if(success){
                         RedisUtil.setFieldValue(UserConstant.REDIS_LOGIN_KEY, result[1], token, ServerConfig.getSessionTime());
-                        UserInfoModel userInfo = userInfoService.getUserInfo(Long.valueOf(result[0]));
-                        List<Long> groupIds = userInfoGroupRelationModelMapper.getGroupIdsByUserId(userInfo.getUserId());
+                        UserInfoModel userInfo = userInfoService.getUserInfoByCache(Long.valueOf(result[0]));
+                        List<Long> groupIds = userInfoGroupRelationModelMapper.getGroupIdsByUserId(userInfo.getUserId(), new Condition());
                         InternalUserInfo internalUserInfo = JsonUtil.convert(userInfo, InternalUserInfo.class);
                         internalUserInfo.setGroupIds(groupIds);
                         return internalUserInfo;

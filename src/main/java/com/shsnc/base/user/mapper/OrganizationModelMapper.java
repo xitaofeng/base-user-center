@@ -1,6 +1,6 @@
 package com.shsnc.base.user.mapper;
 
-import com.shsnc.base.user.model.OrganizationCondition;
+import com.shsnc.base.user.model.condition.OrganizationCondition;
 import com.shsnc.base.user.model.OrganizationModel;
 import com.shsnc.base.util.sql.Pagination;
 import org.apache.ibatis.annotations.Param;
@@ -27,8 +27,6 @@ public interface OrganizationModelMapper {
     List<Long> getOrganizationIdsByOrganizationIds(@Param("organizationIds") Collection<Long> organizationIds);
 
     int deleteOrganizationAndChildren(Long organizationId);
-
-    List<OrganizationModel> getOrganizationsByUserId(Long userId);
 
     int getTotalCountByCondition(@Param("condition") OrganizationCondition condition);
 

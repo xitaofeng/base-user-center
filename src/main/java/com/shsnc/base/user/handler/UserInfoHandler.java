@@ -10,13 +10,12 @@ import com.shsnc.base.user.bean.ExtendPropertyValue;
 import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.bean.UserInfoParam;
 import com.shsnc.base.user.model.ExtendPropertyValueModel;
-import com.shsnc.base.user.model.UserInfoCondition;
 import com.shsnc.base.user.model.UserInfoModel;
+import com.shsnc.base.user.model.condition.UserInfoCondition;
 import com.shsnc.base.user.service.ExtendPropertyValueService;
 import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BaseException;
-import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -60,7 +59,7 @@ public class UserInfoHandler implements RequestHandler {
     @RequestMapper("/getObject")
     @Validate
     @Authentication("BASE_USER_INFO_GET_OBJECT")
-    public UserInfo getObject(@NotNull Long userId) throws BizException {
+    public UserInfo getObject(@NotNull Long userId) throws BaseException {
         UserInfoModel userInfoModel = userInfoService.getUserInfo(userId);
         if (userInfoModel != null) {
             List<UserInfoModel> userInfoModels = Collections.singletonList(userInfoModel);
@@ -75,7 +74,7 @@ public class UserInfoHandler implements RequestHandler {
     @RequestMapper("/getList")
     @Validate
     @Authentication("BASE_USER_INFO_GET_LIST")
-    public List<UserInfo> getList(@NotEmpty List<Long> userIds) throws BizException {
+    public List<UserInfo> getList(@NotEmpty List<Long> userIds) throws BaseException {
         List<UserInfoModel> userInfoModels = userInfoService.getUserInfoListByUserIds(userIds);
         return JsonUtil.convert(userInfoModels,List.class, UserInfo.class);
     }

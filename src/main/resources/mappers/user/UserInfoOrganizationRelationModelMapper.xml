@@ -101,7 +101,7 @@
         )
     </insert>
 
-    <select id="getOrganizationIdsByUserId" resultType="java.lang.Long">
+    <select id="getOrganizationIdByUserId" resultType="java.lang.Long">
         SELECT organization_id
         FROM user_info_organization_relation
         WHERE user_id = #{userId}

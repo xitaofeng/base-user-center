@@ -8,7 +8,7 @@ import com.shsnc.api.core.validation.ValidationType;
 import com.shsnc.base.user.bean.Organization;
 import com.shsnc.base.user.bean.OrganizationNode;
 import com.shsnc.base.user.bean.OrganizationParam;
-import com.shsnc.base.user.model.OrganizationCondition;
+import com.shsnc.base.user.model.condition.OrganizationCondition;
 import com.shsnc.base.user.model.OrganizationModel;
 import com.shsnc.base.user.service.OrganizationService;
 import com.shsnc.base.util.JsonUtil;

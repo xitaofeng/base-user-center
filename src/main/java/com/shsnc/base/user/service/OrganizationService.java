@@ -3,7 +3,7 @@ package com.shsnc.base.user.service;
 import com.shsnc.base.user.mapper.OrganizationModelMapper;
 import com.shsnc.base.user.mapper.OrganizationStructureModelMapper;
 import com.shsnc.base.user.mapper.UserInfoOrganizationRelationModelMapper;
-import com.shsnc.base.user.model.OrganizationCondition;
+import com.shsnc.base.user.model.condition.OrganizationCondition;
 import com.shsnc.base.user.model.OrganizationModel;
 import com.shsnc.base.user.support.Assert;
 import com.shsnc.base.user.support.helper.BeanHelper;
@@ -163,17 +163,6 @@ public class OrganizationService {
     }
 
     /**
-     * 根据用户id返回用户拥有的组织部门列表
-     * @param userId 用户id
-     * @return 用于拥有的组织部门列表
-     * @throws BizException 业务异常
-     */
-    public List<OrganizationModel> getOrganizationsByUserId(Long userId) throws BizException {
-        Assert.notNull(userId,"用户id不能为空！");
-        return organizationModelMapper.getOrganizationsByUserId(userId);
-    }
-
-    /**
      * 根据用户id返回用户拥有的组织部门id以及所有的后代组织部门id
      * @param userId 用户id
      * @return 用于拥有的组织部门id以及所有后代组织部门id列表
@@ -207,5 +196,13 @@ public class OrganizationService {
 
     public List<OrganizationModel> getTreeList(Long parentId) {
         return organizationModelMapper.getOrganizationTree(parentId);
+    }
+
+    public OrganizationModel getOrganizationByUserId(Long userId) {
+        Long organizationId = userInfoOrganizationRelationModelMapper.getOrganizationIdByUserId(userId);
+        if (organizationId != null) {
+            return organizationModelMapper.selectByPrimaryKey(organizationId);
+        }
+        return null;
     }
 }

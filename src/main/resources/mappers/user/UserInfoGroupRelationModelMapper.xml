@@ -14,6 +14,17 @@
         group_id
     </sql>
 
+    <sql id="PermissionSql">
+        <if test="condition != null">
+            <if test="condition.checkPermission">
+                AND group_id IN
+                <foreach collection="condition.objectIds" item="objectId" open="(" close=")" separator=",">
+                    #{objectId}
+                </foreach>
+            </if>
+        </if>
+    </sql>
+
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
         SELECT 
             <include refid="BaseColumn" />
@@ -26,6 +37,7 @@
             group_id
         FROM user_info_group_relation
         WHERE user_id=#{userId}
+        <include refid="PermissionSql"/>
     </select>
 
     <select id="getByUserIds" resultMap="BaseResultMap">
@@ -36,6 +48,14 @@
         <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
             #{userId}
         </foreach>
+        <include refid="PermissionSql"/>
+    </select>
+    <select id="getByUserId" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn" />
+        FROM user_info_group_relation
+        WHERE user_id = #{userId}
+        <include refid="PermissionSql"/>
     </select>
 
     <select id="getUserIdsByGroupId" resultType="java.lang.Long">
@@ -67,6 +87,22 @@
     <delete id="deleteByGroupId">
         DELETE FROM user_info_group_relation
         WHERE group_id = #{groupId}
+    </delete>
+
+    <delete id="deleteByRelationIds">
+        DELETE FROM user_info_group_relation
+        WHERE relation_id IN
+        <foreach collection="relationIds" item="relationId" open="(" close=")" separator=",">
+            #{relationId)
+        </foreach>
+    </delete>
+
+    <delete id="deleteByGroupIds">
+        DELETE FROM user_info_group_relation
+        WHERE group_id IN
+        <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
+            #{groupId}
+        </foreach>
     </delete>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="relationId" >
@@ -132,5 +168,51 @@
             #{groupId}
         </foreach>
     </select>
-      
+
+    <select id="getNotDeletableUserIds" resultType="java.lang.Long">
+        SELECT DISTINCT user_id
+        FROM user_info_group_relation
+        WHERE user_id IN
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+        GROUP BY user_id
+        HAVING COUNT(group_id)=1
+    </select>
+
+    <select id="getDeletableUserIds" resultType="java.lang.Long">
+        SELECT DISTINCT user_id
+        FROM user_info_group_relation
+        WHERE user_id IN
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+        GROUP BY user_id
+        HAVING COUNT(group_id)>1
+    </select>
+
+    <select id="getUserIdsByUserIds" resultType="java.lang.Long">
+        SELECT DISTINCT user_id
+        FROM user_info_group_relation
+        WHERE user_id IN
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+        <include refid="PermissionSql"/>
+    </select>
+
+    <select id="getUserIdByUserId" resultType="java.lang.Long">
+        SELECT DISTINCT user_id
+        FROM user_info_group_relation
+        WHERE user_id = #{userId}
+        <include refid="PermissionSql"/>
+    </select>
+
+    <select id="getByGroupId" resultMap="BaseResultMap">
+        SELECT
+            <include refid="BaseColumn" />
+        FROM user_info_group_relation
+        WHERE group_id = #{groupId}
+    </select>
+
 </mapper>

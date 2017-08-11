@@ -332,7 +332,7 @@ public class DataAuthorizationService {
         if (CollectionUtils.isEmpty(dataAuthorizationMap)) {
             //加载数据 map 数据格式 Map<userId,dataAuthorizationMap>
             List<Long> roleIds = userModuleService.getRoleIdsByUserId(userId);
-            List<Long> userGroupIds = userInfoGroupRelationModelMapper.getGroupIdsByUserId(userId);
+            List<Long> userGroupIds = null;//TODO userInfoGroupRelationModelMapper.getGroupIdsByUserId(userId);
             List<UserDataAuthorization> userDataAuthorizations = authorizationResourceAuthModelMapper.getUserDataAuthorization(userId, roleIds, userGroupIds);
 
             HashMap<Long, String> map;

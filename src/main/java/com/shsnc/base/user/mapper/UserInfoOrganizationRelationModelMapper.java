@@ -22,7 +22,7 @@ public interface UserInfoOrganizationRelationModelMapper {
 
     int insertRelationList(@Param("userInfoOrganizationRelationModels") List<UserInfoOrganizationRelationModel> userInfoOrganizationRelationModels);
 
-    List<Long> getOrganizationIdsByUserId(Long userId);
+    Long getOrganizationIdByUserId(Long userId);
 
     int deleteByUserId(Long userId);
 
