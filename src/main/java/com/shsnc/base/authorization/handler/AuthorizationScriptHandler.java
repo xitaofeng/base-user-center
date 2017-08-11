@@ -26,7 +26,7 @@ import java.util.List;
  */
 @Component
 @LoginRequired
-@RequestMapper("/authorization/script")
+@RequestMapper("/authorization/internal/script")
 public class AuthorizationScriptHandler implements RequestHandler {
 
     @Autowired

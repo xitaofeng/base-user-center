@@ -26,7 +26,7 @@ import java.util.List;
  */
 @Component
 @LoginRequired
-@RequestMapper("/authorization/orchestration")
+@RequestMapper("/authorization/internal/orchestration")
 public class AuthorizationOrchestrationHandler implements RequestHandler {
 
     @Autowired
