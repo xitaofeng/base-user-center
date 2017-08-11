@@ -129,7 +129,7 @@
 
     <sql id="conditionSql">
         <where>
-            role_code != 'super_admin'
+            <!-- role_code != 'super_admin' -->
             <if test="condition != null">
                 <if test="condition.roleName !=null and condition.roleName !=''">
                     AND role_name LIKE CONCAT('%', #{condition.roleName}, '%')

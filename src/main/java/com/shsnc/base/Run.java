@@ -18,8 +18,8 @@ public class Run
                 .bindAddress(bundle.getString("HOST"))
                 .listenPort(Integer.valueOf(bundle.getString("PORT")))
                 .configPath("classpath:beans.xml")
-                .loginServer("http://192.168.11.60/user/internal/authenticate")
-                .authServer("http://192.168.11.60/authorization/internal/user/have")
+                .loginServer(bundle.getString("LOGIN_SERVER"))
+                .authServer(bundle.getString("AUTH_SERVER"))
                 .build();
         server.start();
     }
