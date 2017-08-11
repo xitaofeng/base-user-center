@@ -1,13 +1,15 @@
 package com.shsnc.base.authorization.handler;
 
 import com.shsnc.api.core.RequestHandler;
-import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.base.authorization.config.DataObject;
 import com.shsnc.base.authorization.config.DataOperation;
 import com.shsnc.base.authorization.service.AuthorizationRightsService;
+import com.shsnc.base.user.bean.Group;
+import com.shsnc.base.user.model.GroupModel;
+import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -31,45 +33,58 @@ public class AuthorizationOrchestrationHandler implements RequestHandler {
     private AuthorizationRightsService authorizationRightsService;
 
     /**
-     * 授权编排
+     * 新增编排
      */
     @RequestMapper("/addRights")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ORCHESTRATION_ADD_RIGHTS")
     public boolean addRights(@NotNull Long orchestrationId, @NotNull List<Long> groupIds) throws BaseException {
         authorizationRightsService.authorize(DataObject.ORCHESTRATION,orchestrationId, groupIds, DataOperation.ALL, false);
         return true;
     }
+
     /**
-     * 授权编排
+     * 更新授权
      */
     @RequestMapper("/updateRights")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ORCHESTRATION_UPDATE_RIGHTS")
     public boolean updateRights(@NotNull Long orchestrationId, @NotNull List<Long> groupIds) throws BaseException {
         authorizationRightsService.authorize(DataObject.ORCHESTRATION,orchestrationId, groupIds, DataOperation.ALL, true);
         return true;
     }
 
+    /**
+     * 移除授权
+     */
+    @RequestMapper("/removeRights")
+    @Validate
+    public boolean removeRights(@NotNull Long orchestrationId) throws BaseException {
+        authorizationRightsService.deleteByObjectId(DataObject.ORCHESTRATION, orchestrationId);
+        return true;
+    }
+
     @RequestMapper("/checkOne")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ORCHESTRATION_CHECK_ONE")
     public boolean checkOne(@NotNull Long orchestrationId){
         return authorizationRightsService.checkPermisson(DataObject.ORCHESTRATION, orchestrationId, DataOperation.ALL);
     }
 
     @RequestMapper("/checkMany")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ORCHESTRATION_CHECK_Many")
     public boolean checkMany(@NotEmpty List<Long> orchestrationIds){
         return authorizationRightsService.checkPermisson(DataObject.ORCHESTRATION, orchestrationIds, DataOperation.ALL);
     }
 
     @RequestMapper("/getAllIds")
     @Validate
-    @Authentication("BASE_USER_CENTER_AUTHORIZATION_ORCHESTRATION_GET_ALL_IDS")
     public List<Long> getAllIds() throws BizException {
         return authorizationRightsService.getObjectIds(DataObject.ORCHESTRATION, DataOperation.ALL);
+    }
+
+    @RequestMapper("/getGroups")
+    @Validate
+    public List<Group> getGroups(Long orchestrationId) throws BaseException {
+        List<GroupModel> groupModels = authorizationRightsService.getGroupsByObjectId(DataObject.ORCHESTRATION, orchestrationId);
+        return JsonUtil.convert(groupModels, List.class, Group.class);
     }
 
 }

@@ -26,29 +26,29 @@ import java.util.List;
  */
 @Component
 @LoginRequired
-@RequestMapper("/authorization/script")
-public class AuthorizationScriptHandler implements RequestHandler {
+@RequestMapper("/authorization/resourceGroup")
+public class AuthorizationResourceGroupHandler implements RequestHandler {
 
     @Autowired
     private AuthorizationRightsService authorizationRightsService;
 
     /**
-     * 授权脚本
+     * 新增授权
      */
     @RequestMapper("/addRights")
     @Validate
-    public boolean addRights(@NotNull Long scriptId, @NotNull List<Long> groupIds) throws BaseException {
-        authorizationRightsService.authorize(DataObject.SCRIPT ,scriptId, groupIds, DataOperation.ALL, false);
+    public boolean addRights(@NotNull Long resourceGroupId, @NotNull List<Long> groupIds) throws BaseException {
+        authorizationRightsService.authorize(DataObject.RESOURCE_GROUP, resourceGroupId, groupIds, DataOperation.ALL, false);
         return true;
     }
 
     /**
-     * 授权脚本
+     * 更新授权
      */
     @RequestMapper("/updateRights")
     @Validate
-    public boolean updateRights(@NotNull Long scriptId, @NotNull List<Long> groupIds) throws BaseException {
-        authorizationRightsService.authorize(DataObject.SCRIPT ,scriptId, groupIds, DataOperation.ALL, true);
+    public boolean updateRights(@NotNull Long resourceGroupId, @NotNull List<Long> groupIds) throws BaseException {
+        authorizationRightsService.authorize(DataObject.RESOURCE_GROUP, resourceGroupId, groupIds, DataOperation.ALL, true);
         return true;
     }
 
@@ -57,34 +57,33 @@ public class AuthorizationScriptHandler implements RequestHandler {
      */
     @RequestMapper("/removeRights")
     @Validate
-    public boolean removeRights(@NotNull Long scriptId) throws BaseException {
-        authorizationRightsService.deleteByObjectId(DataObject.SCRIPT, scriptId);
+    public boolean removeRights(@NotNull Long resourceGroupId) throws BaseException {
+        authorizationRightsService.deleteByObjectId(DataObject.RESOURCE_GROUP, resourceGroupId);
         return true;
     }
 
     @RequestMapper("/checkOne")
     @Validate
-    public boolean checkOne(@NotNull Long scriptId){
-        return authorizationRightsService.checkPermisson(DataObject.SCRIPT, scriptId, DataOperation.ALL);
+    public boolean checkOne(@NotNull Long resourceGroupId){
+        return authorizationRightsService.checkPermisson(DataObject.RESOURCE_GROUP, resourceGroupId, DataOperation.ALL);
     }
 
     @RequestMapper("/checkMany")
     @Validate
-    public boolean checkMany(@NotEmpty List<Long> scriptIds){
-        return authorizationRightsService.checkPermisson(DataObject.SCRIPT, scriptIds, DataOperation.ALL);
+    public boolean checkMany(@NotEmpty List<Long> resourceGroupIds){
+        return authorizationRightsService.checkPermisson(DataObject.RESOURCE_GROUP, resourceGroupIds, DataOperation.ALL);
     }
 
     @RequestMapper("/getAllIds")
     @Validate
     public List<Long> getAllIds() throws BizException {
-        return authorizationRightsService.getObjectIds(DataObject.SCRIPT, DataOperation.ALL);
+        return authorizationRightsService.getObjectIds(DataObject.RESOURCE_GROUP, DataOperation.ALL);
     }
-
 
     @RequestMapper("/getGroups")
     @Validate
-    public List<Group> getGroups(Long scriptId) throws BaseException {
-        List<GroupModel> groupModels = authorizationRightsService.getGroupsByObjectId(DataObject.SCRIPT, scriptId);
+    public List<Group> getGroups(Long resourceGroupId) throws BaseException {
+        List<GroupModel> groupModels = authorizationRightsService.getGroupsByObjectId(DataObject.RESOURCE_GROUP, resourceGroupId);
         return JsonUtil.convert(groupModels, List.class, Group.class);
     }
 }

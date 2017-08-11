@@ -1,13 +1,18 @@
 package com.shsnc.base.user.service;
 
+import com.shsnc.api.core.ThreadContext;
 import com.shsnc.base.user.mapper.ExtendPropertyModelMapper;
 import com.shsnc.base.user.mapper.ExtendPropertyValueMapper;
+import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;
 import com.shsnc.base.user.model.ExtendPropertyModel;
 import com.shsnc.base.user.model.ExtendPropertyValueModel;
 import com.shsnc.base.user.model.UserInfoModel;
+import com.shsnc.base.bean.Condition;
 import com.shsnc.base.user.support.Assert;
+import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
+import com.shsnc.base.util.config.MessageCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +30,7 @@ public class ExtendPropertyValueService {
     private UserInfoModelMapper userInfoModelMapper;
     @Autowired
     private ExtendPropertyModelMapper extendPropertyModelMapper;
+    private UserInfoGroupRelationModelMapper userInfoGroupRelationModelMapper;
 
     /**
      * 新增用户扩展属性值
@@ -53,7 +59,7 @@ public class ExtendPropertyValueService {
      * @return 返回新增记录id列表
      * @throws BizException 业务异常
      */
-    public boolean batchAddExtendPropertyValue(List<ExtendPropertyValueModel> extendPropertyValueModels) throws BizException {
+    public boolean batchAddExtendPropertyValue(List<ExtendPropertyValueModel> extendPropertyValueModels) throws BaseException {
         Assert.notEmpty(extendPropertyValueModels);
         Set<Long> propertyIds = new HashSet<>();
         Set<Long> userIds = new HashSet<>();
@@ -69,6 +75,12 @@ public class ExtendPropertyValueService {
         }
         List<Long> dbUserIds = userInfoModelMapper.getUserIdsByUserIds(userIds);
         Assert.isTrue(dbUserIds.size() == userIds.size(),"含有不存在的用户id！");
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            dbUserIds = userInfoGroupRelationModelMapper.getUserIdsByUserIds(userIds, new Condition(true,ThreadContext.getUserInfo().getGroupIds()));
+            if (dbUserIds.size() == userIds.size()) {
+                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            }
+        }
 
         List<Long> dbPropertyIds = extendPropertyModelMapper.getPropertyIdsByPropertyIds(propertyIds);
         Assert.isTrue(dbPropertyIds.size() == propertyIds.size(), "含有不存在的属性id！");
@@ -120,7 +132,7 @@ public class ExtendPropertyValueService {
      * @return 始终返回true
      * @throws BizException 业务异常
      */
-    public boolean batchUpdateExtendPropertyValue(List<ExtendPropertyValueModel> extendPropertyValues) throws BizException {
+    public boolean batchUpdateExtendPropertyValue(List<ExtendPropertyValueModel> extendPropertyValues) throws BaseException {
         Assert.notEmpty(extendPropertyValues);
 
         List<ExtendPropertyValueModel> addExtendPropertyValues = new ArrayList<>();

@@ -1,6 +1,6 @@
 package com.shsnc.base.user.mapper;
 
-import com.shsnc.base.user.bean.GroupCondition;
+import com.shsnc.base.user.model.condition.GroupCondition;
 import com.shsnc.base.user.model.GroupModel;
 import com.shsnc.base.util.sql.Pagination;
 import org.apache.ibatis.annotations.Param;

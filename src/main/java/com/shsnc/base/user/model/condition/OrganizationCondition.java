@@ -1,4 +1,4 @@
-package com.shsnc.base.user.model;
+package com.shsnc.base.user.model.condition;
 
 public class OrganizationCondition {
 

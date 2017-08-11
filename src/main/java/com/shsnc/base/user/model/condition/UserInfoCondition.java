@@ -1,8 +1,8 @@
-package com.shsnc.base.user.model;
+package com.shsnc.base.user.model.condition;
 
-import java.util.List;
+import com.shsnc.base.bean.Condition;
 
-public class UserInfoCondition {
+public class UserInfoCondition extends Condition {
 
     private Long userId;
 
@@ -17,10 +17,6 @@ public class UserInfoCondition {
     private Integer status;
 
     private Long organizationId;
-
-    private boolean checkPermission;
-
-    private List<Long> objectIds;
 
     public Long getUserId() {
         return userId;
@@ -78,19 +74,4 @@ public class UserInfoCondition {
         this.organizationId = organizationId;
     }
 
-    public boolean isCheckPermission() {
-        return checkPermission;
-    }
-
-    public void setCheckPermission(boolean checkPermission) {
-        this.checkPermission = checkPermission;
-    }
-
-    public List<Long> getObjectIds() {
-        return objectIds;
-    }
-
-    public void setObjectIds(List<Long> objectIds) {
-        this.objectIds = objectIds;
-    }
 }
