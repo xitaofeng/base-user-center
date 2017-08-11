@@ -5,6 +5,7 @@ import com.shsnc.api.core.UserInfo;
 import com.shsnc.base.authorization.mapper.*;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.shsnc.base.authorization.model.AuthorizationRoleRelationModel;
+import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.config.BizException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -123,16 +124,17 @@ public class AuthorizationRoleRelationService {
      * @return
      */
     public List<String> getAuthorizationCodeByUserId(Long userId) throws BizException {
-        if (userId == null) {
-            UserInfo userInfo = ThreadContext.getUserInfo();
-            if (userInfo != null) {
-                userId = userInfo.getUserId();
-            } else {
-                throw new BizException("用户超时,请先登录");
-            }
+        BizAssert.notNull(userId, "用户超时,请先登录");
+
+        UserInfo userInfo = ThreadContext.getUserInfo();
+        if (userInfo != null) {
+            userId = userInfo.getUserId();
+        } else {
+            throw new BizException("用户超时,请先登录");
         }
 
-        if (authorizationRoleService.isSuperAdmin(userId)) {
+        //超级用户 或者 属于超级管理员组的成员 加载全部权限码
+        if (userInfo.isSuperAdmin() || authorizationRoleService.isSuperAdmin(userId)) {
             return authorizationInfoModelMapper.getAuthorizationCodeList();
         } else {
 
