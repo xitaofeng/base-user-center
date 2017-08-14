@@ -33,7 +33,6 @@ public class AuthorizationInternalHandler implements RequestHandler {
      * @return
      */
     @RequestMapper("/user/have")
-    //@Authentication("BASE_USER_CENTER_AUTHORIZATION_FUNCTION_USER_HAVE")
     public boolean userHaveAuthorization(@NotNull Long userId, @NotNull String authorizationCode) throws BizException {
         if(authorizationRoleService.isSuperAdmin(userId)){
             return true;
