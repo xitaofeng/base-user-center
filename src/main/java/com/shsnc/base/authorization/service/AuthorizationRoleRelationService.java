@@ -1,10 +1,13 @@
 package com.shsnc.base.authorization.service;
 
-import com.shsnc.api.core.ThreadContext;
-import com.shsnc.api.core.UserInfo;
-import com.shsnc.base.authorization.mapper.*;
+import com.shsnc.base.authorization.mapper.AuthorizationInfoModelMapper;
+import com.shsnc.base.authorization.mapper.AuthorizationRoleModelMapper;
+import com.shsnc.base.authorization.mapper.AuthorizationRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.shsnc.base.authorization.model.AuthorizationRoleRelationModel;
+import com.shsnc.base.user.config.UserConstant;
+import com.shsnc.base.user.model.UserInfoModel;
+import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.config.BizException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,9 @@ public class AuthorizationRoleRelationService {
 
     @Autowired
     private UserModuleService userModuleService;
+
+    @Autowired
+    private UserInfoService userInfoService;
 
     /**
      * 批量插入数据返回 插入条数
@@ -126,22 +132,19 @@ public class AuthorizationRoleRelationService {
     public List<String> getAuthorizationCodeByUserId(Long userId) throws BizException {
         BizAssert.notNull(userId, "用户超时,请先登录");
 
-        UserInfo userInfo = ThreadContext.getUserInfo();
-        if (userInfo != null) {
-            userId = userInfo.getUserId();
-        } else {
-            throw new BizException("用户超时,请先登录");
-        }
 
-        //超级用户 或者 属于超级管理员组的成员 加载全部权限码
-        if (userInfo.isSuperAdmin() || authorizationRoleService.isSuperAdmin(userId)) {
-            return authorizationInfoModelMapper.getAuthorizationCodeList();
-        } else {
+        UserInfoModel userInfoModel = userInfoService.getUserInfoByCache(userId);
+        if (userInfoModel != null) {
+            //超级用户 或者 属于超级管理员组的成员 加载全部权限码
+            if (userInfoModel.equals(UserConstant.USER_INTERNAL_TRUE) || authorizationRoleService.isSuperAdmin(userId)) {
+                return authorizationInfoModelMapper.getAuthorizationCodeList();
+            } else {
 
-            List<Long> roleIds = userModuleService.getRoleIdsByUserId(userId);
+                List<Long> roleIds = userModuleService.getRoleIdsByUserId(userId);
 
-            if (!CollectionUtils.isEmpty(roleIds)) {
-                return authorizationRoleRelationModelMapper.getAuthorizationCodeByRoleIds(roleIds);
+                if (!CollectionUtils.isEmpty(roleIds)) {
+                    return authorizationRoleRelationModelMapper.getAuthorizationCodeByRoleIds(roleIds);
+                }
             }
         }
         return new ArrayList<>();
