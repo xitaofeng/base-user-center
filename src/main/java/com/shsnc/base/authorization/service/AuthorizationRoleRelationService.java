@@ -136,7 +136,7 @@ public class AuthorizationRoleRelationService {
         UserInfoModel userInfoModel = userInfoService.getUserInfoByCache(userId);
         if (userInfoModel != null) {
             //超级用户 或者 属于超级管理员组的成员 加载全部权限码
-            if (userInfoModel.equals(UserConstant.USER_INTERNAL_TRUE) || authorizationRoleService.isSuperAdmin(userId)) {
+            if (userInfoModel.getInternal().equals(UserConstant.USER_INTERNAL_TRUE) || authorizationRoleService.isSuperAdmin(userId)) {
                 return authorizationInfoModelMapper.getAuthorizationCodeList();
             } else {
 
