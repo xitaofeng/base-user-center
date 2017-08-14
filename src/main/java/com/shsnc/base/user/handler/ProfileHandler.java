@@ -5,15 +5,13 @@ import com.shsnc.api.core.ThreadContext;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.base.user.bean.ExtendPropertyValue;
-import com.shsnc.base.user.bean.Organization;
 import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.bean.UserInfoParam;
 import com.shsnc.base.user.model.ExtendPropertyValueModel;
-import com.shsnc.base.user.model.OrganizationModel;
 import com.shsnc.base.user.model.UserInfoModel;
-import com.shsnc.base.user.service.OrganizationService;
 import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.util.JsonUtil;
+import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.crypto.SHAMaker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,28 +31,19 @@ public class ProfileHandler implements RequestHandler {
 
     @Autowired
     private UserInfoService userInfoService;
-    @Autowired
-    private OrganizationService organizationService;
 
     @RequestMapper("/getInfo")
     public UserInfo getInfo() throws BizException {
         Long userId = ThreadContext.getUserInfo().getUserId();
-        UserInfoModel userInfoModel = userInfoService.getUserInfo(userId);
+        UserInfoModel userInfoModel = userInfoService.getUserInfoByCache(userId);
         List<UserInfoModel> userInfoModels = Collections.singletonList(userInfoModel);
         userInfoService.selectGroups(userInfoModels);
         userInfoService.selectOrganization(userInfoModels);
         return JsonUtil.convert(userInfoModel,UserInfo.class);
     }
 
-    @RequestMapper("/getOrganizations")
-    public List<Organization> getOrganizations() throws BizException {
-        Long userId = ThreadContext.getUserInfo().getUserId();
-        List<OrganizationModel> organizationModels = organizationService.getOrganizationsByUserId(userId);
-        return JsonUtil.convert(organizationModels,List.class, Organization.class);
-    }
-
     @RequestMapper("/modifyInfo")
-    public boolean modifyInfo(UserInfoParam userInfo) throws BizException {
+    public boolean modifyInfo(UserInfoParam userInfo) throws BaseException {
         Long userId = ThreadContext.getUserInfo().getUserId();
         UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
         userInfoModel.setUserId(userId);
@@ -70,9 +59,9 @@ public class ProfileHandler implements RequestHandler {
     }
 
     @RequestMapper("/modifyPassword")
-    public void modifyPassword(@NotNull String oldPassword, @NotNull String newPassword) throws BizException {
+    public void modifyPassword(@NotNull String oldPassword, @NotNull String newPassword) throws BaseException {
         Long userId = ThreadContext.getUserInfo().getUserId();
-        UserInfoModel userInfoModel = userInfoService.getUserInfo(userId);
+        UserInfoModel userInfoModel = userInfoService.getUserInfoByCache(userId);
         oldPassword = SHAMaker.sha256String(oldPassword);
         if(userInfoModel.getPassword().equals(oldPassword)){
             UserInfoModel passwordModel = new UserInfoModel();

@@ -2,6 +2,7 @@ package com.shsnc.base.authorization.mapper;
 
 import com.shsnc.base.authorization.config.DataObject;
 import com.shsnc.base.authorization.model.AuthorizationRightsModel;
+import com.shsnc.base.bean.Condition;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -21,23 +22,31 @@ public interface AuthorizationRightsModelMapper {
 
     int insertList(@Param("authorizationRightsModels") List<AuthorizationRightsModel> authorizationRightsModels);
 
-    int deleteByObjectId(@Param("objectId") Long objectId, @Param("dataObject") DataObject dataObject);
+    List<AuthorizationRightsModel> getRights(@Param("dataObject") DataObject dataObject, @Param("condition") Condition condition);
 
-    int deleteByObjectIds(@Param("objectIds") List<Long> objectIds, @Param("dataObject") DataObject dataObject);
+    List<Integer> getPermissionByObjectId(@Param("dataObject") DataObject dataObject, @Param("_objectId") Long objectId, @Param("condition") Condition condition);
 
-    List<AuthorizationRightsModel> getByGroupIds(@Param("groupIds") List<Long> groupIds, @Param("dataObject") DataObject dataObject);
+    List<AuthorizationRightsModel> getByObjectId(@Param("dataObject") DataObject dataObject, @Param("_objectId") Long objectId, @Param("condition") Condition condition);
 
-    List<Long> getObjectIdsByGroupIds(@Param("groupIds") List<Long> groupIds, @Param("dataObject") DataObject dataObject);
+    List<AuthorizationRightsModel> getByObjectIds(@Param("dataObject") DataObject dataObject, @Param("objectIds") List<Long> objectIds, @Param("condition") Condition condition);
 
-    List<Integer> getPermissionByObjectId(@Param("objectId") Long objectId, @Param("dataObject") DataObject dataObject, @Param("groupIds") List<Long> groupIds);
+    List<AuthorizationRightsModel> getByGroupIds(@Param("dataObject") DataObject dataObject, @Param("groupIds") List<Long> groupIds);
 
-    int clearByGroupId(Long groupId);
+    int deleteByGroupId(Long groupId);
 
-    int clearByGroupIds(@Param("groupIds") List<Long> groupIds);
+    int deleteByGroupIds(@Param("groupIds") List<Long> groupIds);
 
-    List<AuthorizationRightsModel> getByObjectId(@Param("objectId") Long objectId, @Param("dataObject") DataObject dataObject, @Param("groupIds") List<Long> groupIds);
+    int deleteByRightIds(@Param("rightIds") List<Long> rightIds);
 
-    List<AuthorizationRightsModel> getByObjectIds(@Param("objectIds") List<Long> objectIds, @Param("dataObject") DataObject dataObject, @Param("groupIds") List<Long> groupIds);
+    int deleteByObjectIds(@Param("dataObject") DataObject dataObject, @Param("objectIds") List<Long> objectIds);
 
-    int deleteByGroupId(@Param("groupId") Long groupId, @Param("dataObject") DataObject dataObject);
+    int deleteByObjectId(@Param("dataObject") DataObject dataObject, @Param("_objectId") Long objectId);
+
+    List<Long> getNotDeletableObjectIds(@Param("dataObject") DataObject dataObject, @Param("objectIds") List<Long> objectIds);
+
+    List<Long> getDeletableObjectIds(@Param("dataObject") DataObject dataObject, @Param("objectIds") List<Long> objectIds);
+
+    List<AuthorizationRightsModel> getByGroupId(@Param("dataObject") DataObject dataObject, @Param("groupId") Long groupId, @Param("condition") Condition condition);
+
+    List<Long> getNotDeletableGroupIds(List<Long> groupIds);
 }
