@@ -101,7 +101,8 @@ public class GroupHandler implements RequestHandler {
     @RequestMapper("/assignUsers")
     @Validate
     @Authentication("BASE_USER_GROUP_ASSIGN_USERS")
-    public boolean assignUsers(@NotNull Long groupId, @NotNull List<Long> userIds) throws BaseException {
+
+    public boolean assignUsers(@NotNull Long groupId, List<Long> userIds) throws BaseException {
         return groupService.assignUsers(groupId, userIds);
     }
 

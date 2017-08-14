@@ -25,14 +25,14 @@ public class AssignHandler implements RequestHandler {
     @RequestMapper("/user/to/role")
     @Validate
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_ASSIGN_USER_TO_ROLE")
-    public boolean userAssignRole(@NotNull Long userId, @NotEmpty List<Long> roleIdList) throws Exception {
+    public boolean userAssignRole(@NotNull Long userId, List<Long> roleIdList) throws Exception {
         return assignService.userAssignRole(userId, roleIdList);
     }
 
     @RequestMapper("/role/to/user")
     @Validate
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_ASSIGN_ROLE_TO_USER")
-    public boolean roleAssignUser(@NotNull Long roleId, @NotEmpty List<Long> userIdList) throws Exception {
+    public boolean roleAssignUser(@NotNull Long roleId,  List<Long> userIdList) throws Exception {
         return assignService.roleAssignUser(roleId, userIdList);
     }
 
