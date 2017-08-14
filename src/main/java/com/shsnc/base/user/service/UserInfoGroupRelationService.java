@@ -91,8 +91,11 @@ public class UserInfoGroupRelationService {
         GroupModel groupModel = groupModelMapper.selectByPrimaryKey(groupId);
         BizAssert.notNull(groupModel, String.format("用户组id【%s】不存在！",groupId));
 
-        List<Long> dbUserIds = userInfoModelMapper.getUserIdsByUserIds(userIds);
-        BizAssert.isTrue(userIds.size() == dbUserIds.size(), "含有不存在的用户id");
+        List<Long> dbUserIds = userIds;
+        if (!userIds.isEmpty()) {
+            dbUserIds = userInfoModelMapper.getUserIdsByUserIds(userIds);
+            BizAssert.isTrue(userIds.size() == dbUserIds.size(), "含有不存在的用户id");
+        }
 
         // 获取当前用户能看得到关系数据
         Condition condition = new Condition();
@@ -102,8 +105,8 @@ public class UserInfoGroupRelationService {
                 throw new BaseException(MessageCode.PERMISSION_DENIED);
             }
             if (update) {
-                dbUserIds = userInfoGroupRelationModelMapper.getUserIdsByGroupIds(groupIds);
-                if (!dbUserIds.containsAll(userIds)) {
+                List<Long> checkUserIds = userInfoGroupRelationModelMapper.getUserIdsByGroupIds(groupIds);
+                if (!checkUserIds.containsAll(userIds)) {
                     throw new BaseException(MessageCode.PERMISSION_DENIED);
                 }
             }
@@ -112,12 +115,12 @@ public class UserInfoGroupRelationService {
 
         List<UserInfoGroupRelationModel> dbGroup = userInfoGroupRelationModelMapper.getByGroupId(groupId);
         Map<Long, UserInfoGroupRelationModel> dbGroupMap = dbGroup.stream().collect(Collectors.toMap(UserInfoGroupRelationModel::getUserId, v->v));
-        List<Long> deleteUserIds = ListUtils.removeAll(dbGroupMap.keySet(), dbUserIds);
-        List<Long> addUserIds = ListUtils.removeAll(dbUserIds, dbGroupMap.keySet());
+        List<Long> deleteUserIds = ListUtils.removeAll(dbGroupMap.keySet(), userIds);
+        List<Long> addUserIds = ListUtils.removeAll(userIds, dbGroupMap.keySet());
 
         // 删除
         if (!deleteUserIds.isEmpty()) {
-            List<Long> notDeletableUserIds = userInfoGroupRelationModelMapper.getNotDeletableUserIds(dbUserIds);
+            List<Long> notDeletableUserIds = userInfoGroupRelationModelMapper.getNotDeletableUserIds(deleteUserIds);
             if (!notDeletableUserIds.isEmpty()) {
                 for (Long userId : notDeletableUserIds) {
                     UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
