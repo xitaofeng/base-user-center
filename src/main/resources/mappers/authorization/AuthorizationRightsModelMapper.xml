@@ -87,7 +87,7 @@
         SELECT
         <include refid="BaseColumn"/>
         FROM authorization_rights
-        WHERE object_type = #{dataObject.type} AND group_id = ${groupId}
+        WHERE object_type = #{dataObject.type} AND group_id = #{groupId}
     </select>
 
     <select id="getNotDeletableObjectIds" resultType="java.lang.Long">
@@ -144,7 +144,7 @@
     <delete id="deleteByRightIds">
         DELETE FROM authorization_rights
         WHERE right_id IN
-        <foreach collection="rightIds" item="rightIds" open="(" close=")" separator=",">
+        <foreach collection="rightIds" item="rightId" open="(" close=")" separator=",">
             #{rightId}
         </foreach>
     </delete>
