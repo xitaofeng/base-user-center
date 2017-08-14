@@ -93,24 +93,29 @@ public class UserInfoGroupRelationService {
         GroupModel groupModel = groupModelMapper.selectByPrimaryKey(groupId);
         BizAssert.notNull(groupModel, String.format("用户组id【%s】不存在！",groupId));
 
-            List<Long> dbUserIds = userInfoModelMapper.getUserIdsByUserIds(userIds);
+        List<Long> dbUserIds = userIds;
+        if (!userIds.isEmpty()) {
+            dbUserIds = userInfoModelMapper.getUserIdsByUserIds(userIds);
             BizAssert.isTrue(userIds.size() == dbUserIds.size(), "含有不存在的用户id");
+        }
 
             // 获取当前用户能看得到关系数据
-            Condition condition = new Condition();
-            if (!ThreadContext.getUserInfo().isSuperAdmin()) {
-                List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
-                if (!groupIds.contains(groupId)) {
-                    throw new BaseException(MessageCode.PERMISSION_DENIED);
-                }
-                if (update) {
+  
+        // 获取当前用户能看得到关系数据
+        Condition condition = new Condition();
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            if (!groupIds.contains(groupId)) {
+                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            }
+            if (update) {
                     dbUserIds = userInfoGroupRelationModelMapper.getUserIdsByGroupIds(groupIds);
                     if (!dbUserIds.containsAll(userIds)) {
                         throw new BaseException(MessageCode.PERMISSION_DENIED);
-                    }
-                }
-                condition.permission(true, groupIds);
+
             }
+            condition.permission(true, groupIds);
+        }
 
             List<UserInfoGroupRelationModel> dbGroup = userInfoGroupRelationModelMapper.getByGroupId(groupId);
             Map<Long, UserInfoGroupRelationModel> dbGroupMap = dbGroup.stream().collect(Collectors.toMap(UserInfoGroupRelationModel::getUserId, v->v));
@@ -134,6 +139,7 @@ public class UserInfoGroupRelationService {
                 }
                 userInfoGroupRelationModelMapper.deleteByRelationIds(deleteRelationIds);
             }
+        
             // 新增
             if (!addUserIds.isEmpty()) {
                 List<UserInfoGroupRelationModel> userInfoGroupRelationModels = new ArrayList<>();
@@ -145,7 +151,7 @@ public class UserInfoGroupRelationService {
                 }
                 userInfoGroupRelationModelMapper.insertRelationList(userInfoGroupRelationModels);
             }
-            
+        }
    
     }
 

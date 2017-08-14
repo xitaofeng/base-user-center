@@ -101,6 +101,7 @@ public class GroupHandler implements RequestHandler {
     @RequestMapper("/assignUsers")
     @Validate
     @Authentication("BASE_USER_GROUP_ASSIGN_USERS")
+
     public boolean assignUsers(@NotNull Long groupId, List<Long> userIds) throws BaseException {
         return groupService.assignUsers(groupId, userIds);
     }
@@ -108,7 +109,7 @@ public class GroupHandler implements RequestHandler {
     @RequestMapper("/assignReresourceGroups")
     @Validate
     @Authentication("BASE_USER_GROUP_ASSIGN_RERESOURCE_GROUPS")
-    public boolean assignReresourceGroups(@NotNull Long groupId, @NotEmpty List<Long> reresourceGroupIds) throws BaseException {
+    public boolean assignReresourceGroups(@NotNull Long groupId, @NotNull List<Long> reresourceGroupIds) throws BaseException {
         return groupService.assignReresourceGroups(groupId, reresourceGroupIds);
     }
 }

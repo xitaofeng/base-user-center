@@ -93,7 +93,7 @@
         DELETE FROM user_info_group_relation
         WHERE relation_id IN
         <foreach collection="relationIds" item="relationId" open="(" close=")" separator=",">
-            #{relationId)
+            #{relationId}
         </foreach>
     </delete>
 
