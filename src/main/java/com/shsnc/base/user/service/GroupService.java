@@ -27,10 +27,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -255,6 +252,17 @@ public class GroupService {
      * @return
      */
     public boolean assignReresourceGroups(Long groupId, List<Long> reresourceGroupIds) throws BaseException {
+        List<Long> notDeletableObjectIds = authorizationRightsService.getNotDeletableObjectIds(DataObject.RESOURCE_GROUP, reresourceGroupIds, groupId);
+        if (!notDeletableObjectIds.isEmpty()) {
+            for (Long notDeletableObjectId : notDeletableObjectIds) {
+                List<ResourceGroupInfo> resourceGroups = BaseResourceService.getResourceGroupsByResourceGroupIds(Collections.singletonList(notDeletableObjectId));
+                if (resourceGroups != null) {
+                    for (ResourceGroupInfo resourceGroup : resourceGroups) {
+                        throw new BizException(String.format("资源组【%s】必须至少归属于一个用户组！",resourceGroup.getGroupName()));
+                    }
+                }
+            }
+        }
         authorizationRightsService.authorize(DataObject.RESOURCE_GROUP, reresourceGroupIds, groupId, DataOperation.ALL, true);
         return true;
     }

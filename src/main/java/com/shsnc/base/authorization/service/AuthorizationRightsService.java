@@ -116,7 +116,7 @@ public class AuthorizationRightsService {
      * @return
      */
     public boolean checkPermisson(DataObject dataObject, List<Long> objectIds, int permission){
-        if (ThreadContext.getUserInfo().isSuperAdmin()) {
+        if (ThreadContext.getUserInfo().isSuperAdmin() || objectIds.isEmpty()) {
             return true;
         }
         List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
@@ -245,7 +245,7 @@ public class AuthorizationRightsService {
     @Transactional(rollbackFor = Exception.class)
     public void authorize(DataObject dataObject, List<Long> objectIds, Long groupId, int permission, boolean update) throws BaseException {
         BizAssert.notNull(dataObject, "对象类型不能为空！");
-        BizAssert.notEmpty(objectIds, String.format("【%s】的id不能为空！", dataObject.getDescription()));
+        BizAssert.notNull(objectIds, String.format("【%s】的id不能为null！", dataObject.getDescription()));
         BizAssert.notNull(groupId, "用户组id不能为空！");
         GroupModel dbGroupModel = groupModelMapper.selectByPrimaryKey(groupId);
         BizAssert.notNull(dbGroupModel, String.format("用户组id【%s】不存在！",groupId));
@@ -266,12 +266,8 @@ public class AuthorizationRightsService {
 
         // 删除
         if (!deleteObjectIds.isEmpty()) {
-            Set<Long> deletableObjectIds = new HashSet<>(authorizationRightsModelMapper.getDeletableObjectIds(dataObject, deleteObjectIds));
             List<Long> rightIds = new ArrayList<>();
             for (Long deleteObjectId : deleteObjectIds) {
-                if (!deletableObjectIds.contains(deleteObjectId)) {
-                    throw new BizException(String.format("%s【%s】必须至少归属于一个用户组", dataObject.getDescription(), deleteObjectId));
-                }
                 rightIds.add(rightsMap.get(deleteObjectId).getRightId());
             }
             authorizationRightsModelMapper.deleteByRightIds(rightIds);
@@ -293,8 +289,8 @@ public class AuthorizationRightsService {
             List<AuthorizationRightsModel> authorizationRightsModels = new ArrayList<>();
             for (Long addObjectId : addObjectIds) {
                 AuthorizationRightsModel authorizationRightsModel = new AuthorizationRightsModel();
-                authorizationRightsModel.setGroupId(addObjectId);
-                authorizationRightsModel.setObjectId(groupId);
+                authorizationRightsModel.setGroupId(groupId);
+                authorizationRightsModel.setObjectId(addObjectId);
                 authorizationRightsModel.setObjectType(dataObject.getType());
                 authorizationRightsModel.setObjectTypeCode(dataObject.toString());
                 authorizationRightsModel.setPermission(permission);
@@ -374,6 +370,38 @@ public class AuthorizationRightsService {
             permission = permission | p;
         }
         return permission;
+    }
+
+    /**
+     * 检查某些对象是否可以删除，那些用户组必选的对象删除关系前应该调用此方法校验是否可以删除
+     * @param dataObject 对象类型
+     * @param objectIds 对象id的集合
+     * @param groupId 用户组id
+     * @return 返回检查不通过对象id集合
+     * @throws BaseException
+     */
+    public List<Long> getNotDeletableObjectIds(DataObject dataObject, List<Long> objectIds, Long groupId) throws BaseException {
+        Condition condition = new Condition();
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            if (!checkGroupId(groupId) || !checkPermisson(dataObject, objectIds, DataOperation.DELETE)) {
+                throw new BaseException(MessageCode.PERMISSION_DENIED);
+            }
+            condition.permission(true, ThreadContext.getUserInfo().getGroupIds());
+        }
+        List<AuthorizationRightsModel> rightsModels = authorizationRightsModelMapper.getByGroupId(dataObject, groupId, condition);
+        Map<Long,AuthorizationRightsModel> rightsMap = rightsModels.stream().collect(Collectors.toMap(AuthorizationRightsModel::getObjectId, v->v));
+        List<Long> deleteObjectIds = ListUtils.removeAll(rightsMap.keySet(), objectIds);
+        Set<Long> notDeletableObjectIds = new HashSet<>(authorizationRightsModelMapper.getNotDeletableObjectIds(dataObject, deleteObjectIds));
+
+        List<Long> result = new ArrayList<>();
+        if (!notDeletableObjectIds.isEmpty()) {
+            for (Long deleteObjectId : deleteObjectIds) {
+                if (notDeletableObjectIds.contains(deleteObjectId)) {
+                    result.add(deleteObjectId);
+                }
+            }
+        }
+        return result;
     }
 
     /**
