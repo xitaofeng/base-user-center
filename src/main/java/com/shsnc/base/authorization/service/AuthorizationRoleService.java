@@ -5,6 +5,7 @@ package com.shsnc.base.authorization.service;
 import com.shsnc.base.authorization.config.AuthorizationConstant;
 import com.shsnc.base.authorization.mapper.AuthorizationGroupRoleRelationModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationRoleModelMapper;
+import com.shsnc.base.authorization.mapper.AuthorizationRoleRelationModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationRoleModel;
 import com.shsnc.base.authorization.model.AuthorizationUserRoleRelationModel;
@@ -16,6 +17,7 @@ import com.shsnc.base.util.bean.RelationMap;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,9 @@ public class AuthorizationRoleService {
 
     @Autowired
     private UserInfoModelMapper userInfoModelMapper;
+    
+    @Autowired
+    private AuthorizationRoleRelationModelMapper authorizationRoleRelationModelMapper;
 
     /**
      * 添加 角色 信息
@@ -124,14 +129,20 @@ public class AuthorizationRoleService {
                     if (AuthorizationRoleModel.EnumIsBuilt.TRUE.getValue() == authorizationRoleModel.getIsBuilt()) {
                         throw new BizException("内置数据不支持删除");
                     }
-                    if (!CollectionUtils.isEmpty(authorizationUserRoleRelationModelMapper.getUserIdByRoleId(roleId))) {
-                        String roleName = authorizationRoleModel.getRoleName();
-                        throw new BizException("角色【" + roleName + "】存在使用的用户");
-                    }
-                    if (!CollectionUtils.isEmpty(authorizationGroupRoleRelationModelMapper.getGroupIdByRoleId(roleId))) {
+                    
+                    //清除角色关联用户
+                    authorizationUserRoleRelationModelMapper.deleteAuthorizationUserRoleRelationModelByRoleId(roleId);
+                    
+                    //清除角色关联权限
+                    authorizationRoleRelationModelMapper.deleteAuthorizationRoleRelationModelByRoleId(roleId);
+                    //  if (!CollectionUtils.isEmpty(authorizationUserRoleRelationModelMapper.getUserIdByRoleId(roleId))) {
+                       /* String roleName = authorizationRoleModel.getRoleName();
+                        throw new BizException("角色【" + roleName + "】存在使用的用户");*/
+                 //   }
+                 /*   if (!CollectionUtils.isEmpty(authorizationGroupRoleRelationModelMapper.getGroupIdByRoleId(roleId))) {
                         String roleName = authorizationRoleModel.getRoleName();
                         throw new BizException("角色【" + roleName + "】存在使用的用户组");
-                    }
+                    }*/
                 } else {
                     throw new BizException("无效数据");
                 }

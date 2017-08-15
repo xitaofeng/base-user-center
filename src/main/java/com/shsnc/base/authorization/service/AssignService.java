@@ -48,19 +48,21 @@ public class AssignService {
      * @return
      */
     @Transactional
-    public boolean userAssignRole(@NotNull Long userId, @NotEmpty List<Long> roleIdList) throws BizException {
+    public boolean userAssignRole(@NotNull Long userId, List<Long> roleIdList) throws BizException {
         if (userId == null) {
             throw new BizException("选择授权的用户");
         }
         if (userInfoModelMapper.selectByPrimaryKey(userId) == null) {
             throw new BizException("无效用户");
         }
-        if (CollectionUtils.isEmpty(roleIdList)) {
-            throw new BizException("选择分配的角色");
-        }
+     
         //删除该角色的所有权限 ，然后重新添加该角色的权限
         authorizationUserRoleRelationModelMapper.deleteAuthorizationUserRoleRelationModelByUserId(userId);
 
+        if (CollectionUtils.isEmpty(roleIdList)) {
+            //throw new BizException("选择分配的角色");
+            return true;
+        }
         List<AuthorizationUserRoleRelationModel> authorizationUserRoleRelationModels = new ArrayList<>();
         for (int i = 0; i < roleIdList.size(); i++) {
             Long roleId = roleIdList.get(i);
@@ -83,19 +85,23 @@ public class AssignService {
      * @return
      */
     @Transactional
-    public boolean roleAssignUser(@NotNull Long roleId, @NotEmpty List<Long> userIdList) throws BizException {
+    public boolean roleAssignUser(@NotNull Long roleId, List<Long> userIdList) throws BizException {
+        
         if (roleId == null) {
             throw new BizException("选择授权的角色");
         }
         if (authorizationRoleModelMapper.getAuthorizationRoleModelByRoleId(roleId) == null) {
             throw new BizException("无效角色");
         }
-        if (CollectionUtils.isEmpty(userIdList)) {
+     /*   if (CollectionUtils.isEmpty(userIdList)) {
             throw new BizException("选择分配的用户");
-        }
+        }*/
         //删除该角色的所有权限 ，然后重新添加该角色的权限
         authorizationUserRoleRelationModelMapper.deleteAuthorizationUserRoleRelationModelByRoleId(roleId);
-
+        
+        if(CollectionUtils.isEmpty(userIdList)){
+               return true;
+        }
         List<AuthorizationUserRoleRelationModel> authorizationUserRoleRelationModels = new ArrayList<>();
         for (int i = 0; i < userIdList.size(); i++) {
             Long userId = userIdList.get(i);
@@ -107,7 +113,8 @@ public class AssignService {
             authorizationUserRoleRelationModel.setRoleId(roleId);
             authorizationUserRoleRelationModels.add(authorizationUserRoleRelationModel);
         }
-        return authorizationUserRoleRelationModelMapper.batchAddAuthorizationUserRoleRelationModel(authorizationUserRoleRelationModels) > 0;
+      
+        return   authorizationUserRoleRelationModelMapper.batchAddAuthorizationUserRoleRelationModel(authorizationUserRoleRelationModels) > 0;
     }
 
     /**
