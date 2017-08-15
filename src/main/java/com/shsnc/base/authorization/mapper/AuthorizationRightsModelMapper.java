@@ -5,6 +5,7 @@ import com.shsnc.base.authorization.model.AuthorizationRightsModel;
 import com.shsnc.base.bean.Condition;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface AuthorizationRightsModelMapper {
@@ -42,7 +43,7 @@ public interface AuthorizationRightsModelMapper {
 
     int deleteByObjectId(@Param("dataObject") DataObject dataObject, @Param("_objectId") Long objectId);
 
-    List<Long> getNotDeletableObjectIds(@Param("dataObject") DataObject dataObject, @Param("objectIds") List<Long> objectIds);
+    List<Long> getNotDeletableObjectIds(@Param("dataObject") DataObject dataObject, @Param("objectIds") Collection<Long> objectIds);
 
     List<Long> getDeletableObjectIds(@Param("dataObject") DataObject dataObject, @Param("objectIds") List<Long> objectIds);
 

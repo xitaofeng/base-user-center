@@ -1,5 +1,6 @@
 package com.shsnc.base.authorization.service;
 
+import com.google.common.collect.Sets;
 import com.shsnc.api.core.ThreadContext;
 import com.shsnc.base.authorization.config.DataObject;
 import com.shsnc.base.authorization.config.DataOperation;
@@ -7,14 +8,11 @@ import com.shsnc.base.authorization.mapper.AuthorizationRightsModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationRightsModel;
 import com.shsnc.base.bean.Condition;
 import com.shsnc.base.user.mapper.GroupModelMapper;
-import com.shsnc.base.user.mapper.UserInfoGroupRelationModelMapper;
 import com.shsnc.base.user.model.GroupModel;
-import com.shsnc.base.user.service.GroupService;
 import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.config.MessageCode;
-import org.apache.commons.collections.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +35,7 @@ public class AuthorizationRightsService {
     @Autowired
     private AuthorizationRightsModelMapper authorizationRightsModelMapper;
     @Autowired
-    private GroupService groupService;
-    @Autowired
     private GroupModelMapper groupModelMapper;
-    @Autowired
-    private UserInfoGroupRelationModelMapper userInfoGroupRelationModelMapper;
 
     private boolean checkGroupId(Long groupId) {
         if (!ThreadContext.getUserInfo().isSuperAdmin()) {
@@ -181,9 +175,13 @@ public class AuthorizationRightsService {
 
         List<AuthorizationRightsModel> rightsModels = authorizationRightsModelMapper.getByObjectId(dataObject, objectId, condition);
         Map<Long,AuthorizationRightsModel> rightsMap = rightsModels.stream().collect(Collectors.toMap(AuthorizationRightsModel::getGroupId, v->v));
-        List<Long> deleteGroupIds = ListUtils.removeAll(rightsMap.keySet(), groupIds);
-        List<Long> updateGroupIds = ListUtils.retainAll(groupIds, rightsMap.keySet());
-        List<Long> addGroupIds = ListUtils.removeAll(groupIds, rightsMap.keySet());
+
+        Set<Long> groupIdSet = Sets.newHashSet(groupIds);
+        Set<Long> dbGroupIds = rightsMap.keySet();
+        Set<Long> deleteGroupIds = Sets.difference(dbGroupIds, groupIdSet);
+        Set<Long> updateGroupIds = Sets.intersection(groupIdSet, dbGroupIds);
+        Set<Long> addGroupIds = Sets.difference(groupIdSet, dbGroupIds);
+
         // 删除
         if (!deleteGroupIds.isEmpty()) {
             List<Long> rightIds = new ArrayList<>();
@@ -260,9 +258,12 @@ public class AuthorizationRightsService {
 
         List<AuthorizationRightsModel> rightsModels = authorizationRightsModelMapper.getByGroupId(dataObject, groupId, condition);
         Map<Long,AuthorizationRightsModel> rightsMap = rightsModels.stream().collect(Collectors.toMap(AuthorizationRightsModel::getObjectId, v->v));
-        List<Long> deleteObjectIds = ListUtils.removeAll(rightsMap.keySet(), objectIds);
-        List<Long> updateObjectIds = ListUtils.retainAll(objectIds, rightsMap.keySet());
-        List<Long> addObjectIds = ListUtils.removeAll(objectIds, rightsMap.keySet());
+
+        Set<Long> objectIdSet = Sets.newHashSet(objectIds);
+        Set<Long> dbObjectIds = rightsMap.keySet();
+        Set<Long> deleteObjectIds = Sets.difference(dbObjectIds, objectIdSet);
+        Set<Long> updateObjectIds = Sets.intersection(objectIdSet, dbObjectIds);
+        Set<Long> addObjectIds = Sets.difference(objectIdSet , dbObjectIds);
 
         // 删除
         if (!deleteObjectIds.isEmpty()) {
@@ -390,14 +391,17 @@ public class AuthorizationRightsService {
         }
         List<AuthorizationRightsModel> rightsModels = authorizationRightsModelMapper.getByGroupId(dataObject, groupId, condition);
         Map<Long,AuthorizationRightsModel> rightsMap = rightsModels.stream().collect(Collectors.toMap(AuthorizationRightsModel::getObjectId, v->v));
-        List<Long> deleteObjectIds = ListUtils.removeAll(rightsMap.keySet(), objectIds);
-        Set<Long> notDeletableObjectIds = new HashSet<>(authorizationRightsModelMapper.getNotDeletableObjectIds(dataObject, deleteObjectIds));
 
+        Set<Long> deleteObjectIds = Sets.difference(rightsMap.keySet(), Sets.newHashSet(objectIds));
         List<Long> result = new ArrayList<>();
-        if (!notDeletableObjectIds.isEmpty()) {
-            for (Long deleteObjectId : deleteObjectIds) {
-                if (notDeletableObjectIds.contains(deleteObjectId)) {
-                    result.add(deleteObjectId);
+        if (!deleteObjectIds.isEmpty()) {
+            Set<Long> notDeletableObjectIds = new HashSet<>(authorizationRightsModelMapper.getNotDeletableObjectIds(dataObject, deleteObjectIds));
+
+            if (!notDeletableObjectIds.isEmpty()) {
+                for (Long deleteObjectId : deleteObjectIds) {
+                    if (notDeletableObjectIds.contains(deleteObjectId)) {
+                        result.add(deleteObjectId);
+                    }
                 }
             }
         }
