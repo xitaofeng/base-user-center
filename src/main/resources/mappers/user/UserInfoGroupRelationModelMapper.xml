@@ -9,15 +9,15 @@
     </resultMap>
 
     <sql id="BaseColumn" >
-        relation_id, 
-        user_id, 
-        group_id
+        ur.relation_id,
+        ur.user_id,
+        ur.group_id
     </sql>
 
     <sql id="PermissionSql">
         <if test="condition != null">
             <if test="condition.checkPermission">
-                AND group_id IN
+                AND ur.group_id IN
                 <foreach collection="condition.objectIds" item="objectId" open="(" close=")" separator=",">
                     #{objectId}
                 </foreach>
@@ -28,51 +28,53 @@
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
         SELECT 
             <include refid="BaseColumn" />
-        FROM user_info_group_relation
-        WHERE relation_id = #{relationId,jdbcType=BIGINT}
+        FROM user_info_group_relation ur
+        WHERE ur.relation_id = #{relationId,jdbcType=BIGINT}
     </select>
 
     <select id="getGroupIdsByUserId" resultType="java.lang.Long">
         SELECT
-            group_id
-        FROM user_info_group_relation
-        WHERE user_id=#{userId}
+            ur.group_id
+        FROM user_info_group_relation ur, user_info ui
+        WHERE ur.user_id=#{userId} AND ur.user_id = ui.user_id AND ui.is_delete = 1
         <include refid="PermissionSql"/>
     </select>
 
     <select id="getByUserIds" resultMap="BaseResultMap">
         SELECT
             <include refid="BaseColumn" />
-        FROM user_info_group_relation
-        WHERE user_id IN
+        FROM user_info_group_relation ur, user_info ui
+        WHERE ur.user_id IN
         <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
             #{userId}
         </foreach>
+        AND ur.user_id = ui.user_id AND ui.is_delete = 1
         <include refid="PermissionSql"/>
     </select>
     <select id="getByUserId" resultMap="BaseResultMap">
         SELECT
             <include refid="BaseColumn" />
-        FROM user_info_group_relation
-        WHERE user_id = #{userId}
+        FROM user_info_group_relation ur, user_info ui
+        WHERE ur.user_id = #{userId} AND ur.user_id = ui.user_id AND ui.is_delete = 1
         <include refid="PermissionSql"/>
     </select>
 
     <select id="getUserIdsByGroupId" resultType="java.lang.Long">
         SELECT
-            user_id
-        FROM user_info_group_relation
-        WHERE group_id=#{groupId}
+            ur.user_id
+        FROM user_info_group_relation ur, user_info ui
+        WHERE ur.group_id=#{groupId} AND ur.user_id = ui.user_id AND ui.is_delete = 1
     </select>
 
     <select id="getByGroupids" resultType="com.shsnc.base.user.model.UserInfoGroupRelationModel">
         SELECT
             <include refid="BaseColumn" />
-        FROM user_info_group_relation
-        WHERE group_id IN
+        FROM user_info_group_relation ur, user_info ui
+        WHERE ur.group_id IN
         <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
             #{groupId}
         </foreach>
+        AND ur.user_id = ui.user_id AND ui.is_delete = 1
     </select>
 
     <delete id="deleteByPrimaryKey" >
@@ -160,59 +162,71 @@
     </update>
 
     <select id="getUserIdsByGroupIds" resultType="java.lang.Long">
-        SELECT
-        DISTINCT user_id
-        FROM user_info_group_relation
-        WHERE group_id IN
+        SELECT DISTINCT ur.user_id
+        FROM user_info_group_relation ur, user_info ui
+        WHERE ur.group_id IN
         <foreach collection="groupIds" item="groupId" open="(" close=")" separator=",">
             #{groupId}
         </foreach>
+        AND ur.user_id = ui.user_id AND ui.is_delete = 1
     </select>
 
     <select id="getNotDeletableUserIds" resultType="java.lang.Long">
-        SELECT DISTINCT user_id
-        FROM user_info_group_relation
-        WHERE user_id IN
+        SELECT DISTINCT ur.user_id
+        FROM user_info_group_relation ur, user_info ui
+        WHERE ur.user_id IN
         <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
             #{userId}
         </foreach>
-        GROUP BY user_id
-        HAVING COUNT(group_id)=1
+        AND ur.user_id = ui.user_id AND ui.is_delete = 1
+        GROUP BY ur.user_id
+        HAVING COUNT(ur.group_id)=1
     </select>
 
     <select id="getDeletableUserIds" resultType="java.lang.Long">
-        SELECT DISTINCT user_id
-        FROM user_info_group_relation
-        WHERE user_id IN
+        SELECT DISTINCT ur.user_id
+        FROM user_info_group_relation ur, user_info ui
+        WHERE ur.user_id IN
         <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
             #{userId}
         </foreach>
-        GROUP BY user_id
-        HAVING COUNT(group_id)>1
+        AND ur.user_id = ui.user_id AND ui.is_delete = 1
+        GROUP BY ur.user_id
+        HAVING COUNT(ur.group_id)>1
     </select>
 
     <select id="getUserIdsByUserIds" resultType="java.lang.Long">
-        SELECT DISTINCT user_id
-        FROM user_info_group_relation
-        WHERE user_id IN
+        SELECT DISTINCT ur.user_id
+        FROM user_info_group_relation ur, user_info ui
+        WHERE ur.user_id IN
         <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
             #{userId}
         </foreach>
+        AND ur.user_id = ui.user_id AND ui.is_delete = 1
         <include refid="PermissionSql"/>
     </select>
 
     <select id="getUserIdByUserId" resultType="java.lang.Long">
-        SELECT DISTINCT user_id
-        FROM user_info_group_relation
-        WHERE user_id = #{userId}
+        SELECT DISTINCT ur.user_id
+        FROM user_info_group_relation ur, user_info ui
+        WHERE ur.user_id = #{userId}
+        AND ur.user_id = ui.user_id AND ui.is_delete = 1
         <include refid="PermissionSql"/>
     </select>
 
     <select id="getByGroupId" resultMap="BaseResultMap">
         SELECT
             <include refid="BaseColumn" />
-        FROM user_info_group_relation
-        WHERE group_id = #{groupId}
+        FROM user_info_group_relation ur, user_info ui
+        AND ur.user_id = ui.user_id AND ui.is_delete = 1
+        WHERE ur.group_id = #{groupId}
+    </select>
+
+    <select id="getCurrentUserIds" resultType="java.lang.Long">
+        SELECT DISTINCT ur2.user_id
+        FROM user_info_group_relation ur1,user_info_group_relation ur2, user_info ui
+        WHERE ur1.user_id = #{userId} AND ur1.group_id=ur2.group_id
+        AND ur2.user_id = ui.user_id AND ui.is_delete = 1
     </select>
 
 </mapper>
