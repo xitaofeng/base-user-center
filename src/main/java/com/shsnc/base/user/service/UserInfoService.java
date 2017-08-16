@@ -554,4 +554,8 @@ public class UserInfoService {
         selectOrganization(userInfoModels);
         return userInfoModels;
     }
+
+    public List<Long> getCurrentUserIds(long userId) {
+        return userInfoGroupRelationModelMapper.getCurrentUserIds(userId);
+    }
 }
