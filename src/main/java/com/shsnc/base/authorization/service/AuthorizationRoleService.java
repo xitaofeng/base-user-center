@@ -67,7 +67,7 @@ public class AuthorizationRoleService {
         if (authorizationRoleModel.getIsBuilt() == null) {
             authorizationRoleModel.setIsBuilt(AuthorizationRoleModel.EnumIsBuilt.FALSE.getValue());
         }
-        if (authorizationRoleModel.getOrders() != null) {
+        if (authorizationRoleModel.getOrders() == null) {
             authorizationRoleModel.setOrders(1);
         }
         authorizationRoleModel.setCreateTime(System.currentTimeMillis());
