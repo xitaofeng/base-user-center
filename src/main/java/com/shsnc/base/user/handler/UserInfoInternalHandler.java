@@ -1,6 +1,7 @@
 package com.shsnc.base.user.handler;
 
 import com.shsnc.api.core.RequestHandler;
+import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.base.user.bean.UserInfo;
@@ -18,6 +19,7 @@ import java.util.List;
 
 
 @Component
+@LoginRequired
 @RequestMapper("/user/internal/info")
 public class UserInfoInternalHandler implements RequestHandler{
 
@@ -44,5 +46,11 @@ public class UserInfoInternalHandler implements RequestHandler{
     public List<UserInfo> getList(@NotEmpty List<Long> userIds) throws BaseException {
         List<UserInfoModel> userInfoModels = userInfoService.getUserInfoListByUserIds(userIds);
         return JsonUtil.convert(userInfoModels,List.class, UserInfo.class);
+    }
+
+    @RequestMapper("/getCurrentUserIds")
+    @Validate
+    public List<Long> getCurrentUserIds(Long userId){
+        return userInfoService.getCurrentUserIds(userId);
     }
 }
