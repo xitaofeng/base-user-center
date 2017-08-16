@@ -1,6 +1,7 @@
 package com.shsnc.base.authorization.handler;
 
 import com.shsnc.api.core.RequestHandler;
+import com.shsnc.api.core.ThreadContext;
 import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
@@ -53,14 +54,13 @@ public class FunctionAuthorizationHandler implements RequestHandler {
     /**
      * 获取用户已有功能权限
      *
-     * @param userId
      * @return
      */
     @RequestMapper("/user/have/list")
     /*@Authentication("BASE_USER_CENTER_AUTHORIZATION_FUNCTION_USER_HAVE_LIST")*/
     @LoginRequired
-    public List<String> userHaveAuthorizationList(Long userId) throws BizException {
-        return authorizationRoleRelationService.getAuthorizationCodeByUserId(userId);
+    public List<String> userHaveAuthorizationList() throws BizException {
+        return authorizationRoleRelationService.getAuthorizationCodeByUserId(ThreadContext.getUserInfo().getUserId());
     }
 
 }
