@@ -9,15 +9,19 @@ import com.shsnc.base.authorization.bean.AuthorizationInfo;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.shsnc.base.authorization.model.condition.AuthorizationInfoCondition;
 import com.shsnc.base.authorization.service.AuthorizationInfoService;
+import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
+
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,5 +122,17 @@ public class AuthorizationInfoHandler implements RequestHandler {
             BeanUtils.copyProperties(authorizationInfoModel, authorizationInfo);
         }
         return authorizationInfo;
+    }
+    
+    /**
+     * 批量导入
+     *
+     * @param 
+     * @return
+     */
+    @RequestMapper("uploadFile")
+    @Validate
+    public boolean uploadFile(MultipartFile file) throws BizException {
+        return authorizationInfoService.uploadFile( file);
     }
 }

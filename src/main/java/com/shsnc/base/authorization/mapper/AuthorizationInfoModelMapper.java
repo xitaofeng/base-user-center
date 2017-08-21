@@ -111,4 +111,6 @@ public interface AuthorizationInfoModelMapper {
      * @return
      */
     List<String> getAuthorizationCodeList();
+    
+    Integer insertBatch(@Param("authorizationInfos") List<AuthorizationInfoModel>  authorizationInfos);
 }
