@@ -71,6 +71,27 @@
             #{authorizationId}
         </foreach>
     </delete>
+    
+    <insert id="insertBatch"  useGeneratedKeys="true" keyProperty="authorizationId"
+            keyColumn="authorization_id">
+           INSERT INTO
+	        <include refid="tableName"/>
+	        (
+	        authorization_name,
+	        authorization_code,
+	        authorization_status,
+	        description,
+	        create_time
+	        )
+	        VALUES
+	        <foreach item="authorizationInfo" collection="authorizationInfos"  separator=",">
+            	(#{authorizationInfo.authorizationName},
+		        #{authorizationInfo.authorizationCode},
+		        #{authorizationInfo.authorizationStatus},
+		        #{authorizationInfo.description},
+		        UNIX_TIMESTAMP(NOW())*1000)
+           </foreach>
+    </insert>
 
     <select id="getAuthorizationByAuthorizationId" resultMap="BaseResultMap">
         SELECT

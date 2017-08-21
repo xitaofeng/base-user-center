@@ -6,17 +6,35 @@ import com.shsnc.base.authorization.mapper.AuthorizationRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel;
 import com.shsnc.base.authorization.model.AuthorizationInfoModel.EnumAuthorizationStatus;
 import com.shsnc.base.authorization.model.condition.AuthorizationInfoCondition;
+import com.shsnc.base.authorization.util.poi.LSExcel;
 import com.shsnc.base.util.StringUtil;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
+
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by Elena on 2017/6/5.
@@ -218,6 +236,148 @@ public class AuthorizationInfoService {
             throw new BizException("权限编码不能为空");
         }
     }
+    
+    /**
+     * 批量导入(测试通过20170621)
+     *
+     * @param file
+     * @throws BizException 
+     * @throws Exception 
+     */
+    public boolean uploadFile( MultipartFile file) throws BizException  {
+        boolean isSuccess;
+        FileInputStream fileInputStream = null;
+        if (file == null) {
+            File customfile = new File("D:\\temp\\Linux20170817191752.xlsx");
+            try {
+                fileInputStream = new FileInputStream(customfile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+
+            String fileName = file.getOriginalFilename();
+            System.out.println("filename:" + fileName);
+            if (!(fileName.endsWith(".xlsx") || fileName.endsWith(".xls"))) {
+                throw new BizException("只支持[.xlsx,.xls]格式导入");
+            }
+
+            try {
+                fileInputStream = (FileInputStream) file.getInputStream();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // 1.获得excel表
+        // Workbook work =
+        // WorkbookFactory.create(file.getInputStream());
+        Workbook work = null;
+        try {
+            work = WorkbookFactory.create(fileInputStream);
+            // 2.获得sheet页
+            Sheet sheet = work.getSheetAt(0); // 获得sheet页
+            if (sheet != null) {
+                // 3.解析sheet页
+                this.parseSheet(sheet);
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            
+            e.printStackTrace();
+        } finally {
+            try {
+                work.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        isSuccess = true;
+        return isSuccess;
+
+    }
+    
+    /**
+     * 解析excel表
+     *
+     * @param sheet
+     * @throws Exception 
+     */
+    private boolean parseSheet(Sheet sheet) throws Exception {
+        List<AuthorizationInfoModel> instances = new ArrayList<>();// 缓存所有excel表数据
+        // 1.解析表头
+        List<String> titles =LSExcel.getTitles(sheet);
+        // 2.解析 body
+        Set<String> checkNames = new HashSet<>();
+
+        int rowNums = sheet.getLastRowNum();
+
+        if (rowNums >= 1) {
+
+            for (int rowNum = 1; rowNum <= rowNums; rowNum++) {
+                Row row = sheet.getRow(rowNum);
+                if (row != null) {
+                    // 解析行数据，并封装成ResourceInstance对象
+                    Map<String, String> cellValues =LSExcel.getCellValues(titles, row);
+                    AuthorizationInfoModel authorization = new AuthorizationInfoModel();
+                    String authorizationName = LSExcel.getStringValueByCell(row.getCell(0));
+                    String authorizationCode = LSExcel.getStringValueByCell(row.getCell(1));
+                    authorization.setAuthorizationCode(authorizationCode);
+                    authorization.setAuthorizationName(authorizationName);
+                    authorization.setDescription(authorizationName);
+                    authorization.setAuthorizationStatus(1);
+                    
+                    instances.add(authorization);
+
+                 
+                }
+            }
+
+        }
+
+        // 4.写入数据库
+        if (!CollectionUtils.isEmpty(instances)) {
+           /* for (AuthorizationInfoModel instance : instances) {
+                this.addInstance(instance);
+            }*/
+            //查找已经存在的权限码
+            //AuthorizationInfoCondition conditon = new AuthorizationInfoCondition();
+            
+            List<AuthorizationInfoModel> existModel =  this.getAuthorizationList(null);
+            List<AuthorizationInfoModel> notExistModel = new ArrayList<AuthorizationInfoModel>();
+            
+            boolean flag = true ;
+            for(AuthorizationInfoModel instance : instances){
+                flag = true;
+                for(AuthorizationInfoModel exist : existModel){
+                    
+                    if(instance.getAuthorizationCode().equals(exist.getAuthorizationCode())){
+                        
+                        flag = false;
+                        break;
+                    }
+                }
+               if(flag){
+                   notExistModel.add(instance);
+               }
+               
+            }
+           
+           if(!CollectionUtils.isEmpty(notExistModel)){
+               
+               authorizationInfoModelMapper.insertBatch(notExistModel);
+           }
+            
+            
+        }
+        return true;
+
+    }
+
 
     /**
      * 验证数据是否重复
@@ -242,4 +402,9 @@ public class AuthorizationInfoService {
             return list.size() > 0;
         }
     }
+    
+
+
+    
+    
 }
