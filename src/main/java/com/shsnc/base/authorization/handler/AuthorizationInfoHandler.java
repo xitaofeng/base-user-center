@@ -133,6 +133,6 @@ public class AuthorizationInfoHandler implements RequestHandler {
     @RequestMapper("uploadFile")
     @Validate
     public boolean uploadFile(MultipartFile file) throws BizException {
-        return authorizationInfoService.uploadFile( file);
+        return authorizationInfoService.updateFile( file);
     }
 }

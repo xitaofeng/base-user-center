@@ -244,7 +244,7 @@ public class AuthorizationInfoService {
      * @throws BizException 
      * @throws Exception 
      */
-    public boolean uploadFile( MultipartFile file) throws BizException  {
+    public boolean updateFile( MultipartFile file) throws BizException  {
         boolean isSuccess;
         FileInputStream fileInputStream = null;
         if (file == null) {
@@ -279,7 +279,7 @@ public class AuthorizationInfoService {
             Sheet sheet = work.getSheetAt(0); // 获得sheet页
             if (sheet != null) {
                 // 3.解析sheet页
-                this.parseSheet(sheet);
+                this.insertSheet(sheet);
 
             }
         } catch (IOException e) {
@@ -307,12 +307,12 @@ public class AuthorizationInfoService {
      * @param sheet
      * @throws Exception 
      */
-    private boolean parseSheet(Sheet sheet) throws Exception {
+    private boolean insertSheet(Sheet sheet) throws Exception {
         List<AuthorizationInfoModel> instances = new ArrayList<>();// 缓存所有excel表数据
         // 1.解析表头
         List<String> titles =LSExcel.getTitles(sheet);
         // 2.解析 body
-        Set<String> checkNames = new HashSet<>();
+       // Set<String> checkNames = new HashSet<>();
 
         int rowNums = sheet.getLastRowNum();
 
