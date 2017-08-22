@@ -218,8 +218,8 @@
         SELECT
             <include refid="BaseColumn" />
         FROM user_info_group_relation ur, user_info ui
-        AND ur.user_id = ui.user_id AND ui.is_delete = 1
-        WHERE ur.group_id = #{groupId}
+       where 1=1 AND ur.user_id = ui.user_id AND ui.is_delete = 1
+        and ur.group_id = #{groupId}
     </select>
 
     <select id="getCurrentUserIds" resultType="java.lang.Long">

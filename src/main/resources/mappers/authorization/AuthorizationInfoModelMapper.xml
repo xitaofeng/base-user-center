@@ -20,8 +20,7 @@
     <sql id="tableName">authorization_info</sql>
 
     <!-- SQL语句格式美化，关键字用大写字母 -->
-    <insert id="addAuthorizationInfo" useGeneratedKeys="true" keyProperty="authorizationId"
-            keyColumn="authorization_id">
+    <insert id="addAuthorizationInfo" >
         INSERT INTO
         <include refid="tableName"/>
         (
