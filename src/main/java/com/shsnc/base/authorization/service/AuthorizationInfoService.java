@@ -392,7 +392,7 @@ public class AuthorizationInfoService {
             boolean isRepetition = false;
             for (int i = 0; i < list.size(); i++) {
                 AuthorizationInfoModel tempAuthorizationInfoModel = list.get(i);
-                if (authorizationId != tempAuthorizationInfoModel.getAuthorizationId()) {
+                if (authorizationId.longValue() != tempAuthorizationInfoModel.getAuthorizationId().longValue()) {
                     isRepetition = true;
                     break;
                 }
