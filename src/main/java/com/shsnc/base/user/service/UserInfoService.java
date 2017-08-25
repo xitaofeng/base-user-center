@@ -241,7 +241,12 @@ public class UserInfoService {
         // 更新与用户组的关系
         List<Long> groupIds = userInfoModel.getGroupIds();
         if(groupIds != null){
-            userInfoGroupRelationService.batchUpdateUserInfoGroupRelation(userInfoModel.getUserId(), groupIds, true);
+            try{
+                userInfoGroupRelationService.batchUpdateUserInfoGroupRelation(userInfoModel.getUserId(), groupIds, true);
+            }catch(Exception e){
+                throw new BaseException(MessageCode.BIZ_ERROR,"存在重复的用户与用户组关系！");
+            }
+           
         }
 
         // 更新用户扩展属性值

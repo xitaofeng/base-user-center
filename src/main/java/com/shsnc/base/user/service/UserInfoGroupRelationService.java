@@ -79,7 +79,7 @@ public class UserInfoGroupRelationService {
         // 新增
         if (!addGroupIds.isEmpty()) {
             List<UserInfoGroupRelationModel> userInfoGroupRelationModels = new ArrayList<>();
-            for (Long groupId : groupIds) {
+            for (Long groupId : addGroupIds) {
                 UserInfoGroupRelationModel relation = new UserInfoGroupRelationModel();
                 relation.setGroupId(groupId);
                 relation.setUserId(userId);

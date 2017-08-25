@@ -6,17 +6,21 @@ import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.base.authorization.config.DataObject;
 import com.shsnc.base.authorization.config.DataOperation;
+import com.shsnc.base.authorization.model.AuthorizationRightsModel;
 import com.shsnc.base.authorization.service.AuthorizationRightsService;
 import com.shsnc.base.user.bean.Group;
 import com.shsnc.base.user.model.GroupModel;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
+
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -86,4 +90,16 @@ public class AuthorizationResourceGroupHandler implements RequestHandler {
         List<GroupModel> groupModels = authorizationRightsService.getGroupsByObjectId(DataObject.RESOURCE_GROUP, resourceGroupId);
         return JsonUtil.convert(groupModels, List.class, Group.class);
     }
+    
+    @RequestMapper("/getResourceGroups")
+    @Validate
+    public List<Long> getResourceGroups(List<Long> groupIds) throws BaseException {
+        
+        List<Long> resourceGroupIds = authorizationRightsService.getRightsByGroupIds(DataObject.RESOURCE_GROUP, groupIds);
+        
+      
+        return resourceGroupIds;
+    }
+    
+    
 }
