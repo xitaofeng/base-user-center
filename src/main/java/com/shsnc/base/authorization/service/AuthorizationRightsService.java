@@ -13,6 +13,7 @@ import com.shsnc.base.util.BizAssert;
 import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.config.MessageCode;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -329,6 +330,32 @@ public class AuthorizationRightsService {
         List<AuthorizationRightsModel> rightsModelList =  authorizationRightsModelMapper.getByObjectIds(dataObject, objectIds, condition);
         return filterRights(rightsModelList, dataOperation);
     }
+    
+    /**
+     * 
+    * @Title: getRightsByGroupIds 
+    * @Description: TODO(根据用户组获取资源组) 
+    * @param dataObject
+    * @param groupIds
+    * @return
+    * @throws BizException            参数     
+    * @return List<Long>    返回类型 
+    * @throws
+     */
+    public List<Long> getRightsByGroupIds( DataObject dataObject,List<Long> groupIds) throws BizException {
+      
+        BizAssert.notEmpty(groupIds, String.format("【%s】的id不能为空！", "用户组"));
+      
+        List<AuthorizationRightsModel> rightsModelList =  authorizationRightsModelMapper.getByGroupIds(dataObject, groupIds);
+       
+         List<Long> resourceGroupIds = new ArrayList<Long>();
+        
+        for(AuthorizationRightsModel rights : rightsModelList){
+            resourceGroupIds.add(rights.getObjectId());
+        }
+        return resourceGroupIds;
+    }
+
 
     /**
      * 获取用户拥有的某类数据的所有id

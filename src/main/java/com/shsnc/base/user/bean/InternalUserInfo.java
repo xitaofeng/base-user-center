@@ -20,6 +20,8 @@ public class InternalUserInfo {
     private Integer status;
     private boolean superAdmin;
     private List<Long> groupIds;
+    
+    private List<Long> resourceGroupIds;
 
     public Long getUserId() {
         return userId;
@@ -92,4 +94,14 @@ public class InternalUserInfo {
     public void setSuperAdmin(Boolean superAdmin) {
         this.superAdmin = superAdmin;
     }
+
+    public List<Long> getResourceGroupIds() {
+        return resourceGroupIds;
+    }
+
+    public void setResourceGroupIds(List<Long> resourceGroupIds) {
+        this.resourceGroupIds = resourceGroupIds;
+    }
+    
+    
 }
