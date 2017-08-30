@@ -55,7 +55,7 @@ public class BaseResourceService {
         params.put("resourceGroupIds", resourceGroupIds);
         ApiResult<List> result;
         try {
-            result = ApiClient.requestInternal(ModuleConstant.BASE_RESOURCE_MODULE + GET_RESOURCE_GROUPS_BY_RESOURCE_GROUPIDS, params, List.class, HttpServerConfig.getSignatureKey());
+            result = ApiClient.requestInternal(ModuleConstant.BASE_RESOURCE_MODULE + GET_RESOURCE_GROUPS_BY_RESOURCE_GROUPIDS, params, List.class, HttpServerConfig.getSignatureKey(),ThreadContext.getClientInfo().getToken());
         } catch (IOException e) {
             LOG.error(ERROR_MESSAGE, e);
             throw new BizException(ERROR_MESSAGE);
