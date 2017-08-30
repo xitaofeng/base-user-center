@@ -37,7 +37,7 @@ public class BaseResourceService {
 
         params.put("resourceCode", resourceCode);
         try {
-            String url =  ModuleConstant.BASE_RESOURCE_MODULE + BaseResourceConstant.RESOURCE_INSTANCE_GETINSTANCEBYID;
+            String url =  ModuleConstant.MODULE_RESOURCE_URL + BaseResourceConstant.RESOURCE_INSTANCE_GETINSTANCEBYID;
             ApiResult<ResourceInfo> apiResult = ApiClient.request(url, params, ResourceInfo.class);
             LOG.debug("请求数据字典服务：地址【{}】，参数【{}】，结果【{}】", url, JsonUtil.toJsonString(params), JsonUtil.toJsonString(apiResult));
             if (apiResult.getMessageCode() == 200) {
@@ -55,7 +55,7 @@ public class BaseResourceService {
         params.put("resourceGroupIds", resourceGroupIds);
         ApiResult<List> result;
         try {
-            result = ApiClient.requestInternal(ModuleConstant.BASE_RESOURCE_MODULE + GET_RESOURCE_GROUPS_BY_RESOURCE_GROUPIDS, params, List.class, HttpServerConfig.getSignatureKey(),ThreadContext.getClientInfo().getToken());
+            result = ApiClient.requestInternal(ModuleConstant.MODULE_RESOURCE_URL + GET_RESOURCE_GROUPS_BY_RESOURCE_GROUPIDS, params, List.class, HttpServerConfig.getSignatureKey(),ThreadContext.getClientInfo().getToken());
         } catch (IOException e) {
             LOG.error(ERROR_MESSAGE, e);
             throw new BizException(ERROR_MESSAGE);
