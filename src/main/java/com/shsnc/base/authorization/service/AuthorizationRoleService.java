@@ -354,7 +354,7 @@ public class AuthorizationRoleService {
             boolean isRepetition = false;
             for (int i = 0; i < list.size(); i++) {
                 AuthorizationRoleModel authorizationRoleModel = list.get(i);
-                if (roleId != authorizationRoleModel.getRoleId()) {
+                if (!roleId.equals(authorizationRoleModel.getRoleId())) {
                     isRepetition = true;
                     break;
                 }

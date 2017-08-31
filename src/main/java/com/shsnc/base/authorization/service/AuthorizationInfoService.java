@@ -168,6 +168,7 @@ public class AuthorizationInfoService {
 
     /**
      * 分页查询
+     *
      * @param condition
      * @param pagination
      * @return
@@ -236,15 +237,15 @@ public class AuthorizationInfoService {
             throw new BizException("权限编码不能为空");
         }
     }
-    
+
     /**
      * 批量导入(测试通过20170621)
      *
      * @param file
-     * @throws BizException 
-     * @throws Exception 
+     * @throws BizException
+     * @throws Exception
      */
-    public boolean updateFile( MultipartFile file) throws BizException  {
+    public boolean updateFile(MultipartFile file) throws BizException {
         boolean isSuccess;
         FileInputStream fileInputStream = null;
         if (file == null) {
@@ -287,7 +288,7 @@ public class AuthorizationInfoService {
         } catch (InvalidFormatException e) {
             e.printStackTrace();
         } catch (Exception e) {
-            
+
             e.printStackTrace();
         } finally {
             try {
@@ -300,19 +301,19 @@ public class AuthorizationInfoService {
         return isSuccess;
 
     }
-    
+
     /**
      * 解析excel表
      *
      * @param sheet
-     * @throws Exception 
+     * @throws Exception
      */
     private boolean insertSheet(Sheet sheet) throws Exception {
         List<AuthorizationInfoModel> instances = new ArrayList<>();// 缓存所有excel表数据
         // 1.解析表头
-        List<String> titles =LSExcel.getTitles(sheet);
+        List<String> titles = LSExcel.getTitles(sheet);
         // 2.解析 body
-       // Set<String> checkNames = new HashSet<>();
+        // Set<String> checkNames = new HashSet<>();
 
         int rowNums = sheet.getLastRowNum();
 
@@ -322,7 +323,7 @@ public class AuthorizationInfoService {
                 Row row = sheet.getRow(rowNum);
                 if (row != null) {
                     // 解析行数据，并封装成ResourceInstance对象
-                    Map<String, String> cellValues =LSExcel.getCellValues(titles, row);
+                    Map<String, String> cellValues = LSExcel.getCellValues(titles, row);
                     AuthorizationInfoModel authorization = new AuthorizationInfoModel();
                     String authorizationName = LSExcel.getStringValueByCell(row.getCell(0));
                     String authorizationCode = LSExcel.getStringValueByCell(row.getCell(1));
@@ -330,10 +331,10 @@ public class AuthorizationInfoService {
                     authorization.setAuthorizationName(authorizationName);
                     authorization.setDescription(authorizationName);
                     authorization.setAuthorizationStatus(1);
-                    
+
                     instances.add(authorization);
 
-                 
+
                 }
             }
 
@@ -346,33 +347,33 @@ public class AuthorizationInfoService {
             }*/
             //查找已经存在的权限码
             //AuthorizationInfoCondition conditon = new AuthorizationInfoCondition();
-            
-            List<AuthorizationInfoModel> existModel =  this.getAuthorizationList(null);
+
+            List<AuthorizationInfoModel> existModel = this.getAuthorizationList(null);
             List<AuthorizationInfoModel> notExistModel = new ArrayList<AuthorizationInfoModel>();
-            
-            boolean flag = true ;
-            for(AuthorizationInfoModel instance : instances){
+
+            boolean flag = true;
+            for (AuthorizationInfoModel instance : instances) {
                 flag = true;
-                for(AuthorizationInfoModel exist : existModel){
-                    
-                    if(instance.getAuthorizationCode().equals(exist.getAuthorizationCode())){
-                        
+                for (AuthorizationInfoModel exist : existModel) {
+
+                    if (instance.getAuthorizationCode().equals(exist.getAuthorizationCode())) {
+
                         flag = false;
                         break;
                     }
                 }
-               if(flag){
-                   notExistModel.add(instance);
-               }
-               
+                if (flag) {
+                    notExistModel.add(instance);
+                }
+
             }
-           
-           if(!CollectionUtils.isEmpty(notExistModel)){
-               
-               authorizationInfoModelMapper.insertBatch(notExistModel);
-           }
-            
-            
+
+            if (!CollectionUtils.isEmpty(notExistModel)) {
+
+                authorizationInfoModelMapper.insertBatch(notExistModel);
+            }
+
+
         }
         return true;
 
@@ -392,7 +393,7 @@ public class AuthorizationInfoService {
             boolean isRepetition = false;
             for (int i = 0; i < list.size(); i++) {
                 AuthorizationInfoModel tempAuthorizationInfoModel = list.get(i);
-                if (authorizationId.longValue() != tempAuthorizationInfoModel.getAuthorizationId().longValue()) {
+                if (!authorizationId.equals(tempAuthorizationInfoModel.getAuthorizationId())) {
                     isRepetition = true;
                     break;
                 }
@@ -402,9 +403,6 @@ public class AuthorizationInfoService {
             return list.size() > 0;
         }
     }
-    
 
 
-    
-    
 }
