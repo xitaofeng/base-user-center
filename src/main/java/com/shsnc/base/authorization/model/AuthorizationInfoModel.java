@@ -1,11 +1,13 @@
 package com.shsnc.base.authorization.model;
 
+import com.shsnc.base.util.StringUtil;
+
 import java.io.Serializable;
 
 /**
  * Created by LuoJun on 2017/6/5.
  */
-public class AuthorizationInfoModel implements Serializable{
+public class AuthorizationInfoModel implements Serializable {
 
     private Long authorizationId;
 
@@ -52,6 +54,9 @@ public class AuthorizationInfoModel implements Serializable{
     }
 
     public void setAuthorizationName(String authorizationName) {
+        if (StringUtil.isNotEmpty(authorizationName)) {
+            authorizationName = authorizationName.trim();
+        }
         this.authorizationName = authorizationName;
     }
 
@@ -60,6 +65,9 @@ public class AuthorizationInfoModel implements Serializable{
     }
 
     public void setAuthorizationCode(String authorizationCode) {
+        if (StringUtil.isNotEmpty(authorizationCode)) {
+            authorizationCode = authorizationCode.trim();
+        }
         this.authorizationCode = authorizationCode;
     }
 

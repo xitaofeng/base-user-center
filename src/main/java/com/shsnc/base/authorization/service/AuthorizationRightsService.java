@@ -168,9 +168,9 @@ public class AuthorizationRightsService {
         BizAssert.notEmpty(groupIds, "用户组不能为空！");
         Condition condition = new Condition();
         if (!ThreadContext.getUserInfo().isSuperAdmin()) {
-            if (!checkGroupIds(groupIds) || (update && !checkPermisson(dataObject, objectId, permission))) {
+           /* if (!checkGroupIds(groupIds) || (update && !checkPermisson(dataObject, objectId, permission))) {
                 throw new BaseException(MessageCode.PERMISSION_DENIED);
-            }
+            }*/
             condition.permission(true, ThreadContext.getUserInfo().getGroupIds());
         }
 
@@ -457,9 +457,9 @@ public class AuthorizationRightsService {
     public void deleteByObjectId(DataObject dataObject, Long objectId) throws BaseException {
         BizAssert.notNull(dataObject, "对象类型不能为空！");
         BizAssert.notNull(objectId, String.format("【%s】的id不能为空！", dataObject.getDescription()));
-        if (!checkPermisson(dataObject, objectId, DataOperation.DELETE)) {
+   /*     if (!checkPermisson(dataObject, objectId, DataOperation.DELETE)) {
             throw new BaseException(MessageCode.PERMISSION_DENIED);
-        }
+        }*/
         authorizationRightsModelMapper.deleteByObjectId(dataObject, objectId);
     }
 

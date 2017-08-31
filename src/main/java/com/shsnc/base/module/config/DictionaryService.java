@@ -39,7 +39,7 @@ public class DictionaryService {
         entity.put("mapKey", mapKey);
         params.put("entity", entity);
         try {
-            String url =  ModuleConstant.BASE_DICTIONARY_MODULE + BaseDictionaryConstant.DICTIONARY_MAP_GETBYPROJECTDICTKEY;
+            String url =  ModuleConstant.MODULE_DICTIONARY_URL + BaseDictionaryConstant.DICTIONARY_MAP_GETBYPROJECTDICTKEY;
             ApiResult<DictionaryMapInfo> apiResult = ApiClient.request(url, params, DictionaryMapInfo.class);
             LOG.debug("请求数据字典服务：地址【{}】，参数【{}】，结果【{}】", url, JsonUtil.toJsonString(params), JsonUtil.toJsonString(apiResult));
             if (apiResult.getMessageCode() == 200) {
