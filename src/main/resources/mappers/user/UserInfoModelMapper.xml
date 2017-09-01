@@ -347,6 +347,8 @@
             LEFT JOIN user_info_organization_relation uo ON ui.user_id=uo.user_id
         </if>
         <include refid="conditionSql"/>
+            AND internal !=2
+        
     </select>
     <select id="getByUserIds" resultMap="BaseResultMap">
         SELECT
