@@ -34,7 +34,7 @@ public class AmpRemoteService {
         params.put("usergrpPermission", usergrpRights);
         ApiResult<BooleanResult> result = null;
         try {
-            result = ApiClient.request(ModuleConstant.BASE_AMP_MODULE + UPDATE_RIGHTS, params, BooleanResult.class, ThreadContext.getClientInfo().getToken());
+            result = ApiClient.request(ModuleConstant.MODULE_AMP_URL + UPDATE_RIGHTS, params, BooleanResult.class, ThreadContext.getClientInfo().getToken());
         } catch (IOException e) {
             LOGGER.error(ERROR_MESSAGE, e);
             throw new BizException(ERROR_MESSAGE);

@@ -22,10 +22,17 @@
 
     <sql id="PermissionSql">
         <if test="condition != null and condition.checkPermission">
-            AND group_id IN
-            <foreach collection="condition.objectIds" item="objectId" open="(" close=")" separator=",">
-                #{objectId}
-            </foreach>
+            <choose>
+                <when test="condition.objectIds != null and condition.objectIds.size > 0">
+                    AND group_id IN
+                    <foreach collection="condition.objectIds" item="objectId" open="(" close=")" separator=",">
+                        #{objectId}
+                    </foreach>
+                </when>
+                <otherwise>
+                    AND 1=2
+                </otherwise>
+            </choose>
         </if>
     </sql>
 

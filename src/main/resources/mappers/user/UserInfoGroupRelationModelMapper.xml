@@ -15,13 +15,18 @@
     </sql>
 
     <sql id="PermissionSql">
-        <if test="condition != null">
-            <if test="condition.checkPermission">
-                AND ur.group_id IN
-                <foreach collection="condition.objectIds" item="objectId" open="(" close=")" separator=",">
-                    #{objectId}
-                </foreach>
-            </if>
+        <if test="condition != null and condition.checkPermission">
+            <choose>
+                <when test="condition.objectIds != null and condition.objectIds.size > 0">
+                    AND ur.group_id IN
+                    <foreach collection="condition.objectIds" item="objectId" open="(" close=")" separator=",">
+                        #{objectId}
+                    </foreach>
+                </when>
+                <otherwise>
+                    AND 1=2
+                </otherwise>
+            </choose>
         </if>
     </sql>
 
@@ -218,8 +223,8 @@
         SELECT
             <include refid="BaseColumn" />
         FROM user_info_group_relation ur, user_info ui
-       where 1=1 AND ur.user_id = ui.user_id AND ui.is_delete = 1
-        and ur.group_id = #{groupId}
+        WHERE ur.user_id = ui.user_id AND ui.is_delete = 1
+        AND ur.group_id = #{groupId}
     </select>
 
     <select id="getCurrentUserIds" resultType="java.lang.Long">
