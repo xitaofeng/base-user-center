@@ -329,6 +329,7 @@ public class UserInfoService {
         checkPassword(userInfoModel);
         checkMobile(userInfoModel);
         checkEmail(userInfoModel);
+        BizAssert.hasLength(userInfoModel.getAlias(),"用户姓名不能为空！");
         if (!Integer.valueOf(UserConstant.USER_STATUS_DISABLED).equals(userInfoModel.getStatus())){
             userInfoModel.setStatus(UserConstant.USER_STATUS_ENABLED);
         }
@@ -398,6 +399,11 @@ public class UserInfoService {
         userInfoModel.setCreateTime(null);
         userInfoModel.setInternal(null);
         userInfoModel.setIsDelete(null);
+
+        String alias = userInfoModel.getAlias();
+        if (alias != null) {
+            BizAssert.hasLength(alias, "用户姓名不能为空！");
+        }
 
         List<Long> groupIds = userInfoModel.getGroupIds();
         Long defaultGroupId = userInfoModel.getDefaultGroupId();
