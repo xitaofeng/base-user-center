@@ -36,7 +36,7 @@
 
     <sql id="PermissionSql">
         <if test="condition != null and condition.checkPermission">
-            AND ui.user_id IN
+            AND user_id IN
             <foreach collection="condition.objectIds" item="objectId" open="(" close=")" separator=",">
                 #{objectId}
             </foreach>

@@ -15,7 +15,6 @@ public class ModuleConstant {
 
     private static final String MODULE_DEFAULT_URL;
     public static final String MODULE_ATM_URL;
-    public static final String MODULE_USER_CENTER_URL;
     public static final String MODULE_DICTIONARY_URL;
     public static final String MODULE_RESOURCE_URL;
     public static final String MODULE_AMP_URL;
@@ -26,13 +25,11 @@ public class ModuleConstant {
 
             MODULE_DEFAULT_URL = properties.getProperty("module.default_url");
             MODULE_ATM_URL = properties.getProperty("module.atm_url", MODULE_DEFAULT_URL);
-            MODULE_USER_CENTER_URL = properties.getProperty("module.user_center_url", MODULE_DEFAULT_URL);
             MODULE_DICTIONARY_URL = properties.getProperty("module.dictionary_url", MODULE_DEFAULT_URL);
             MODULE_RESOURCE_URL = properties.getProperty("module.resource_url", MODULE_DEFAULT_URL);
             MODULE_AMP_URL = properties.getProperty("module.amp_url", MODULE_DEFAULT_URL);
 
             BizAssert.notNull(MODULE_ATM_URL, "配置文件server.properties[module.atm_url]属性不能为空！");
-            BizAssert.notNull(MODULE_USER_CENTER_URL, "配置文件server.properties[module.user_center_url]属性不能为空！");
             BizAssert.notNull(MODULE_DICTIONARY_URL, "配置文件server.properties[module.dictionary_url]属性不能为空！");
             BizAssert.notNull(MODULE_RESOURCE_URL, "配置文件server.properties[module.resource_url]属性不能为空！");
             BizAssert.notNull(MODULE_AMP_URL, "配置文件server.properties[module.amp_url]属性不能为空！");
