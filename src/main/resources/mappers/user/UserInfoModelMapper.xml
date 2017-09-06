@@ -324,7 +324,7 @@
         SELECT
             COUNT(1)
         FROM
-            user_info
+            user_info ui
         <include refid="conditionSql"/>
     </select>
     <select id="getPageByCondition" resultMap="BaseResultMap">

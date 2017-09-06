@@ -67,7 +67,7 @@ public class ProfileHandler implements RequestHandler {
             UserInfoModel passwordModel = new UserInfoModel();
             passwordModel.setUserId(userId);
             passwordModel.setPassword(SHAMaker.sha256String(newPassword));
-            userInfoService.updateUserInfo(passwordModel, null, null);
+            userInfoService.updatePassword(userId, SHAMaker.sha256String(newPassword));
 
         } else {
             throw new BizException("原登陆密码错误！");
