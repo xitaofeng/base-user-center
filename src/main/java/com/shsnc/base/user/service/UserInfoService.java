@@ -512,7 +512,6 @@ public class UserInfoService {
         Assert.notNull(userId,"用户id不能为空！");
         UserInfoModel dbUserInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
         Assert.notNull(dbUserInfoModel,"用户id不存在！");
-        Assert.isTrue(dbUserInfoModel.getInternal() == UserConstant.USER_INTERNAL_FALSE, "不能更新内部用户！");
 
         if (!ThreadContext.getUserInfo().isSuperAdmin()) {
             List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
