@@ -142,4 +142,58 @@
             login_ip = #{loginIp,jdbcType=VARCHAR}
         WHERE history_id = #{historyId,jdbcType=BIGINT}
     </update>
+    
+     <select id="getTotalCountByCondition" resultType="java.lang.Integer">
+        SELECT
+            COUNT(1)
+        FROM
+            user_login_history
+        <where>
+              1=1
+            <if test="condition != null">
+                <if test="condition.accountName != null and condition.accountName != ''">
+                    AND INSTR(account_name,#{condition.accountName})>0
+                </if>
+                <if test="condition.loginIp != null and condition.loginIp != ''">
+                    AND INSTR(login_ip,#{condition.loginIp})>0
+                </if>
+            </if>
+        </where>
+    </select>
+    <select id="getPageByCondition" resultMap="BaseResultMap">
+        SELECT
+            ui.*
+        FROM user_login_history ui
+       
+          <where>
+              1=1
+            <if test="condition != null">
+                <if test="condition.accountName != null and condition.accountName != ''">
+                    AND INSTR(account_name,#{condition.accountName})>0
+                </if>
+                <if test="condition.loginIp != null and condition.loginIp != ''">
+                    AND INSTR(login_ip,#{condition.loginIp})>0
+                </if>
+            </if>
+        </where>
+        <include refid="orderSql"/>
+        <include refid="pageSql"/>
+    </select>
+    
+     <sql id="orderSql">
+        <if test="pagination != null">
+            <if test="pagination.sorting != null">
+                ORDER BY ${pagination.sorting}
+            </if>
+            <if test="pagination.sorting == null">
+                ORDER BY user_id DESC
+            </if>
+        </if>
+    </sql>
+    
+       <sql id="pageSql">
+        <if test="pagination != null" >
+            LIMIT #{pagination.start}, #{pagination.pagesize}
+        </if>
+    </sql>
 </mapper>

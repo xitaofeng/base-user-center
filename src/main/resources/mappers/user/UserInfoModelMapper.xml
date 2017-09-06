@@ -36,7 +36,7 @@
 
     <sql id="PermissionSql">
         <if test="condition != null and condition.checkPermission">
-            AND user_id IN
+            AND ui.user_id IN
             <foreach collection="condition.objectIds" item="objectId" open="(" close=")" separator=",">
                 #{objectId}
             </foreach>
@@ -292,7 +292,7 @@
 
     <sql id="conditionSql">
         <where>
-            is_delete = 1
+            is_delete = 1 and internal !=2
             <if test="condition != null">
                 <if test="condition.username != null and condition.username != ''">
                     AND INSTR(username,#{condition.username})>0
@@ -343,11 +343,12 @@
         SELECT
             ui.*
         FROM user_info ui
+        
         <if test="condition != null and condition.organizationId != null">
             LEFT JOIN user_info_organization_relation uo ON ui.user_id=uo.user_id
         </if>
         <include refid="conditionSql"/>
-            AND internal !=2
+         
         
     </select>
     <select id="getByUserIds" resultMap="BaseResultMap">
