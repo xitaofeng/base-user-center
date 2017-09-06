@@ -6,6 +6,7 @@ import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.model.UserInfoModel;
+import com.shsnc.base.user.model.condition.UserInfoCondition;
 import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BaseException;
@@ -46,6 +47,11 @@ public class UserInfoInternalHandler implements RequestHandler{
     public List<UserInfo> getList(@NotEmpty List<Long> userIds) throws BaseException {
         List<UserInfoModel> userInfoModels = userInfoService.getUserInfoListByUserIds(userIds);
         return JsonUtil.convert(userInfoModels,List.class, UserInfo.class);
+    }
+
+    @RequestMapper("/getUserIdsByCondition")
+    public List<Long> getUserIdsByCondition(UserInfoCondition condition) throws BaseException {
+        return userInfoService.getUserIdsByCondition(condition);
     }
 
     @RequestMapper("/getCurrentUserIds")
