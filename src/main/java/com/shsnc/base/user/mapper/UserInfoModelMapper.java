@@ -35,4 +35,6 @@ public interface UserInfoModelMapper {
     List<UserInfoModel> getListByCondition(@Param("condition") UserInfoCondition condition);
 
     List<UserInfoModel> getByUserIds(@Param("userIds") Collection<Long> userIds);
+
+    List<Long> getUserIdsByCondition(@Param("condition") UserInfoCondition condition);
 }
