@@ -512,7 +512,6 @@ public class UserInfoService {
         Assert.notNull(userId,"用户id不能为空！");
         UserInfoModel dbUserInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
         Assert.notNull(dbUserInfoModel,"用户id不存在！");
-        Assert.isTrue(dbUserInfoModel.getInternal() == UserConstant.USER_INTERNAL_FALSE, "不能更新内部用户！");
 
         if (!ThreadContext.getUserInfo().isSuperAdmin()) {
             List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
@@ -551,8 +550,8 @@ public class UserInfoService {
         return userInfoOrganizationRelationService.batchUpdateUserToOrganizationRelation(userIds, organizationId);
     }
 
-    public List<UserInfoModel> findUsers(UserInfoCondition condition) {
-        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+    public List<UserInfoModel> findUsers(UserInfoCondition condition, boolean checkPermission) {
+        if (checkPermission && !ThreadContext.getUserInfo().isSuperAdmin()) {
             List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
             if (!groupIds.isEmpty()) {
                 List<Long> userIds = userInfoGroupRelationModelMapper.getUserIdsByGroupIds(groupIds);
@@ -568,5 +567,9 @@ public class UserInfoService {
 
     public List<Long> getCurrentUserIds(long userId) {
         return userInfoGroupRelationModelMapper.getCurrentUserIds(userId);
+    }
+
+    public List<Long> getUserIdsByCondition(UserInfoCondition condition) {
+        return userInfoModelMapper.getUserIdsByCondition(condition);
     }
 }

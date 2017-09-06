@@ -52,7 +52,7 @@ public class UserInfoHandler implements RequestHandler {
     @RequestMapper("/findUsers")
     @Authentication("BASE_USER_INFO_FIND_USERS")
     public List<UserInfo> findUsers(UserInfoCondition condition){
-        List<UserInfoModel> users = userInfoService.findUsers(condition);
+        List<UserInfoModel> users = userInfoService.findUsers(condition, true);
         return JsonUtil.convert(users, List.class, UserInfo.class);
     }
 

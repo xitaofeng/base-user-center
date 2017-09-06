@@ -292,7 +292,7 @@
 
     <sql id="conditionSql">
         <where>
-            is_delete = 1 and internal !=2
+            is_delete = 1
             <if test="condition != null">
                 <if test="condition.username != null and condition.username != ''">
                     AND INSTR(username,#{condition.username})>0
@@ -324,7 +324,7 @@
         SELECT
             COUNT(1)
         FROM
-            user_info
+            user_info ui
         <include refid="conditionSql"/>
     </select>
     <select id="getPageByCondition" resultMap="BaseResultMap">
@@ -343,13 +343,10 @@
         SELECT
             ui.*
         FROM user_info ui
-        
         <if test="condition != null and condition.organizationId != null">
             LEFT JOIN user_info_organization_relation uo ON ui.user_id=uo.user_id
         </if>
         <include refid="conditionSql"/>
-         
-        
     </select>
     <select id="getByUserIds" resultMap="BaseResultMap">
         SELECT
@@ -361,5 +358,15 @@
                 #{userId}
             </foreach>
         </where>
+    </select>
+
+    <select id="getUserIdsByCondition" resultType="java.lang.Long">
+        SELECT
+            DISTINCT ui.user_id
+        FROM user_info ui
+        <if test="condition != null and condition.organizationId != null">
+            LEFT JOIN user_info_organization_relation uo ON ui.user_id=uo.user_id
+        </if>
+        <include refid="conditionSql"/>
     </select>
 </mapper>
