@@ -368,7 +368,7 @@ public class UserInfoService {
 
         UserInfoModel dbUserInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
         Assert.notNull(dbUserInfoModel,"用户id不存在！");
-        Assert.isTrue(dbUserInfoModel.getInternal() == UserConstant.USER_INTERNAL_FALSE, "不能更新内部用户！");
+        //Assert.isTrue(dbUserInfoModel.getInternal() == UserConstant.USER_INTERNAL_FALSE, "不能更新内部用户！");
         Assert.isTrue(dbUserInfoModel.getIsDelete() == UserConstant.USER_DELETEED_FALSE, "用户已经被删除！");
 
         if (!ThreadContext.getUserInfo().isSuperAdmin()) {
