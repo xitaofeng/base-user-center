@@ -10,6 +10,7 @@ public enum DataObject {
     RESOURCE_GROUP(1, "资源组"),
     SCRIPT(2, "脚本"),
     ORCHESTRATION(3, "编排"),
+    INSPECTION(4, "巡检"),
 
     ;
 
