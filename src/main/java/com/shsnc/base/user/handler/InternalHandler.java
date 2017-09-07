@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.validation.constraints.NotNull;
 
@@ -38,7 +39,7 @@ public class InternalHandler implements RequestHandler {
     private UserInfoService userInfoService;
     @Autowired
     private UserInfoGroupRelationModelMapper userInfoGroupRelationModelMapper;
-    
+
     @Autowired
     private AuthorizationRightsService authorizationRightsService;
 
@@ -49,26 +50,31 @@ public class InternalHandler implements RequestHandler {
         String[] result = null;
         try {
             result = SimpleTokenProvider.resolveToken(token);
-            if(result.length != 3){
+            if (result.length != 3) {
                 errorMsg = "无效token！";
-            } else{
+            } else {
                 try {
-                    String serverToken = RedisUtil.getFieldValue(UserConstant.REDIS_LOGIN_KEY,result[1]);
-                    boolean success =  serverToken != null && serverToken.equals(token);
-                    if(success){
+                    String serverToken = RedisUtil.getFieldValue(UserConstant.REDIS_LOGIN_KEY, result[1]);
+                    boolean success = serverToken != null && serverToken.equals(token);
+                    if (success) {
                         RedisUtil.setFieldValue(UserConstant.REDIS_LOGIN_KEY, result[1], token, ServerConfig.getSessionTime());
                         UserInfoModel userInfo = userInfoService.getUserInfoByCache(Long.valueOf(result[0]));
                         List<Long> groupIds = userInfoGroupRelationModelMapper.getGroupIdsByUserId(userInfo.getUserId(), new Condition());
-                        //增加用户关联资源组，用于权限过滤
-                        List<Long> resourceGroupIds = authorizationRightsService.getRightsByGroupIds(DataObject.RESOURCE_GROUP, groupIds);
+                        logger.info("当前用户用户组id:【{}】", JsonUtil.toJsonString(groupIds));
+
                         InternalUserInfo internalUserInfo = JsonUtil.convert(userInfo, InternalUserInfo.class);
-                        internalUserInfo.setGroupIds(groupIds);
-                        internalUserInfo.setResourceGroupIds(resourceGroupIds);
+                        //增加用户关联资源组，用于权限过滤
+                        if (!CollectionUtils.isEmpty(groupIds)) {
+                            List<Long> resourceGroupIds = authorizationRightsService.getRightsByGroupIds(DataObject.RESOURCE_GROUP, groupIds);
+                            logger.info("当前用户资源组id:【{}】", JsonUtil.toJsonString(resourceGroupIds));
+                            internalUserInfo.setGroupIds(groupIds);
+                            internalUserInfo.setResourceGroupIds(resourceGroupIds);
+                        }
                         return internalUserInfo;
                     }
                 } catch (Exception e) {
                     errorMsg = "服务器异常！";
-                    logger.error("连接Redis异常！",e);
+                    logger.error("连接Redis异常！", e);
                 }
             }
         } catch (Exception e) {
@@ -76,7 +82,7 @@ public class InternalHandler implements RequestHandler {
         }
 
         // 提示信息
-        if(errorMsg != null){
+        if (errorMsg != null) {
             throw new BizException(errorMsg);
         }
         return null;

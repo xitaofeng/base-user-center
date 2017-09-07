@@ -330,26 +330,26 @@ public class AuthorizationRightsService {
         List<AuthorizationRightsModel> rightsModelList =  authorizationRightsModelMapper.getByObjectIds(dataObject, objectIds, condition);
         return filterRights(rightsModelList, dataOperation);
     }
-    
+
     /**
-     * 
-    * @Title: getRightsByGroupIds 
-    * @Description: TODO(根据用户组获取资源组) 
+     *
+    * @Title: getRightsByGroupIds
+    * @Description: TODO(根据用户组获取资源组)
     * @param dataObject
     * @param groupIds
     * @return
-    * @throws BizException            参数     
-    * @return List<Long>    返回类型 
+    * @throws BizException            参数
+    * @return List<Long>    返回类型
     * @throws
      */
     public List<Long> getRightsByGroupIds( DataObject dataObject,List<Long> groupIds) throws BizException {
-      
+
         BizAssert.notEmpty(groupIds, String.format("【%s】的id不能为空！", "用户组"));
-      
+
         List<AuthorizationRightsModel> rightsModelList =  authorizationRightsModelMapper.getByGroupIds(dataObject, groupIds);
-       
+
          List<Long> resourceGroupIds = new ArrayList<Long>();
-        
+
         for(AuthorizationRightsModel rights : rightsModelList){
             resourceGroupIds.add(rights.getObjectId());
         }
