@@ -48,6 +48,6 @@ public abstract class UserConstant {
 
     public static final String REDIS_LOGIN_KEY = "USERCENTER_LOGIN_TOKEN";
     public static final String REDIS_LOGIN_USER = "USERCENTER_LOGIN_USER";
-    public static final String REDIS_USER_INFO_KEY = "USERCENTER_USER_INFO_TOKEN";
+    public static final String REDIS_USER_INFO_KEY = "USERCENTER_USER_INFO";
 
 }
