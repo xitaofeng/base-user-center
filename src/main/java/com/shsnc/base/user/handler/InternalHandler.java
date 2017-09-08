@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.validation.constraints.NotNull;
 
@@ -66,11 +67,14 @@ public class InternalHandler implements RequestHandler {
 
                         UserInfoModel userInfo = userInfoService.getUserInfoByCache(Long.valueOf(result[0]));
                         List<Long> groupIds = userInfoGroupRelationModelMapper.getGroupIdsByUserId(userInfo.getUserId(), new Condition());
-                        //增加用户关联资源组，用于权限过滤
-                        List<Long> resourceGroupIds = authorizationRightsService.getRightsByGroupIds(DataObject.RESOURCE_GROUP, groupIds);
                         InternalUserInfo internalUserInfo = JsonUtil.convert(userInfo, InternalUserInfo.class);
-                        internalUserInfo.setGroupIds(groupIds);
-                        internalUserInfo.setResourceGroupIds(resourceGroupIds);
+
+                        if(!CollectionUtils.isEmpty(groupIds)) {
+                            //增加用户关联资源组，用于权限过滤
+                            List<Long> resourceGroupIds = authorizationRightsService.getRightsByGroupIds(DataObject.RESOURCE_GROUP, groupIds);
+                            internalUserInfo.setGroupIds(groupIds);
+                            internalUserInfo.setResourceGroupIds(resourceGroupIds);
+                        }
                         return internalUserInfo;
                     }
                 } catch (Exception e) {
