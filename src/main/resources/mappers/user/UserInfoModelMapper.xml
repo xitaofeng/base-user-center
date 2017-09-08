@@ -369,4 +369,10 @@
         </if>
         <include refid="conditionSql"/>
     </select>
+
+    <select id="getPasswordByUserId" resultType="java.lang.String">
+        SELECT password
+        FROM user_info ui
+        WHERE ui.user_id=#{userId}
+    </select>
 </mapper>
