@@ -572,4 +572,8 @@ public class UserInfoService {
     public List<Long> getUserIdsByCondition(UserInfoCondition condition) {
         return userInfoModelMapper.getUserIdsByCondition(condition);
     }
+
+    public String getPasswordByUserId(Long userId) {
+        return userInfoModelMapper.getPasswordByUserId(userId);
+    }
 }
