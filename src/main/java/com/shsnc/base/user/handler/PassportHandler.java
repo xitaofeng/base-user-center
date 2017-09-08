@@ -100,7 +100,10 @@ public class PassportHandler implements RequestHandler{
                         Certification certification = new Certification(token);
                         loginResult.setCertification(certification);
                         try {
-                            RedisUtil.setFieldValue(UserConstant.REDIS_LOGIN_KEY, uuid, token, ServerConfig.getSessionTime());
+                            // 会话有效期缓存
+                            RedisUtil.saveString(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_KEY,uuid), token , ServerConfig.getSessionTime());
+                            // 用户id到token的缓存
+                            RedisUtil.setFieldValue(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_USER,userId), uuid, token, ServerConfig.getSessionTime());
                         } catch (Exception e) {
                             errorMsg = "服务器异常！";
                             serverMsg = "操作REDIS失败";
@@ -145,7 +148,10 @@ public class PassportHandler implements RequestHandler{
         }
         if (result != null) {
             try {
-                RedisUtil.delMapField(UserConstant.REDIS_LOGIN_KEY, result[1]);
+                // 移除会话有效期
+                RedisUtil.remove(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_KEY,result[1]));
+                // 移除用户id到token的缓存
+                RedisUtil.delMapField(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_USER,result[0]),result[1]);
             } catch (Exception e) {
                 errorMsg = "服务器异常！";
                 serverMsg = "操作REDIS失败";
