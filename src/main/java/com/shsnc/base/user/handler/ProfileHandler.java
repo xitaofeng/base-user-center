@@ -7,10 +7,12 @@ import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.base.user.bean.ExtendPropertyValue;
 import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.bean.UserInfoParam;
+import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.model.ExtendPropertyValueModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.util.JsonUtil;
+import com.shsnc.base.util.RedisUtil;
 import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.crypto.SHAMaker;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by houguangqiang on 2017/6/8.
@@ -68,7 +71,11 @@ public class ProfileHandler implements RequestHandler {
             passwordModel.setUserId(userId);
             passwordModel.setPassword(SHAMaker.sha256String(newPassword));
             userInfoService.updatePassword(userId, SHAMaker.sha256String(newPassword));
-
+            Map<String, String> tokenMap = RedisUtil.getMap(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_USER, userId.toString()));
+            for (Map.Entry<String, String> entry : tokenMap.entrySet()) {
+                RedisUtil.remove(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_KEY,entry.getValue()));
+            }
+            RedisUtil.remove(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_USER, userId.toString()));
         } else {
             throw new BizException("原登陆密码错误！");
         }

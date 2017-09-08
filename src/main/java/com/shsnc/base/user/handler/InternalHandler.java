@@ -53,10 +53,17 @@ public class InternalHandler implements RequestHandler {
                 errorMsg = "无效token！";
             } else{
                 try {
-                    String serverToken = RedisUtil.getFieldValue(UserConstant.REDIS_LOGIN_KEY,result[1]);
-                    boolean success =  serverToken != null && serverToken.equals(token);
+                    String serverToken = RedisUtil.getString(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_KEY,result[1]));
+                    String userServerToken = RedisUtil.getFieldValue(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_USER, result[0]), result[1]);
+                    boolean success =  serverToken != null
+                            && serverToken.equals(token)
+                            && serverToken.equals(userServerToken);
                     if(success){
-                        RedisUtil.setFieldValue(UserConstant.REDIS_LOGIN_KEY, result[1], token, ServerConfig.getSessionTime());
+                        // 更新会话缓存
+                        RedisUtil.setExpire(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_KEY,result[1]),ServerConfig.getSessionTime());
+                        // 更新用户id到token的缓存
+                        RedisUtil.setExpire(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_USER,result[0]),ServerConfig.getSessionTime());
+
                         UserInfoModel userInfo = userInfoService.getUserInfoByCache(Long.valueOf(result[0]));
                         List<Long> groupIds = userInfoGroupRelationModelMapper.getGroupIdsByUserId(userInfo.getUserId(), new Condition());
                         //增加用户关联资源组，用于权限过滤
@@ -81,4 +88,5 @@ public class InternalHandler implements RequestHandler {
         }
         return null;
     }
+
 }
