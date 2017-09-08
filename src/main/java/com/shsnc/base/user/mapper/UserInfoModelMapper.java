@@ -37,4 +37,6 @@ public interface UserInfoModelMapper {
     List<UserInfoModel> getByUserIds(@Param("userIds") Collection<Long> userIds);
 
     List<Long> getUserIdsByCondition(@Param("condition") UserInfoCondition condition);
+
+    String getPasswordByUserId(Long userId);
 }

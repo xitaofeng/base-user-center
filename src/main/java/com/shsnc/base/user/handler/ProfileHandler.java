@@ -64,9 +64,9 @@ public class ProfileHandler implements RequestHandler {
     @RequestMapper("/modifyPassword")
     public void modifyPassword(@NotNull String oldPassword, @NotNull String newPassword) throws BaseException {
         Long userId = ThreadContext.getUserInfo().getUserId();
-        UserInfoModel userInfoModel = userInfoService.getUserInfoByCache(userId);
+        String dbPassword = userInfoService.getPasswordByUserId(userId);
         oldPassword = SHAMaker.sha256String(oldPassword);
-        if(userInfoModel.getPassword().equals(oldPassword)){
+        if(dbPassword.equals(oldPassword)){
             UserInfoModel passwordModel = new UserInfoModel();
             passwordModel.setUserId(userId);
             passwordModel.setPassword(SHAMaker.sha256String(newPassword));
