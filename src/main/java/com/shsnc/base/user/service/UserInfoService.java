@@ -513,14 +513,6 @@ public class UserInfoService {
         UserInfoModel dbUserInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
         Assert.notNull(dbUserInfoModel,"用户id不存在！");
 
-        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
-            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
-            Condition condition = new Condition(true, groupIds);
-            Long dbUserId = userInfoGroupRelationModelMapper.getUserIdByUserId(userId, condition);
-            if (dbUserId == null) {
-                throw new BaseException(MessageCode.PERMISSION_DENIED);
-            }
-        }
         UserInfoModel userInfoModel = new UserInfoModel();
         userInfoModel.setUserId(userId);
         userInfoModel.setPassword(newPassword);

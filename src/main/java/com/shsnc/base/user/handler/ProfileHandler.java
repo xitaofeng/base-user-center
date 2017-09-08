@@ -67,10 +67,7 @@ public class ProfileHandler implements RequestHandler {
         String dbPassword = userInfoService.getPasswordByUserId(userId);
         oldPassword = SHAMaker.sha256String(oldPassword);
         if(dbPassword.equals(oldPassword)){
-            UserInfoModel passwordModel = new UserInfoModel();
-            passwordModel.setUserId(userId);
-            passwordModel.setPassword(SHAMaker.sha256String(newPassword));
-            userInfoService.updatePassword(userId, SHAMaker.sha256String(newPassword));
+            userInfoService.updatePassword(userId, newPassword);
             Map<String, String> tokenMap = RedisUtil.getMap(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_USER, userId.toString()));
             for (Map.Entry<String, String> entry : tokenMap.entrySet()) {
                 RedisUtil.remove(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_KEY,entry.getValue()));
