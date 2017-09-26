@@ -141,7 +141,7 @@ public class AuthorizationRightsService {
     }
 
     /**
-     * 更新对象授权
+     * 更新对象授权，一个对象授权给多个用户组
      * @param dataObject 对象类型
      * @param objectId 对象id
      * @param groupIds 用户组id列表
@@ -154,7 +154,7 @@ public class AuthorizationRightsService {
     }
 
     /**
-     * 更新对象授权
+     * 更新对象授权，一个对象授权给多个用户组
      * @param dataObject 对象类型
      * @param objectId 对象id
      * @param groupIds 用户组id列表
@@ -198,7 +198,7 @@ public class AuthorizationRightsService {
                 if (!authorizationRightsModel.getPermission().equals(permission)) {
                     AuthorizationRightsModel updateRightsModel = new AuthorizationRightsModel();
                     updateRightsModel.setRightId(authorizationRightsModel.getRightId());
-                    updateRightsModel.setPermission(authorizationRightsModel.getPermission());
+                    updateRightsModel.setPermission(permission);
                     authorizationRightsModelMapper.updateByPrimaryKeySelective(authorizationRightsModel);
                 }
             }
@@ -221,7 +221,7 @@ public class AuthorizationRightsService {
     }
 
     /**
-     * 更新对象授权
+     * 更新对象授权，多个对象授权给一个用户组
      * @param dataObject 对象类型
      * @param objectIds 对象id列表
      * @param groupId 用户组id
@@ -234,7 +234,7 @@ public class AuthorizationRightsService {
     }
 
     /**
-     * 更新对象授权
+     * 更新对象授权，多个对象授权给一个用户组
      * @param dataObject 对象类型
      * @param objectIds 对象id列表
      * @param groupId 用户组id
@@ -251,9 +251,9 @@ public class AuthorizationRightsService {
 
         Condition condition = new Condition();
         if (!ThreadContext.getUserInfo().isSuperAdmin()) {
-            if (!checkGroupId(groupId) || (update && !checkPermisson(dataObject, objectIds, permission))) {
+           /* if (!checkGroupId(groupId) || (update && !checkPermisson(dataObject, objectIds, permission))) {
                 throw new BaseException(MessageCode.PERMISSION_DENIED);
-            }
+            }*/
             condition.permission(true, ThreadContext.getUserInfo().getGroupIds());
         }
 
@@ -281,7 +281,7 @@ public class AuthorizationRightsService {
                 if (!authorizationRightsModel.getPermission().equals(permission)) {
                     AuthorizationRightsModel updateRightsModel = new AuthorizationRightsModel();
                     updateRightsModel.setRightId(authorizationRightsModel.getRightId());
-                    updateRightsModel.setPermission(authorizationRightsModel.getPermission());
+                    updateRightsModel.setPermission(permission);
                     authorizationRightsModelMapper.updateByPrimaryKeySelective(authorizationRightsModel);
                 }
             }
