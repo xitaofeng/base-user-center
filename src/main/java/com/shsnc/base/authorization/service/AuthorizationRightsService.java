@@ -511,4 +511,16 @@ public class AuthorizationRightsService {
         }
         return groupModelMapper.getByGroupIds(groupIds);
     }
+
+    public List<Long> getGroupIdsByObjectId(DataObject dataObject, Long objectId) throws BizException {
+        BizAssert.notNull(dataObject, "对象类型不能为空！");
+        BizAssert.notNull(objectId, String.format("【%s】的id不能为空！", dataObject.getDescription()));
+        Condition condition = new Condition();
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            condition.permission(true, groupIds);
+        }
+        List<AuthorizationRightsModel> rights = authorizationRightsModelMapper.getByObjectId(dataObject, objectId, condition);
+        return rights.stream().map(AuthorizationRightsModel::getGroupId).distinct().collect(Collectors.toList());
+    }
 }

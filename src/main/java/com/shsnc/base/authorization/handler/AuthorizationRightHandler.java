@@ -87,4 +87,10 @@ public class AuthorizationRightHandler implements RequestHandler {
         return JsonUtil.convert(groupModels, List.class, Group.class);
     }
 
+    @RequestMapper("/getGroupIds")
+    @Validate
+    public List<Long> getGroupIds(@NotNull String sourceType, Long sourceId) throws BaseException {
+        return authorizationRightsService.getGroupIdsByObjectId(DataObject.of(sourceType), sourceId);
+    }
+
 }
