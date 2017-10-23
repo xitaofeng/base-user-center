@@ -46,6 +46,7 @@ public class UserInfoInternalHandler implements RequestHandler{
     @Validate
     public List<UserInfo> getList(@NotEmpty List<Long> userIds) throws BaseException {
         List<UserInfoModel> userInfoModels = userInfoService.getUserInfoListByUserIds(userIds);
+
         return JsonUtil.convert(userInfoModels,List.class, UserInfo.class);
     }
 
