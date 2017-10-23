@@ -20,7 +20,6 @@ import java.util.List;
 
 
 @Component
-@LoginRequired
 @RequestMapper("/user/internal/info")
 public class UserInfoInternalHandler implements RequestHandler{
 
@@ -29,6 +28,7 @@ public class UserInfoInternalHandler implements RequestHandler{
 
     @RequestMapper("/getObject")
     @Validate
+    @LoginRequired
     public UserInfo getObject(@NotNull Long userId) throws BaseException {
         UserInfoModel userInfoModel = userInfoService.getUserInfo(userId);
         if (userInfoModel != null) {
@@ -56,6 +56,7 @@ public class UserInfoInternalHandler implements RequestHandler{
 
     @RequestMapper("/getCurrentUserIds")
     @Validate
+    @LoginRequired
     public List<Long> getCurrentUserIds(Long userId){
         return userInfoService.getCurrentUserIds(userId);
     }
