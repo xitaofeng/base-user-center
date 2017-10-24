@@ -186,7 +186,7 @@
                 ORDER BY ${pagination.sorting}
             </if>
             <if test="pagination.sorting == null">
-                ORDER BY user_id DESC
+                ORDER BY login_time DESC
             </if>
         </if>
     </sql>
