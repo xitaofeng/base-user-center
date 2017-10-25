@@ -63,13 +63,13 @@ public class UserInfoService {
 
     public UserInfoModel getUserInfo(Long userId) throws BaseException {
         Assert.notNull(userId,"用户id不能为空！");
-        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
-            Condition condition = new Condition(true, ThreadContext.getUserInfo().getGroupIds());
-            Long dbUserId = userInfoGroupRelationModelMapper.getUserIdByUserId(userId, condition);
-            if (dbUserId == null) {
-                throw new BaseException(MessageCode.PERMISSION_DENIED);
-            }
-        }
+        //if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+        //    Condition condition = new Condition(true, ThreadContext.getUserInfo().getGroupIds());
+        //    Long dbUserId = userInfoGroupRelationModelMapper.getUserIdByUserId(userId, condition);
+        //    if (dbUserId == null) {
+        //        throw new BaseException(MessageCode.PERMISSION_DENIED);
+        //    }
+        //}
         return getUserInfoByCache(userId);
     }
 
