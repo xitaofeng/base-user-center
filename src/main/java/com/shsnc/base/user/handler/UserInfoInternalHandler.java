@@ -10,6 +10,7 @@ import com.shsnc.base.user.model.condition.UserInfoCondition;
 import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BaseException;
+import com.shsnc.base.util.config.BizException;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,7 @@ public class UserInfoInternalHandler implements RequestHandler{
 
     @RequestMapper("/getObject")
     @Validate
+    @LoginRequired
     public UserInfo getObject(@NotNull Long userId) throws BaseException {
         UserInfoModel userInfoModel = userInfoService.getUserInfo(userId);
         if (userInfoModel != null) {
@@ -38,6 +40,14 @@ public class UserInfoInternalHandler implements RequestHandler{
             return JsonUtil.convert(userInfoModel, UserInfo.class);
         }
         return null;
+    }
+
+
+    @RequestMapper("/getUserInfo")
+    @Validate
+    public UserInfo getUserInfo(@NotNull Long userId) throws BizException {
+        UserInfoModel userInfoModel = userInfoService.getUserInfoByCache(userId);
+        return JsonUtil.convert(userInfoModel, UserInfo.class);
     }
 
 
