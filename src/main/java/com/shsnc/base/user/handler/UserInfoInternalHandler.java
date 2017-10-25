@@ -28,7 +28,6 @@ public class UserInfoInternalHandler implements RequestHandler{
 
     @RequestMapper("/getObject")
     @Validate
-    @LoginRequired
     public UserInfo getObject(@NotNull Long userId) throws BaseException {
         UserInfoModel userInfoModel = userInfoService.getUserInfo(userId);
         if (userInfoModel != null) {
