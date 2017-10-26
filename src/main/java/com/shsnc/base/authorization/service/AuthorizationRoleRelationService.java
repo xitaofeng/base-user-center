@@ -49,7 +49,7 @@ public class AuthorizationRoleRelationService {
      * @param authorizationIdList
      * @return
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean roleBatchAuthorization(Long roleId, List<Long> authorizationIdList) throws BizException {
         if (roleId == null) {
             throw new BizException("选择授权的角色");
@@ -84,7 +84,7 @@ public class AuthorizationRoleRelationService {
      * @param authorizationCodeList
      * @return
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean roleBatchAuthorizationCode(Long roleId, List<String> authorizationCodeList) throws BizException {
         if (roleId == null) {
             throw new BizException("选择授权的角色");
