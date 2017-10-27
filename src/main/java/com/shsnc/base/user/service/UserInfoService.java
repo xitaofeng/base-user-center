@@ -61,7 +61,7 @@ public class UserInfoService {
     @Autowired
     private AuthorizationUserRoleRelationModelMapper authorizationUserRoleRelationModelMapper;
 
-    public UserInfoModel getUserInfo(Long userId) throws BaseException {
+    public UserInfoModel getUserInfo(Long userId) throws BizException {
         Assert.notNull(userId,"用户id不能为空！");
         //if (!ThreadContext.getUserInfo().isSuperAdmin()) {
         //    Condition condition = new Condition(true, ThreadContext.getUserInfo().getGroupIds());
