@@ -1,11 +1,11 @@
 package com.shsnc.base.user.mapper;
 
-import java.util.List;
-
+import com.shsnc.base.user.model.LoginHistoryModel;
+import com.shsnc.base.user.model.condition.LoginHistoryCondition;
+import com.shsnc.base.util.sql.Pagination;
 import org.apache.ibatis.annotations.Param;
 
-import com.shsnc.base.user.model.LoginHistoryModel;
-import com.shsnc.base.util.sql.Pagination;
+import java.util.List;
 
 public interface LoginHistoryModelMapper {
     int deleteByPrimaryKey(Long historyId);
@@ -20,7 +20,7 @@ public interface LoginHistoryModelMapper {
 
     int updateByPrimaryKey(LoginHistoryModel record);
     
-    int getTotalCountByCondition(@Param("condition")LoginHistoryModel condition);
+    int getTotalCountByCondition(@Param("condition")LoginHistoryCondition condition);
     
-    List<LoginHistoryModel> getPageByCondition(@Param("condition")LoginHistoryModel condition, @Param("pagination")Pagination pagination);
+    List<LoginHistoryModel> getPageByCondition(@Param("condition")LoginHistoryCondition condition, @Param("pagination")Pagination pagination);
 }

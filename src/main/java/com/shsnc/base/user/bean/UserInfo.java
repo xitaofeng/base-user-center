@@ -15,6 +15,7 @@ public class UserInfo {
     private String mobile;
     private String email;
     private Integer internal;
+    private boolean superAdmin;
     private Integer status;
     private Organization organization;
     private Group defaultGroup;
@@ -107,5 +108,13 @@ public class UserInfo {
 
     public void setDefaultGroup(Group defaultGroup) {
         this.defaultGroup = defaultGroup;
+    }
+
+    public boolean isSuperAdmin() {
+        return superAdmin;
+    }
+
+    public void setSuperAdmin(boolean superAdmin) {
+        this.superAdmin = superAdmin;
     }
 }
