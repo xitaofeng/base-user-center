@@ -88,7 +88,7 @@ public class PassportHandler implements RequestHandler{
                         token = SimpleTokenProvider.generateToken(userId, uuid, ServerConfig.isDevModel());
                     } catch (Exception e) {
                         errorMsg = "服务器异常！生成token失败";
-                        serverMsg = "用户登陆生成token异常";
+                        serverMsg = "用户登录生成token异常";
                         logger.error(serverMsg, e);
                     }
                     if (token != null) {
@@ -118,7 +118,7 @@ public class PassportHandler implements RequestHandler{
                     }
                 }
             } else {
-                errorMsg = "登陆密码错误！";
+                errorMsg = "登录密码错误！";
                 serverMsg = errorMsg;
             }
         }
