@@ -219,13 +219,13 @@
                         </goals>
                         <configuration>
                             <fromDir>target/${project.artifactId}</fromDir>
-                            <url>scp://root:123456@192.168.11.60/root/project/user-center</url>
+                            <url>scp://root:123456@192.168.11.60/root/project/base-user-center</url>
                             <excludes>config/*, lib/*</excludes>
                             <commands>
                                 <!-- 杀死原来的进程 -->
                                 <command>pkill -f ${project.artifactId}.jar</command>
                                 <!-- 重新启动，程序的输出结果写到nohup.out文件中 -->
-                                <command>cd /root/project/user-center ; nohup java -jar ${project.artifactId}.jar > nohup.out 2>&amp;1 &amp;</command>
+                                <command>cd /root/project/base-user-center ; nohup java -jar ${project.artifactId}.jar > nohup.out 2>&amp;1 &amp;</command>
                             </commands>
                             <displayCommandOutputs>true</displayCommandOutputs>
                         </configuration>

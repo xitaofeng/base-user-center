@@ -10,8 +10,10 @@ import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMap
 import com.shsnc.base.authorization.model.AuthorizationRoleModel;
 import com.shsnc.base.authorization.model.AuthorizationUserRoleRelationModel;
 import com.shsnc.base.authorization.model.condition.AuthorizationRoleCondition;
+import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.mapper.UserInfoModelMapper;
 import com.shsnc.base.user.model.UserInfoModel;
+import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.util.StringUtil;
 import com.shsnc.base.util.bean.RelationMap;
 import com.shsnc.base.util.config.BizException;
@@ -42,6 +44,9 @@ public class AuthorizationRoleService {
 
     @Autowired
     private AuthorizationGroupRoleRelationModelMapper authorizationGroupRoleRelationModelMapper;
+
+    @Autowired
+    private UserInfoService userInfoService;
 
     @Autowired
     private UserInfoModelMapper userInfoModelMapper;
@@ -295,6 +300,10 @@ public class AuthorizationRoleService {
     public boolean isSuperAdmin(Long userId) throws BizException {
         if (userId == null) {
             throw new BizException("无效数据");
+        }
+        UserInfoModel userInfo = userInfoService.getUserInfo(userId);
+        if (userInfo.getInternal().equals(UserConstant.USER_INTERNAL_TRUE)) {
+            return true;
         }
         String roleCode = AuthorizationConstant.ROLE_CODE_SUPER_ADMIN;
         return authorizationUserRoleRelationModelMapper.getCountByUserIdAndRoleCode(userId, roleCode) > 0;
