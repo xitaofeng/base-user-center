@@ -5,6 +5,7 @@ import com.shsnc.api.core.ThreadContext;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.validation.Validate;
+import com.shsnc.base.authorization.service.AuthorizationRoleService;
 import com.shsnc.base.bean.Condition;
 import com.shsnc.base.user.bean.Certification;
 import com.shsnc.base.user.bean.LoginResult;
@@ -31,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -51,6 +51,8 @@ public class PassportHandler implements RequestHandler{
     private OrganizationService organizationService;
     @Autowired
     private GroupService groupService;
+    @Autowired
+    private AuthorizationRoleService authorizationRoleService;
 
     @RequestMapper("/login")
     @Validate
@@ -96,6 +98,10 @@ public class PassportHandler implements RequestHandler{
                         userInfoModel.setGroups(groupModels);
 
                         UserInfo userInfo = JsonUtil.convert(userInfoModel, UserInfo.class);
+
+                        boolean superAdmin = authorizationRoleService.isSuperAdmin(userInfo.getUserId());
+                        userInfo.setSuperAdmin(superAdmin);
+
                         loginResult.setUserInfo(userInfo);
                         Certification certification = new Certification(token);
                         loginResult.setCertification(certification);
@@ -119,7 +125,7 @@ public class PassportHandler implements RequestHandler{
         // 记录登陆历史记录
         String ip = ThreadContext.getClientInfo().getClientIp();
         loginHistory.setLoginIp(ip);
-        loginHistory.setLoginTime(new Date().getTime());
+        loginHistory.setLoginTime(System.currentTimeMillis());
         loginHistory.setLoginType(UserConstant.LOGIN);
         loginHistory.setSuccess(serverMsg == null ? UserConstant.LOGIN_SUCCESS : UserConstant.LOGIN_ERROR);
         loginHistory.setErrorMsg(serverMsg);
@@ -161,8 +167,9 @@ public class PassportHandler implements RequestHandler{
 
         // 记录登出历史记录
         String ip = ThreadContext.getClientInfo().getClientIp();
+        loginHistory.setAccountName(ThreadContext.getUserInfo().getUsername());
         loginHistory.setLoginIp(ip);
-        loginHistory.setLoginTime(new Date().getTime());
+        loginHistory.setLoginTime(System.currentTimeMillis());
         loginHistory.setLoginType(UserConstant.LOGOUT);
         loginHistory.setSuccess(serverMsg == null ? UserConstant.LOGIN_SUCCESS : UserConstant.LOGIN_ERROR);
         loginHistory.setErrorMsg(serverMsg);

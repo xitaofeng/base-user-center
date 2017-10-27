@@ -160,13 +160,12 @@
             </if>
         </where>
     </select>
+
     <select id="getPageByCondition" resultMap="BaseResultMap">
         SELECT
-            ui.*
+            <include refid="BaseColumn"/>
         FROM user_login_history ui
-       
-          <where>
-              1=1
+        <where>
             <if test="condition != null">
                 <if test="condition.accountName != null and condition.accountName != ''">
                     AND INSTR(account_name,#{condition.accountName})>0
