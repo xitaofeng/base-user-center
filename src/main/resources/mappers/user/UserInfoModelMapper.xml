@@ -309,7 +309,12 @@
                 <if test="condition.status != null">
                     AND status=#{condition.status}
                 </if>
-                <include refid="PermissionSql"/>
+                <if test="condition.checkPermission">
+                    AND ui.user_id IN
+                    <foreach collection="condition.objectIds" item="objectId" open="(" close=")" separator=",">
+                        #{objectId}
+                    </foreach>
+                </if>
                 <if test="condition.organizationId != null">
                     AND organization_id IN (
                         SELECT descendant_id
