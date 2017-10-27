@@ -58,7 +58,7 @@ public class PassportHandler implements RequestHandler{
     @Validate
     public LoginResult login(@NotNull String account, @NotNull String password) throws BizException {
         LoginResult loginResult = new LoginResult();
-        // 登陆start
+        // 登录start
         String errorMsg = null;
         String serverMsg = null;
         UserInfoModel userInfoModel = null;
@@ -88,7 +88,7 @@ public class PassportHandler implements RequestHandler{
                         token = SimpleTokenProvider.generateToken(userId, uuid, ServerConfig.isDevModel());
                     } catch (Exception e) {
                         errorMsg = "服务器异常！生成token失败";
-                        serverMsg = "用户登陆生成token异常";
+                        serverMsg = "用户登录生成token异常";
                         logger.error(serverMsg, e);
                     }
                     if (token != null) {
@@ -118,11 +118,11 @@ public class PassportHandler implements RequestHandler{
                     }
                 }
             } else {
-                errorMsg = "登陆密码错误！";
+                errorMsg = "登录密码错误！";
                 serverMsg = errorMsg;
             }
         }
-        // 记录登陆历史记录
+        // 记录登录历史记录
         String ip = ThreadContext.getClientInfo().getClientIp();
         loginHistory.setLoginIp(ip);
         loginHistory.setLoginTime(System.currentTimeMillis());

@@ -74,7 +74,7 @@ public class ProfileHandler implements RequestHandler {
             }
             RedisUtil.remove(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_USER, userId.toString()));
         } else {
-            throw new BizException("原登陆密码错误！");
+            throw new BizException("原登录密码错误！");
         }
     }
 
