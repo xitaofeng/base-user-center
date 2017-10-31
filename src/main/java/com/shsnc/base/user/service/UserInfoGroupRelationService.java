@@ -128,7 +128,7 @@ public class UserInfoGroupRelationService {
 
         // 删除
         if (!deleteUserIds.isEmpty()) {
-            List<Long> notDeletableUserIds = userInfoGroupRelationModelMapper.getNotDeletableUserIds(dbUserIds);
+            List<Long> notDeletableUserIds = userInfoGroupRelationModelMapper.getNotDeletableUserIds(deleteUserIds);
             if (!notDeletableUserIds.isEmpty()) {
                 for (Long userId : notDeletableUserIds) {
                     UserInfoModel userInfoModel = userInfoModelMapper.selectByPrimaryKey(userId);
