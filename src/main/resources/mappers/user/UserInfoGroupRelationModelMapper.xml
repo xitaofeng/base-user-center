@@ -183,7 +183,7 @@
         <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
             #{userId}
         </foreach>
-        AND ur.user_id = ui.user_id AND ui.is_delete = 1
+        AND ur.user_id = ui.user_id AND ui.is_delete = 1 AND ui.internal=1
         GROUP BY ur.user_id
         HAVING COUNT(ur.group_id)=1
     </select>
