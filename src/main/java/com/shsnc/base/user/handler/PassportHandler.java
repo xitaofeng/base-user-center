@@ -4,9 +4,12 @@ import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.ThreadContext;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
+import com.shsnc.api.core.util.LogRecord;
+import com.shsnc.api.core.util.LogWriter;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.base.authorization.service.AuthorizationRoleService;
 import com.shsnc.base.bean.Condition;
+import com.shsnc.base.constants.LogConstant;
 import com.shsnc.base.user.bean.Certification;
 import com.shsnc.base.user.bean.LoginResult;
 import com.shsnc.base.user.bean.UserInfo;
@@ -16,10 +19,7 @@ import com.shsnc.base.user.model.GroupModel;
 import com.shsnc.base.user.model.LoginHistoryModel;
 import com.shsnc.base.user.model.OrganizationModel;
 import com.shsnc.base.user.model.UserInfoModel;
-import com.shsnc.base.user.service.AccountService;
-import com.shsnc.base.user.service.GroupService;
-import com.shsnc.base.user.service.LoginHistoryService;
-import com.shsnc.base.user.service.OrganizationService;
+import com.shsnc.base.user.service.*;
 import com.shsnc.base.user.support.token.SimpleTokenProvider;
 import com.shsnc.base.user.support.token.TokenHelper;
 import com.shsnc.base.util.JsonUtil;
@@ -43,6 +43,8 @@ public class PassportHandler implements RequestHandler{
 
     private Logger logger = LoggerFactory.getLogger(PassportHandler.class);
 
+    @Autowired
+    private UserInfoService userInfoService;
     @Autowired
     private AccountService accountService;
     @Autowired
@@ -71,6 +73,10 @@ public class PassportHandler implements RequestHandler{
             serverMsg = errorMsg;
         }
         if (userInfoModel != null) {
+            LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.LOGIN);
+            logRecord.setDescription(String.format("用户【%s】登陆",userInfoModel.getUsername()));
+            LogWriter.writeLog(logRecord);
+
             loginHistory.setUserId(userInfoModel.getUserId());
             String newPassword = SHAMaker.sha256String(password);
             if(userInfoModel.getPassword().equals(newPassword)){
@@ -153,6 +159,12 @@ public class PassportHandler implements RequestHandler{
             serverMsg = errorMsg;
         }
         if (result != null) {
+            UserInfoModel userInfo = userInfoService.getUserInfo(loginHistory.getUserId());
+            if (userInfo != null) {
+                LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.LOGIN);
+                logRecord.setDescription(String.format("用户【%s】登陆",userInfo.getUsername()));
+                LogWriter.writeLog(logRecord);
+            }
             try {
                 // 移除会话有效期
                 RedisUtil.remove(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_KEY,result[1]));

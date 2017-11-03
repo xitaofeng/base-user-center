@@ -3,13 +3,16 @@ package com.shsnc.base.user.handler;
 import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.RequestMapper;
+import com.shsnc.api.core.util.LogRecord;
+import com.shsnc.api.core.util.LogWriter;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
+import com.shsnc.base.constants.LogConstant;
 import com.shsnc.base.user.bean.Organization;
 import com.shsnc.base.user.bean.OrganizationNode;
 import com.shsnc.base.user.bean.OrganizationParam;
-import com.shsnc.base.user.model.condition.OrganizationCondition;
 import com.shsnc.base.user.model.OrganizationModel;
+import com.shsnc.base.user.model.condition.OrganizationCondition;
 import com.shsnc.base.user.service.OrganizationService;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BizException;
@@ -89,6 +92,9 @@ public class OrganizationHandler implements RequestHandler {
     @Validate(groups = ValidationType.Add.class)
     public Long add(OrganizationParam organization) throws BizException {
         OrganizationModel organizationModel = JsonUtil.convert(organization, OrganizationModel.class);
+        LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.ADD);
+        logRecord.setDescription(String.format("新增部门【%s】", organization.getName()));
+        LogWriter.writeLog(logRecord);
         return organizationService.addOrganization(organizationModel, organization.getParentId());
     }
 
@@ -97,6 +103,9 @@ public class OrganizationHandler implements RequestHandler {
     @Validate(groups = ValidationType.Update.class)
     public boolean update(OrganizationParam organization) throws BizException {
         OrganizationModel organizationModel = JsonUtil.convert(organization, OrganizationModel.class);
+        LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.UPDATE);
+        logRecord.setDescription(String.format("更新部门【%s】", organization.getName()));
+        LogWriter.writeLog(logRecord);
         return organizationService.updateOrganization(organizationModel, organization.getParentId());
     }
 
@@ -104,6 +113,12 @@ public class OrganizationHandler implements RequestHandler {
     @Authentication("BASE_USER_ORGANIZATION_DELETE")
     @Validate
     public boolean delete(@NotNull Long organizationId) throws BizException {
+        OrganizationModel organization = organizationService.getOrganization(organizationId);
+        if (organization != null) {
+            LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.DELETE);
+            logRecord.setDescription(String.format("删除部门【%s】", organization.getName()));
+            LogWriter.writeLog(logRecord);
+        }
         return organizationService.deleteOrganization(organizationId);
     }
 
@@ -111,6 +126,12 @@ public class OrganizationHandler implements RequestHandler {
     @Authentication("BASE_USER_ORGANIZATION_DELETE_TREE")
     @Validate
     public boolean deleteTree(@NotNull Long organizationId) throws BizException {
+        OrganizationModel organization = organizationService.getOrganization(organizationId);
+        if (organization != null) {
+            LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.DELETE);
+            logRecord.setDescription(String.format("删除部门【%s】以及所属下级部门", organization.getName()));
+            LogWriter.writeLog(logRecord);
+        }
         return organizationService.deleteOrganizationTree(organizationId);
     }
 

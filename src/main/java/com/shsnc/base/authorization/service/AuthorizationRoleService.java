@@ -370,7 +370,11 @@ public class AuthorizationRoleService {
             }
             return isRepetition;
         } else {
-            return list.size() > 0;
+            return !list.isEmpty();
         }
+    }
+
+    public List<AuthorizationRoleModel> getByRoleIds(List<Long> roleIds) {
+        return authorizationRoleModelMapper.getByRoleIds(roleIds);
     }
 }

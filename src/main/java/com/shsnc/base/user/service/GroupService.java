@@ -274,4 +274,8 @@ public class GroupService {
         }
         return new ArrayList<>();
     }
+
+    public List<GroupModel> getByGroupIds(List<Long> groupIds) {
+        return groupModelMapper.getByGroupIds(groupIds);
+    }
 }
