@@ -20,7 +20,7 @@ public class Run
                 .configPath("classpath:beans.xml")
                 .loginServer(bundle.getString("LOGIN_SERVER"))
                 .authServer(bundle.getString("AUTH_SERVER"))
-                .loginServer(bundle.getString("LOG_SERVER"))
+                .logServer(bundle.getString("LOG_SERVER"))
                 .build();
         server.start();
     }

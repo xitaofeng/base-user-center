@@ -87,7 +87,7 @@ public class UserInfoHandler implements RequestHandler {
     @Validate(groups = ValidationType.Add.class)
     public Long add(UserInfoParam userInfo) throws BaseException {
         LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.ADD);
-        logRecord.setDescription(String.format("新增用户【%s】",userInfo.getUsername()));
+        logRecord.setDescription(String.format("新增用户【%s】",userInfo.getAlias()));
         LogWriter.writeLog(logRecord);
 
         UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
@@ -105,7 +105,7 @@ public class UserInfoHandler implements RequestHandler {
     @Authentication("BASE_USER_INFO_UPDATE")
     public boolean update(UserInfoParam userInfo) throws BaseException {
         LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.UPDATE);
-        logRecord.setDescription(String.format("更新用户【%s】",userInfo.getUsername()));
+        logRecord.setDescription(String.format("更新用户【%s】",userInfo.getAlias()));
         LogWriter.writeLog(logRecord);
 
         UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
@@ -125,7 +125,7 @@ public class UserInfoHandler implements RequestHandler {
         UserInfoModel userInfo = userInfoService.getUserInfo(userId);
         if (userInfo != null) {
             LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.DELETE);
-            logRecord.setDescription(String.format("删除用户【%s】",userInfo.getUsername()));
+            logRecord.setDescription(String.format("删除用户【%s】",userInfo.getAlias()));
             LogWriter.writeLog(logRecord);
         }
         return userInfoService.deleteUserInfo(userId);
@@ -138,7 +138,7 @@ public class UserInfoHandler implements RequestHandler {
         List<UserInfoModel> userInfoModels = userInfoService.getUserInfoListByUserIds(userIds);
         if (!userInfoModels.isEmpty()) {
             LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.DELETE);
-            logRecord.setDescription(String.format("批量删除用户【%s】", userInfoModels.stream().map(UserInfoModel::getUsername).reduce("】【", String::concat)));
+            logRecord.setDescription(String.format("批量删除用户【%s】", userInfoModels.stream().map(UserInfoModel::getAlias).reduce("】【", String::concat)));
             LogWriter.writeLog(logRecord);
         }
         return userInfoService.batchDeleteUserInfo(userIds);
@@ -159,7 +159,7 @@ public class UserInfoHandler implements RequestHandler {
         UserInfoModel userInfo = userInfoService.getUserInfo(userId);
         if (userInfo != null) {
             LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.UPDATE);
-            logRecord.setDescription(String.format("更新用户【%s】密码",userInfo.getUsername()));
+            logRecord.setDescription(String.format("更新用户【%s】密码",userInfo.getAlias()));
             LogWriter.writeLog(logRecord);
         }
         return userInfoService.updatePassword(userId,newPassword);
@@ -172,7 +172,7 @@ public class UserInfoHandler implements RequestHandler {
         UserInfoModel userInfo = userInfoService.getUserInfo(userId);
         if (userInfo != null) {
             LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.UPDATE);
-            logRecord.setDescription(String.format("更新用户【%s】跟组织结构关系",userInfo.getUsername()));
+            logRecord.setDescription(String.format("更新用户【%s】跟组织结构关系",userInfo.getAlias()));
             LogWriter.writeLog(logRecord);
         }
         return userInfoService.moveToOrganization(Collections.singletonList(userId), organizationId);
