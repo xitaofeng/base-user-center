@@ -73,6 +73,7 @@ public class PassportHandler implements RequestHandler{
             serverMsg = errorMsg;
         }
         if (userInfoModel != null) {
+            ThreadContext.setUserInfo(JsonUtil.convert(userInfoModel, com.shsnc.api.core.UserInfo.class));
             LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.LOGIN);
             logRecord.setDescription(String.format("用户【%s】登入",userInfoModel.getAlias()));
             LogWriter.writeLog(logRecord);
