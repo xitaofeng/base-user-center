@@ -162,7 +162,7 @@ public class PassportHandler implements RequestHandler{
         if (result != null) {
             UserInfoModel userInfo = userInfoService.getUserInfo(loginHistory.getUserId());
             if (userInfo != null) {
-                LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.LOGIN);
+                LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.LOGOUT);
                 logRecord.setDescription(String.format("用户【%s】登出",userInfo.getAlias()));
                 LogWriter.writeLog(logRecord);
             }
