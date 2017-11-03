@@ -74,7 +74,7 @@ public class PassportHandler implements RequestHandler{
         }
         if (userInfoModel != null) {
             LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.LOGIN);
-            logRecord.setDescription(String.format("用户【%s】登陆",userInfoModel.getUsername()));
+            logRecord.setDescription(String.format("用户【%s】登入",userInfoModel.getAlias()));
             LogWriter.writeLog(logRecord);
 
             loginHistory.setUserId(userInfoModel.getUserId());
@@ -162,7 +162,7 @@ public class PassportHandler implements RequestHandler{
             UserInfoModel userInfo = userInfoService.getUserInfo(loginHistory.getUserId());
             if (userInfo != null) {
                 LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.LOGIN);
-                logRecord.setDescription(String.format("用户【%s】登陆",userInfo.getUsername()));
+                logRecord.setDescription(String.format("用户【%s】登出",userInfo.getAlias()));
                 LogWriter.writeLog(logRecord);
             }
             try {
