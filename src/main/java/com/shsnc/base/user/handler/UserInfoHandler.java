@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -138,7 +139,7 @@ public class UserInfoHandler implements RequestHandler {
         List<UserInfoModel> userInfoModels = userInfoService.getUserInfoListByUserIds(userIds);
         if (!userInfoModels.isEmpty()) {
             LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.DELETE);
-            logRecord.setDescription(String.format("批量删除用户【%s】", userInfoModels.stream().map(UserInfoModel::getAlias).reduce("】【", String::concat)));
+            logRecord.setDescription(String.format("删除用户【%s】", userInfoModels.stream().map(UserInfoModel::getAlias).collect(Collectors.joining("】【"))));
             LogWriter.writeLog(logRecord);
         }
         return userInfoService.batchDeleteUserInfo(userIds);

@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Elena on 2017/6/7.
@@ -88,7 +89,7 @@ public class AuthorizationRoleHandler implements RequestHandler {
         List<AuthorizationRoleModel> authorizationRoleModels = authorizationRoleService.getByRoleIds(roleIdList);
         if (!authorizationRoleModels.isEmpty()) {
             LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.DELETE);
-            logRecord.setDescription(String.format("批量删除角色【%s】", authorizationRoleModels.stream().map(AuthorizationRoleModel::getRoleName).reduce("】【", String::concat)));
+            logRecord.setDescription(String.format("删除角色【%s】", authorizationRoleModels.stream().map(AuthorizationRoleModel::getRoleName).collect(Collectors.joining("】【"))));
             LogWriter.writeLog(logRecord);
         }
         return authorizationRoleService.batchDeleteAuthorizationRole(roleIdList);
