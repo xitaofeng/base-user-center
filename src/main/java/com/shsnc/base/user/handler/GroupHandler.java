@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -113,7 +114,7 @@ public class GroupHandler implements RequestHandler {
         List<GroupModel> groupModels = groupService.getByGroupIds(groupIds);
         if (!groupModels.isEmpty()) {
             LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.DELETE);
-            logRecord.setDescription(String.format("批量删除用户组【%s】", groupModels.stream().map(GroupModel::getName).reduce("】【", String::concat)));
+            logRecord.setDescription(String.format("删除用户组【%s】", groupModels.stream().map(GroupModel::getName).collect(Collectors.joining("】【"))));
             LogWriter.writeLog(logRecord);
         }
         return groupService.batchDeleteGroup(groupIds);
