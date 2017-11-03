@@ -4,6 +4,9 @@ import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.ThreadContext;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
+import com.shsnc.api.core.util.LogRecord;
+import com.shsnc.api.core.util.LogWriter;
+import com.shsnc.base.constants.LogConstant;
 import com.shsnc.base.user.bean.ExtendPropertyValue;
 import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.bean.UserInfoParam;
@@ -47,7 +50,14 @@ public class ProfileHandler implements RequestHandler {
 
     @RequestMapper("/modifyInfo")
     public boolean modifyInfo(UserInfoParam userInfo) throws BaseException {
+
         Long userId = ThreadContext.getUserInfo().getUserId();
+        UserInfoModel dbUserInfo = userInfoService.getUserInfo(userId);
+        if (userInfo != null) {
+            LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.UPDATE);
+            logRecord.setDescription(String.format("用户【%s】修改信息",dbUserInfo.getUsername()));
+            LogWriter.writeLog(logRecord);
+        }
         UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
         userInfoModel.setUserId(userId);
         userInfoModel.setUsername(null);
@@ -64,6 +74,12 @@ public class ProfileHandler implements RequestHandler {
     @RequestMapper("/modifyPassword")
     public void modifyPassword(@NotNull String oldPassword, @NotNull String newPassword) throws BaseException {
         Long userId = ThreadContext.getUserInfo().getUserId();
+        UserInfoModel userInfo = userInfoService.getUserInfo(userId);
+        if (userInfo != null) {
+            LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.UPDATE);
+            logRecord.setDescription(String.format("用户【%s】修改密码",userInfo.getUsername()));
+            LogWriter.writeLog(logRecord);
+        }
         String dbPassword = userInfoService.getPasswordByUserId(userId);
         oldPassword = SHAMaker.sha256String(oldPassword);
         if(dbPassword.equals(oldPassword)){

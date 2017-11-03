@@ -4,8 +4,11 @@ import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
+import com.shsnc.api.core.util.LogRecord;
+import com.shsnc.api.core.util.LogWriter;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
+import com.shsnc.base.constants.LogConstant;
 import com.shsnc.base.user.bean.ExtendPropertyValue;
 import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.bean.UserInfoParam;
@@ -83,12 +86,17 @@ public class UserInfoHandler implements RequestHandler {
     @Authentication("BASE_USER_INFO_ADD")
     @Validate(groups = ValidationType.Add.class)
     public Long add(UserInfoParam userInfo) throws BaseException {
+        LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.ADD);
+        logRecord.setDescription(String.format("新增用户【%s】",userInfo.getUsername()));
+        LogWriter.writeLog(logRecord);
+
         UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
         List<ExtendPropertyValue> extendPropertyValues = userInfo.getExtendPropertyValues();
         List<ExtendPropertyValueModel> extendPropertyValueModels = null;
         if(extendPropertyValues != null){
             extendPropertyValueModels = JsonUtil.convert(extendPropertyValues, List.class, ExtendPropertyValueModel.class);
         }
+
         return userInfoService.addUserInfo(userInfoModel, extendPropertyValueModels, userInfo.getRoleIds());
     }
 
@@ -96,19 +104,30 @@ public class UserInfoHandler implements RequestHandler {
     @Validate(groups = ValidationType.Update.class)
     @Authentication("BASE_USER_INFO_UPDATE")
     public boolean update(UserInfoParam userInfo) throws BaseException {
+        LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.UPDATE);
+        logRecord.setDescription(String.format("更新用户【%s】",userInfo.getUsername()));
+        LogWriter.writeLog(logRecord);
+
         UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
         List<ExtendPropertyValue> extendPropertyValues = userInfo.getExtendPropertyValues();
         List<ExtendPropertyValueModel> extendPropertyValueModels = null;
         if(extendPropertyValues != null){
             extendPropertyValueModels = JsonUtil.convert(extendPropertyValues, List.class, ExtendPropertyValueModel.class);
         }
-        return userInfoService.updateUserInfo(userInfoModel, extendPropertyValueModels,userInfo.getRoleIds());
+
+        return userInfoService.updateUserInfo(userInfoModel, extendPropertyValueModels, userInfo.getRoleIds());
     }
 
     @RequestMapper("/delete")
     @Validate
     @Authentication("BASE_USER_INFO_DELETE")
     public boolean delete(@NotNull Long userId) throws BaseException {
+        UserInfoModel userInfo = userInfoService.getUserInfo(userId);
+        if (userInfo != null) {
+            LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.DELETE);
+            logRecord.setDescription(String.format("删除用户【%s】",userInfo.getUsername()));
+            LogWriter.writeLog(logRecord);
+        }
         return userInfoService.deleteUserInfo(userId);
     }
 
@@ -116,6 +135,12 @@ public class UserInfoHandler implements RequestHandler {
     @Validate
     @Authentication("BASE_USER_INFO_BATCH_DELETE")
     public boolean batchDelete(@NotEmpty List<Long> userIds) throws BaseException {
+        List<UserInfoModel> userInfoModels = userInfoService.getUserInfoListByUserIds(userIds);
+        if (!userInfoModels.isEmpty()) {
+            LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.DELETE);
+            logRecord.setDescription(String.format("批量删除用户【%s】", userInfoModels.stream().map(UserInfoModel::getUsername).reduce("】【", String::concat)));
+            LogWriter.writeLog(logRecord);
+        }
         return userInfoService.batchDeleteUserInfo(userIds);
     }
 
@@ -131,6 +156,12 @@ public class UserInfoHandler implements RequestHandler {
     @Validate
     @Authentication("BASE_USER_INFO_RESET_PASSWORD")
     public boolean resetPassword(@NotNull Long userId, @NotNull String newPassword) throws BaseException {
+        UserInfoModel userInfo = userInfoService.getUserInfo(userId);
+        if (userInfo != null) {
+            LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.UPDATE);
+            logRecord.setDescription(String.format("更新用户【%s】密码",userInfo.getUsername()));
+            LogWriter.writeLog(logRecord);
+        }
         return userInfoService.updatePassword(userId,newPassword);
     }
 
@@ -138,6 +169,12 @@ public class UserInfoHandler implements RequestHandler {
     @Authentication("BASE_USER_ORGANIZATION_MOVE_TO_ORGANIZATION")
     @Validate
     public boolean moveToOrganization(@NotNull Long userId, @NotNull Long organizationId) throws BaseException {
+        UserInfoModel userInfo = userInfoService.getUserInfo(userId);
+        if (userInfo != null) {
+            LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.UPDATE);
+            logRecord.setDescription(String.format("更新用户【%s】跟组织结构关系",userInfo.getUsername()));
+            LogWriter.writeLog(logRecord);
+        }
         return userInfoService.moveToOrganization(Collections.singletonList(userId), organizationId);
     }
 }
