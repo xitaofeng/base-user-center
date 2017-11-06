@@ -25,12 +25,15 @@ import com.shsnc.base.user.support.token.TokenHelper;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.RedisUtil;
 import com.shsnc.base.util.config.BizException;
+import com.shsnc.base.util.crypto.RSAUtil;
 import com.shsnc.base.util.crypto.SHAMaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -59,6 +62,13 @@ public class PassportHandler implements RequestHandler{
     @RequestMapper("/login")
     @Validate
     public LoginResult login(@NotNull String account, @NotNull String password) throws BizException {
+        try {
+            password = RSAUtil.decrypt(password);
+        } catch (BadPaddingException e) {
+            throw new BizException("密码格式错误！");
+        } catch (IllegalBlockSizeException e) {
+            throw new BizException("密码长度过长！");
+        }
         LoginResult loginResult = new LoginResult();
         // 登录start
         String errorMsg = null;
