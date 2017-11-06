@@ -11,7 +11,9 @@ import com.shsnc.base.authorization.service.AssignService;
 import com.shsnc.base.authorization.service.AuthorizationRoleService;
 import com.shsnc.base.constants.LogConstant;
 import com.shsnc.base.user.model.GroupModel;
+import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.service.GroupService;
+import com.shsnc.base.user.service.UserInfoService;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,11 +34,19 @@ public class AssignHandler implements RequestHandler {
     private GroupService groupService;
     @Autowired
     private AuthorizationRoleService authorizationRoleService;
+    @Autowired
+    private UserInfoService userInfoService;
 
     @RequestMapper("/user/to/role")
     @Validate
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_ASSIGN_USER_TO_ROLE")
     public boolean userAssignRole(@NotNull Long userId, List<Long> roleIdList) throws Exception {
+        UserInfoModel userInfo = userInfoService.getUserInfo(userId);
+        if (userInfo != null) {
+            LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.AUTHORIZE);
+            logRecord.setDescription(String.format("给用户【%s】分配角色", userInfo.getAlias()));
+            LogWriter.writeLog(logRecord);
+        }
         return assignService.userAssignRole(userId, roleIdList);
     }
 
@@ -44,6 +54,12 @@ public class AssignHandler implements RequestHandler {
     @Validate
     @Authentication("BASE_USER_CENTER_AUTHORIZATION_ASSIGN_ROLE_TO_USER")
     public boolean roleAssignUser(@NotNull Long roleId,  List<Long> userIdList) throws Exception {
+        AuthorizationRoleModel authorizationRoleModel = authorizationRoleService.getAuthorizationRoleByRoleId(roleId);
+        if (authorizationRoleModel != null) {
+            LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.AUTHORIZE);
+            logRecord.setDescription(String.format("给角色【%s】分配用户", authorizationRoleModel.getRoleName()));
+            LogWriter.writeLog(logRecord);
+        }
         return assignService.roleAssignUser(roleId, userIdList);
     }
 
