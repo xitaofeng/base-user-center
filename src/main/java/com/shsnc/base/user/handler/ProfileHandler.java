@@ -18,10 +18,13 @@ import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.RedisUtil;
 import com.shsnc.base.util.config.BaseException;
 import com.shsnc.base.util.config.BizException;
+import com.shsnc.base.util.crypto.RSAUtil;
 import com.shsnc.base.util.crypto.SHAMaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
@@ -53,7 +56,7 @@ public class ProfileHandler implements RequestHandler {
 
         Long userId = ThreadContext.getUserInfo().getUserId();
         UserInfoModel dbUserInfo = userInfoService.getUserInfo(userId);
-        if (userInfo != null) {
+        if (dbUserInfo != null) {
             LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.UPDATE);
             logRecord.setDescription(String.format("用户【%s】修改信息",dbUserInfo.getUsername()));
             LogWriter.writeLog(logRecord);
@@ -79,6 +82,20 @@ public class ProfileHandler implements RequestHandler {
             LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.UPDATE);
             logRecord.setDescription(String.format("用户【%s】修改密码",userInfo.getUsername()));
             LogWriter.writeLog(logRecord);
+        }
+        try {
+            oldPassword = RSAUtil.decrypt(oldPassword);
+        } catch (BadPaddingException e) {
+            throw new BizException("旧密码格式错误！");
+        } catch (IllegalBlockSizeException e) {
+            throw new BizException("旧密码长度过长！");
+        }
+        try {
+            newPassword = RSAUtil.decrypt(newPassword);
+        } catch (BadPaddingException e) {
+            throw new BizException("新密码格式错误！");
+        } catch (IllegalBlockSizeException e) {
+            throw new BizException("新密码长度过长！");
         }
         String dbPassword = userInfoService.getPasswordByUserId(userId);
         oldPassword = SHAMaker.sha256String(oldPassword);

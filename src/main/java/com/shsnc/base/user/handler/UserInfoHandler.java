@@ -19,12 +19,16 @@ import com.shsnc.base.user.service.ExtendPropertyValueService;
 import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BaseException;
+import com.shsnc.base.util.config.BizException;
+import com.shsnc.base.util.crypto.RSAUtil;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
@@ -97,7 +101,14 @@ public class UserInfoHandler implements RequestHandler {
         if(extendPropertyValues != null){
             extendPropertyValueModels = JsonUtil.convert(extendPropertyValues, List.class, ExtendPropertyValueModel.class);
         }
-
+        try {
+            String password = RSAUtil.decrypt(userInfo.getPassword());
+            userInfo.setPassword(password);
+        } catch (BadPaddingException e) {
+            throw new BizException("密码格式错误！");
+        } catch (IllegalBlockSizeException e) {
+            throw new BizException("密码长度过长！");
+        }
         return userInfoService.addUserInfo(userInfoModel, extendPropertyValueModels, userInfo.getRoleIds());
     }
 
@@ -163,7 +174,14 @@ public class UserInfoHandler implements RequestHandler {
             logRecord.setDescription(String.format("更新用户【%s】密码",userInfo.getAlias()));
             LogWriter.writeLog(logRecord);
         }
-        return userInfoService.updatePassword(userId,newPassword);
+        try {
+            String password = RSAUtil.decrypt(newPassword);
+            return userInfoService.updatePassword(userId, password);
+        } catch (BadPaddingException e) {
+            throw new BizException("密码格式错误！");
+        } catch (IllegalBlockSizeException e) {
+            throw new BizException("密码长度过长！");
+        }
     }
 
     @RequestMapper("/moveToOrganization")
