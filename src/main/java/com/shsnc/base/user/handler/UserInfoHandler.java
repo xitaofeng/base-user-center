@@ -102,8 +102,8 @@ public class UserInfoHandler implements RequestHandler {
             extendPropertyValueModels = JsonUtil.convert(extendPropertyValues, List.class, ExtendPropertyValueModel.class);
         }
         try {
-            String password = RSAUtil.decrypt(userInfo.getPassword());
-            userInfo.setPassword(password);
+            String password = RSAUtil.decrypt(userInfoModel.getPassword());
+            userInfoModel.setPassword(password);
         } catch (BadPaddingException e) {
             throw new BizException("密码格式错误！");
         } catch (IllegalBlockSizeException e) {
