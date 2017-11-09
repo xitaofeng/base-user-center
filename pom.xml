@@ -132,7 +132,7 @@
         </dependency>
     </dependencies>
     <build>
-        <finalName>base-user-center</finalName>
+        <finalName>${project.artifactId}</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -219,13 +219,10 @@
                         </goals>
                         <configuration>
                             <fromDir>target/${project.artifactId}</fromDir>
-                            <url>scp://root:123456@192.168.11.60/root/project/base-user-center</url>
-                            <excludes>config/*, lib/*</excludes>
+                            <url>scp://root:123456@192.168.11.60/root/project/${project.artifactId}</url>
+                            <excludes>config/*,lib/*</excludes>
                             <commands>
-                                <!-- 杀死原来的进程 -->
-                                <command>pkill -f ${project.artifactId}.jar</command>
-                                <!-- 重新启动，程序的输出结果写到nohup.out文件中 -->
-                                <command>cd /root/project/base-user-center ; nohup java -jar ${project.artifactId}.jar > nohup.out 2>&amp;1 &amp;</command>
+                                <command>/usr/bin/jar.sh -restart ${project.artifactId}</command>
                             </commands>
                             <displayCommandOutputs>true</displayCommandOutputs>
                         </configuration>
