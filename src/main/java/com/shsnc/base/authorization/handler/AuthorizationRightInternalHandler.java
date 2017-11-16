@@ -27,7 +27,7 @@ import java.util.List;
 @Component
 @LoginRequired
 @RequestMapper("/authorization/internal/right")
-public class AuthorizationRightHandler implements RequestHandler {
+public class AuthorizationRightInternalHandler implements RequestHandler {
 
     @Autowired
     private AuthorizationRightsService authorizationRightsService;

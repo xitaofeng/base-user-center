@@ -1,8 +1,8 @@
 package com.shsnc.base.user.model.condition;
 
-import com.shsnc.base.bean.Condition;
+import java.util.List;
 
-public class UserInfoCondition extends Condition {
+public class UserInfoCondition {
 
     private Long userId;
 
@@ -17,6 +17,8 @@ public class UserInfoCondition extends Condition {
     private Integer status;
 
     private Long organizationId;
+
+    private List<Long> userIds;
 
     public Long getUserId() {
         return userId;
@@ -74,4 +76,11 @@ public class UserInfoCondition extends Condition {
         this.organizationId = organizationId;
     }
 
+    public List<Long> getUserIds() {
+        return userIds;
+    }
+
+    public void setUserIds(List<Long> userIds) {
+        this.userIds = userIds;
+    }
 }

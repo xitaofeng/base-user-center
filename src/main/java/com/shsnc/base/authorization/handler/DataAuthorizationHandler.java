@@ -20,6 +20,7 @@ import java.util.Map;
 /**
  * Created by Elena on 2017/6/7.
  * 数据权限处理器
+ * @deprecated 请用 {@link AuthorizationRightInternalHandler} 取代
  */
 @Component
 @RequestMapper("/authorization/data")

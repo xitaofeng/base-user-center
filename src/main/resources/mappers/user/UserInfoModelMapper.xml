@@ -34,15 +34,6 @@
         is_delete
     </sql>
 
-    <sql id="PermissionSql">
-        <if test="condition != null and condition.checkPermission">
-            AND user_id IN
-            <foreach collection="condition.objectIds" item="objectId" open="(" close=")" separator=",">
-                #{objectId}
-            </foreach>
-        </if>
-    </sql>
-
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
         SELECT
           <include refid="BaseColumn"/>
@@ -309,11 +300,19 @@
                 <if test="condition.status != null">
                     AND status=#{condition.status}
                 </if>
-                <if test="condition.checkPermission">
-                    AND ui.user_id IN
-                    <foreach collection="condition.objectIds" item="objectId" open="(" close=")" separator=",">
-                        #{objectId}
-                    </foreach>
+                <if test="condition.userIds != null">
+                    AND
+                    <choose>
+                        <when test="condition.userIds.zise()>0">
+                            ui.user_id IN
+                            <foreach collection="condition.userIds" item="userId" open="(" close=")" separator=",">
+                                #{userId}
+                            </foreach>
+                        </when>
+                        <otherwise>
+                            1=2
+                        </otherwise>
+                    </choose>
                 </if>
                 <if test="condition.organizationId != null">
                     AND organization_id IN (

@@ -60,7 +60,7 @@ public class GroupService {
         if (!ThreadContext.getUserInfo().isSuperAdmin()) {
             List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
             if (!groupIds.isEmpty()) {
-                condition.permission(true, groupIds);
+                condition.setGroupIds(groupIds);
             } else {
                 return new ArrayList<>();
             }
@@ -94,7 +94,7 @@ public class GroupService {
         if (!ThreadContext.getUserInfo().isSuperAdmin()) {
             List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
             if (!groupIds.isEmpty()) {
-                condition.permission(true, groupIds);
+                condition.setGroupIds(groupIds);
             } else {
                 return new QueryData(pagination);
             }

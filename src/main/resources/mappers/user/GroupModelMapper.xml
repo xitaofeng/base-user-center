@@ -14,22 +14,6 @@
         code
     </sql>
 
-    <sql id="PermissionSql">
-        <if test="condition != null and condition.checkPermission">
-            <choose>
-                <when test="condition.objectIds != null and condition.objectIds.size > 0">
-                    AND group_id IN
-                    <foreach collection="condition.objectIds" item="objectId" open="(" close=")" separator=",">
-                        #{objectId}
-                    </foreach>
-                </when>
-                <otherwise>
-                    AND 1=2
-                </otherwise>
-            </choose>
-        </if>
-    </sql>
-
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
         SELECT 
             <include refid="BaseColumn" />
@@ -63,13 +47,26 @@
     <sql id="conditionSql">
         <where>
             <if test="condition != null">
+                <if test="condition.groupIds != null">
+                    AND
+                    <choose>
+                        <when test="condition.groupIds.size()>0">
+                            group_id IN
+                            <foreach collection="condition.groupIds" item="groupId" open="(" close=")" separator=",">
+                                #{groupId}
+                            </foreach>
+                        </when>
+                        <otherwise>
+                            1=2
+                        </otherwise>
+                    </choose>
+                </if>
                 <if test="condition.name != null and condition.name != ''">
                     AND INSTR(name,#{condition.name})>0
                 </if>
                 <if test="condition.code != null and condition.code != ''">
                     AND INSTR(code,#{condition.code})>0
                 </if>
-                <include refid="PermissionSql"/>
             </if>
         </where>
     </sql>

@@ -85,7 +85,7 @@ public class UserInfoService {
             List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
             if (!groupIds.isEmpty()) {
                 List<Long> userIds = userInfoGroupRelationModelMapper.getUserIdsByGroupIds(groupIds);
-                condition.permission(true, userIds);
+                condition.setUserIds(userIds);
             } else {
                 return new QueryData(pagination);
             }
@@ -333,7 +333,7 @@ public class UserInfoService {
         userInfoModel.setIsDelete(UserConstant.USER_DELETEED_FALSE);
         userInfoModel.setAttemptIp("");
         userInfoModel.setAttemptTime(0L);
-        userInfoModel.setCreateTime(new Date().getTime());
+        userInfoModel.setCreateTime(System.currentTimeMillis());
         Long organizationId = userInfoModel.getOrganizationId();
         BizAssert.notNull(organizationId, "用户所属组织不能为空！");
         OrganizationModel organizationModel = organizationModelMapper.selectByPrimaryKey(organizationId);
@@ -540,7 +540,7 @@ public class UserInfoService {
             List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
             if (!groupIds.isEmpty()) {
                 List<Long> userIds = userInfoGroupRelationModelMapper.getUserIdsByGroupIds(groupIds);
-                condition.permission(true,userIds);
+                condition.setUserIds(userIds);
             } else {
                 return new ArrayList<>();
             }

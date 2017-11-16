@@ -161,7 +161,17 @@ public class AuthorizationRoleRelationService {
         if (authorizationCode == null) {
             throw new BizException("选择权限");
         }
-        List<String> authorizationCodeList = getAuthorizationCodeByUserId(userId);
-        return authorizationCodeList.contains(authorizationCode);
+        if (authorizationRoleService.isSuperAdmin(userId)) {
+            return true;
+        }
+        List<Long> roleIds = userModuleService.getRoleIdsByUserId(userId);
+        if (!roleIds.isEmpty()) {
+            List<String> authorizationCodes = authorizationRoleRelationModelMapper.getAuthorizationCodeByRoleIds(roleIds);
+            return authorizationCodes.contains(authorizationCode);
+        }
+        return false;
     }
+
+
+
 }
