@@ -303,7 +303,7 @@
                 <if test="condition.userIds != null">
                     AND
                     <choose>
-                        <when test="condition.userIds.zise()>0">
+                        <when test="condition.userIds.size()>0">
                             ui.user_id IN
                             <foreach collection="condition.userIds" item="userId" open="(" close=")" separator=",">
                                 #{userId}
