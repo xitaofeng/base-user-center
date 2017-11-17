@@ -58,4 +58,5 @@ public interface AuthorizationRoleRelationModelMapper {
      * @return
      */
     Integer deleteAuthorizationRoleRelationModelByRoleId(@Param("roleId") Long roleId);
+
 }

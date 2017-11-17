@@ -76,7 +76,7 @@
 
     <select id="getAuthorizationCodeByRoleIds" resultType="java.lang.String">
         SELECT
-          i.authorization_code
+          DISTINCT i.authorization_code
         FROM
         authorization_role_relation r INNER JOIN authorization_info i
         ON r.authorization_id = i.authorization_id

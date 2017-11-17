@@ -23,7 +23,9 @@ import java.util.List;
  * @author houguangqiang
  * @date 2017-08-09
  * @since 1.0
+ * @deprecated 请用 {@link AuthorizationRightInternalHandler} 取代
  */
+@Deprecated
 @Component
 @LoginRequired
 @RequestMapper("/authorization/internal/inspection")

@@ -33,7 +33,7 @@
 
     <select id="getRoleIdByUserId" resultType="java.lang.Long">
         SELECT
-        role_id
+          DISTINCT role_id
         FROM
         <include refid="tableName"/>
         WHERE user_id = #{userId }

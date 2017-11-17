@@ -1,11 +1,12 @@
 package com.shsnc.base.user.model.condition;
 
-import com.shsnc.base.bean.Condition;
+import java.util.List;
 
-public class GroupCondition extends Condition {
+public class GroupCondition {
 
     private String name;
     private String code;
+    private List<Long> groupIds;
 
 
     public String getName() {
@@ -24,4 +25,11 @@ public class GroupCondition extends Condition {
         this.code = code;
     }
 
+    public List<Long> getGroupIds() {
+        return groupIds;
+    }
+
+    public void setGroupIds(List<Long> groupIds) {
+        this.groupIds = groupIds;
+    }
 }

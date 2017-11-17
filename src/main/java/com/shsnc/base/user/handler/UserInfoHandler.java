@@ -8,10 +8,13 @@ import com.shsnc.api.core.util.LogRecord;
 import com.shsnc.api.core.util.LogWriter;
 import com.shsnc.api.core.validation.Validate;
 import com.shsnc.api.core.validation.ValidationType;
+import com.shsnc.base.authorization.service.AuthorizationRoleRelationService;
 import com.shsnc.base.constants.LogConstant;
 import com.shsnc.base.user.bean.ExtendPropertyValue;
+import com.shsnc.base.user.bean.Group;
 import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.bean.UserInfoParam;
+import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.model.ExtendPropertyValueModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.model.condition.UserInfoCondition;
@@ -46,6 +49,8 @@ public class UserInfoHandler implements RequestHandler {
     private UserInfoService userInfoService;
     @Autowired
     private ExtendPropertyValueService extendPropertyValueService;
+    @Autowired
+    private AuthorizationRoleRelationService authorizationRoleRelationService;
 
     private String[][] filedMapping=  {{"userId","user_id"},{"username","username"},{"alias","alias"},{"mobile","mobile"},{"email","email"},{"status","status"}};
 
@@ -61,6 +66,23 @@ public class UserInfoHandler implements RequestHandler {
     @Authentication("BASE_USER_INFO_FIND_USERS")
     public List<UserInfo> findUsers(UserInfoCondition condition){
         List<UserInfoModel> users = userInfoService.findUsers(condition, true);
+        return JsonUtil.convert(users, List.class, UserInfo.class);
+    }
+
+    @RequestMapper("/getAuditorList")
+    @Authentication("BASE_USER_INFO_GET_AUDITOR_LIST")
+    public List<Group> getAuditorList(UserInfoCondition condition){
+        List<UserInfoModel> users = userInfoService.findUsers(condition, true);
+        users = users.stream().filter(v -> {
+            if (v.getInternal().equals(UserConstant.USER_INTERNAL_FALSE)) {
+                try {
+                    return authorizationRoleRelationService.userHaveAuthorization(v.getUserId(), "ATM_SCRIPT_INFO_UPDATE_AUDIT");
+                } catch (BizException ignored) {
+                    // nothing to do
+                }
+            }
+            return true;
+        }).collect(Collectors.toList());
         return JsonUtil.convert(users, List.class, UserInfo.class);
     }
 

@@ -30,7 +30,6 @@
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="historyId">
         INSERT INTO user_login_history (
-            history_id,
             user_id,
             login_type,
             success,
@@ -40,7 +39,6 @@
             login_ip
         )
         values (
-            #{historyId,jdbcType=BIGINT},
             #{userId,jdbcType=BIGINT},
             #{loginType,jdbcType=TINYINT},
             #{success,jdbcType=TINYINT},
@@ -54,7 +52,6 @@
     <insert id="insertSelective" useGeneratedKeys="true" keyProperty="historyId">
         INSERT INTO user_login_history
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            history_id,
             <if test="userId != null">
                 user_id,
             </if>
@@ -78,7 +75,6 @@
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            #{historyId,jdbcType=BIGINT},
             <if test="userId != null">
                 #{userId,jdbcType=BIGINT},
             </if>
@@ -149,15 +145,7 @@
         FROM
             user_login_history
         <where>
-              1=1
-            <if test="condition != null">
-                <if test="condition.accountName != null and condition.accountName != ''">
-                    AND INSTR(account_name,#{condition.accountName})>0
-                </if>
-                <if test="condition.loginIp != null and condition.loginIp != ''">
-                    AND INSTR(login_ip,#{condition.loginIp})>0
-                </if>
-            </if>
+            <include refid="conditionSql"/>
         </where>
     </select>
 
@@ -165,24 +153,28 @@
         SELECT
             <include refid="BaseColumn"/>
         FROM user_login_history ui
-        <where>
-            <if test="condition != null">
-                <if test="condition.accountName != null and condition.accountName != ''">
-                    AND INSTR(account_name,#{condition.accountName})>0
-                </if>
-                <if test="condition.loginIp != null and condition.loginIp != ''">
-                    AND INSTR(login_ip,#{condition.loginIp})>0
-                </if>
-                <if test="condition.errorMsg != null and condition.errorMsg != ''">
-                    AND INSTR(error_msg,#{condition.errorMsg})>0
-                </if>
-            </if>
-        </where>
+        <include refid="conditionSql"/>
         <include refid="orderSql"/>
         <include refid="pageSql"/>
     </select>
-    
-     <sql id="orderSql">
+
+    <sql id="conditionSql">
+        <where>
+            <if test="condition != null">
+                <if test="condition.accountName != null and condition.accountName != ''">
+                    AND account_name LIKE concat('%',#{condition.accountName},'%')
+                </if>
+                <if test="condition.loginIp != null and condition.loginIp != ''">
+                    AND login_ip LIKE concat('%',#{condition.loginIp} ,'%')
+                </if>
+                <if test="condition.errorMsg != null and condition.errorMsg != ''">
+                    AND error_msg LIKE concat('%',#{condition.errorMsg},'%')
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <sql id="orderSql">
         <if test="pagination != null">
             <if test="pagination.sorting != null">
                 ORDER BY ${pagination.sorting}
@@ -193,7 +185,7 @@
         </if>
     </sql>
     
-       <sql id="pageSql">
+    <sql id="pageSql">
         <if test="pagination != null" >
             LIMIT #{pagination.start}, #{pagination.pagesize}
         </if>
