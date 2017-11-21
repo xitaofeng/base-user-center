@@ -76,7 +76,7 @@ public class UserInfoHandler implements RequestHandler {
         users = users.stream().filter(v -> {
             if (v.getInternal().equals(UserConstant.USER_INTERNAL_FALSE)) {
                 try {
-                    return authorizationRoleRelationService.userHaveAuthorization(v.getUserId(), "ATM_SCRIPT_INFO_UPDATE_AUDIT");
+                    return authorizationRoleRelationService.userHaveAuthorization(v.getUserId(), "ATM_SCRIPT_INFO_UPDATE_AUDIT_PASS");
                 } catch (BizException ignored) {
                     // nothing to do
                 }
