@@ -1,10 +1,16 @@
 package com.shsnc.base.user.handler;
 
 import com.shsnc.api.core.RequestHandler;
+import com.shsnc.api.core.ThreadContext;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
+import com.shsnc.api.core.util.LogRecord;
+import com.shsnc.api.core.util.LogWriter;
 import com.shsnc.api.core.validation.Validate;
+import com.shsnc.api.core.validation.ValidationType;
+import com.shsnc.base.constants.LogConstant;
 import com.shsnc.base.user.bean.UserInfo;
+import com.shsnc.base.user.bean.UserInfoParam;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.model.condition.UserInfoCondition;
 import com.shsnc.base.user.service.UserInfoService;
@@ -69,5 +75,29 @@ public class UserInfoInternalHandler implements RequestHandler{
     @LoginRequired
     public List<Long> getCurrentUserIds(Long userId){
         return userInfoService.getCurrentUserIds(userId);
+    }
+
+    /**
+     * 内部调用用于4A用户同步
+     * @param userInfo
+     * @return
+     * @throws BaseException
+     */
+    @RequestMapper("/add")
+    @Validate(groups = ValidationType.Add.class)
+    public Long add(UserInfoParam userInfo) throws BaseException {
+        com.shsnc.api.core.UserInfo apiUserInfo = ThreadContext.getUserInfo();
+        if (apiUserInfo == null) {
+            apiUserInfo = new com.shsnc.api.core.UserInfo();
+            apiUserInfo.setSuperAdmin(true);
+            apiUserInfo.setAlias("admin");
+            ThreadContext.setUserInfo(apiUserInfo);
+        }
+        LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.ADD);
+        logRecord.setDescription(String.format("新增用户【%s】",userInfo.getAlias()));
+        LogWriter.writeLog(logRecord);
+
+        UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);
+        return userInfoService.addUserInfo(userInfoModel, null, userInfo.getRoleIds());
     }
 }
