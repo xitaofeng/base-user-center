@@ -7,35 +7,25 @@ import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.util.LogRecord;
 import com.shsnc.api.core.util.LogWriter;
 import com.shsnc.api.core.validation.Validate;
-import com.shsnc.base.authorization.service.AuthorizationRoleService;
-import com.shsnc.base.bean.Condition;
 import com.shsnc.base.constants.LogConstant;
-import com.shsnc.base.user.bean.Certification;
 import com.shsnc.base.user.bean.LoginResult;
 import com.shsnc.base.user.bean.UserInfo;
-import com.shsnc.base.user.config.ServerConfig;
 import com.shsnc.base.user.config.UserConstant;
-import com.shsnc.base.user.model.GroupModel;
 import com.shsnc.base.user.model.LoginHistoryModel;
-import com.shsnc.base.user.model.OrganizationModel;
 import com.shsnc.base.user.model.UserInfoModel;
-import com.shsnc.base.user.service.*;
+import com.shsnc.base.user.service.LoginHistoryService;
+import com.shsnc.base.user.service.PassportService;
+import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.user.support.token.SimpleTokenProvider;
-import com.shsnc.base.user.support.token.TokenHelper;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.RedisUtil;
 import com.shsnc.base.util.config.BizException;
-import com.shsnc.base.util.crypto.RSAUtil;
-import com.shsnc.base.util.crypto.SHAMaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * Created by houguangqiang on 2017/6/9.
@@ -49,108 +39,47 @@ public class PassportHandler implements RequestHandler{
     @Autowired
     private UserInfoService userInfoService;
     @Autowired
-    private AccountService accountService;
-    @Autowired
     private LoginHistoryService loginHistoryService;
     @Autowired
-    private OrganizationService organizationService;
-    @Autowired
-    private GroupService groupService;
-    @Autowired
-    private AuthorizationRoleService authorizationRoleService;
+    private PassportService passportService;
 
     @RequestMapper("/login")
     @Validate
     public LoginResult login(@NotNull String account, @NotNull String password) throws BizException {
-        try {
-            password = RSAUtil.decrypt(password);
-        } catch (BadPaddingException e) {
-            throw new BizException("密码格式错误！");
-        } catch (IllegalBlockSizeException e) {
-            throw new BizException("密码长度过长！");
-        }
-        LoginResult loginResult = new LoginResult();
-        // 登录start
+
+        LoginResult loginResult = null;
         String errorMsg = null;
-        String serverMsg = null;
-        UserInfoModel userInfoModel = null;
-        LoginHistoryModel loginHistory = new LoginHistoryModel();
-        loginHistory.setAccountName(account);
         try {
-            userInfoModel = accountService.getUserInfoByAccountName(account);
+            loginResult = passportService.login(account, password);
         } catch (BizException e) {
             errorMsg = e.getErrorMessage();
-            serverMsg = errorMsg;
         }
-        if (userInfoModel != null) {
-            ThreadContext.setUserInfo(JsonUtil.convert(userInfoModel, com.shsnc.api.core.UserInfo.class));
-            LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.LOGIN);
-            logRecord.setDescription(String.format("用户【%s】登入",userInfoModel.getAlias()));
-            LogWriter.writeLog(logRecord);
+        LoginHistoryModel loginHistory = new LoginHistoryModel();
+        loginHistory.setAccountName(account);
 
-            loginHistory.setUserId(userInfoModel.getUserId());
-            String newPassword = SHAMaker.sha256String(password);
-            if(userInfoModel.getPassword().equals(newPassword)){
-                if(userInfoModel.getStatus().equals(UserConstant.USER_STATUS_DISABLED)){
-                    errorMsg = "该账户已被禁用，具体请联系管理员！";
-                    serverMsg = errorMsg;
-                } else if(userInfoModel.getStatus().equals(UserConstant.USER_STATUS_LOCKED)){
-                    errorMsg = "该账户已被锁住，如需解锁请联系管理员！";
-                    serverMsg = errorMsg;
-                } else {
-                    String userId = userInfoModel.getUserId().toString();
-                    String uuid = ServerConfig.isOnlyCheck() || ServerConfig.isDevModel() ? TokenHelper.encodeUID(userId) : TokenHelper.generateUUID();
-                    String token = null;
-                    try {
-                        token = SimpleTokenProvider.generateToken(userId, uuid, ServerConfig.isDevModel());
-                    } catch (Exception e) {
-                        errorMsg = "服务器异常！生成token失败";
-                        serverMsg = "用户登录生成token异常";
-                        logger.error(serverMsg, e);
-                    }
-                    if (token != null) {
-                        OrganizationModel organizationModel = organizationService.getOrganizationByUserId(userInfoModel.getUserId());
-                        userInfoModel.setOrganization(organizationModel);
-                        List<GroupModel> groupModels = groupService.getGroupByUserId(userInfoModel.getUserId(), new Condition());
-                        userInfoModel.setGroups(groupModels);
-
-                        UserInfo userInfo = JsonUtil.convert(userInfoModel, UserInfo.class);
-
-                        boolean superAdmin = authorizationRoleService.isSuperAdmin(userInfo.getUserId());
-                        userInfo.setSuperAdmin(superAdmin);
-
-                        loginResult.setUserInfo(userInfo);
-                        Certification certification = new Certification(token);
-                        loginResult.setCertification(certification);
-                        try {
-                            // 会话有效期缓存
-                            RedisUtil.saveString(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_KEY,uuid), token , ServerConfig.getSessionTime());
-                            // 用户id到token的缓存
-                            RedisUtil.setFieldValue(RedisUtil.buildRedisKey(UserConstant.REDIS_LOGIN_USER,userId), uuid, token, ServerConfig.getSessionTime());
-                        } catch (Exception e) {
-                            errorMsg = "服务器异常！";
-                            serverMsg = "操作REDIS失败";
-                            logger.error(serverMsg, e);
-                        }
-                    }
-                }
-            } else {
-                errorMsg = "登录密码错误！";
-                serverMsg = errorMsg;
-            }
-        }
         // 记录登录历史记录
         String ip = ThreadContext.getClientInfo().getClientIp();
+        if (loginResult != null) {
+            UserInfo userInfo = loginResult.getUserInfo();
+            if (userInfo != null) {
+                loginHistory.setUserId(userInfo.getUserId());
+                ThreadContext.setUserInfo(JsonUtil.convert(userInfo, com.shsnc.api.core.UserInfo.class));
+                LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.LOGIN);
+                logRecord.setDescription(String.format("用户【%s】登入",userInfo.getAlias()));
+                LogWriter.writeLog(logRecord);
+            }
+        }
         loginHistory.setLoginIp(ip);
         loginHistory.setLoginTime(System.currentTimeMillis());
         loginHistory.setLoginType(UserConstant.LOGIN);
-        loginHistory.setSuccess(serverMsg == null ? UserConstant.LOGIN_SUCCESS : UserConstant.LOGIN_ERROR);
-        loginHistory.setErrorMsg(serverMsg);
+        loginHistory.setSuccess(errorMsg == null ? UserConstant.LOGIN_SUCCESS : UserConstant.LOGIN_ERROR);
+        loginHistory.setErrorMsg(errorMsg);
         loginHistoryService.addLoginHistory(loginHistory);
-        // 提示信息
+
         if (errorMsg != null) {
             throw new BizException(errorMsg);
         }
+
         return loginResult;
     }
 
