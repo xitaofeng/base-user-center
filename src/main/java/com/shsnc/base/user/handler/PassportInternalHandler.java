@@ -38,11 +38,11 @@ public class PassportInternalHandler implements RequestHandler{
 
     @Validate
     @RequestMapper("/login")
-    public LoginResult login(@NotNull Long userId) throws BizException {
+    public LoginResult login(@NotNull String username) throws BizException {
         LoginResult loginResult = null;
         String errorMsg = null;
         try {
-            loginResult = passportService.login(userId);
+            loginResult = passportService.login(username);
         } catch (BizException e) {
             errorMsg = e.getErrorMessage();
         }

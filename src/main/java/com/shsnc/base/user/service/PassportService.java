@@ -47,8 +47,8 @@ public class PassportService {
     @Autowired
     private AuthorizationRoleService authorizationRoleService;
 
-    public LoginResult login(Long userId) throws BizException {
-        UserInfoModel userInfo = userInfoService.getUserInfo(userId);
+    public LoginResult login(String username) throws BizException {
+        UserInfoModel userInfo = accountService.getUserInfoByAccountName(username);
         return getLoginResult(userInfo);
     }
 
