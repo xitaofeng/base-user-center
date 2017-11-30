@@ -21,6 +21,8 @@ public enum DataObject {
     INSPECTION_ITEM(5, "巡检项"),
     /** 作业 */
     TASK(6, "作业"),
+    /** 文件 */
+    FILE(7, "文件"),
 
     ;
 

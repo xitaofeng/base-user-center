@@ -55,10 +55,20 @@ public class AuthorizationRightInternalHandler implements RequestHandler {
     /**
      * 移除授权
      */
-    @RequestMapper("/removeRights")
+    @RequestMapper("/deleteRights")
     @Validate
-    public boolean removeRights(@NotNull String sourceType, @NotNull Long sourceId) throws BaseException {
+    public boolean deleteRights(@NotNull String sourceType, @NotNull Long sourceId) throws BaseException {
         authorizationRightsService.deleteByObjectId(DataObject.of(sourceType), sourceId);
+        return true;
+    }
+
+    /**
+     * 移除授权
+     */
+    @RequestMapper("/batchDeleteRights")
+    @Validate
+    public boolean batchDeleteRights(@NotNull String sourceType, @NotEmpty List<Long> sourceIds) throws BaseException {
+        authorizationRightsService.deleteByObjectIds(DataObject.of(sourceType), sourceIds);
         return true;
     }
 

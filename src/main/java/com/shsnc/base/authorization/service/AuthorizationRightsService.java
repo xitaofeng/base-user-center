@@ -443,9 +443,9 @@ public class AuthorizationRightsService {
     public void deleteByObjectIds(DataObject dataObject, List<Long> objectIds) throws BaseException {
         BizAssert.notNull(dataObject, "对象类型不能为空！");
         BizAssert.notEmpty(objectIds, String.format("【%s】的id不能为空！", dataObject.getDescription()));
-        if (!checkPermisson(dataObject, objectIds, DataOperation.DELETE)) {
-            throw new BaseException(MessageCode.PERMISSION_DENIED);
-        }
+//        if (!checkPermisson(dataObject, objectIds, DataOperation.DELETE)) {
+//            throw new BaseException(MessageCode.PERMISSION_DENIED);
+//        }
         authorizationRightsModelMapper.deleteByObjectIds(dataObject, objectIds);
     }
 
