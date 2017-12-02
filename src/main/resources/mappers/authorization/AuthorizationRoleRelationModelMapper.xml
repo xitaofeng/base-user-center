@@ -88,7 +88,7 @@
     </select>
 
     <select id="getUserIdsByAuthorizationCodeAndUserIds" resultType="java.lang.Long">
-        SELECT user_id
+        SELECT DISTINCT user_id
         FROM authorization_info a, authorization_role_relation ar, authorization_user_role_relation ur
         WHERE a.authorization_code=#{authorizationCode} AND a.authorization_id=ar.authorization_id
         AND ar.role_id=ur.role_id
