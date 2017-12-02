@@ -96,7 +96,7 @@
         </foreach>
     </select>
     <select id="getUserIdsByRoleCodeAndUserIds" resultType="java.lang.Long">
-        SELECT ur.user_id
+        SELECT DISTINCT ur.user_id
         FROM authorization_role r,authorization_user_role_relation ur,user_info u
         WHERE r.role_code = #{roleCode} AND r.role_id = ur.role_id
         <if test="userIds != null">
