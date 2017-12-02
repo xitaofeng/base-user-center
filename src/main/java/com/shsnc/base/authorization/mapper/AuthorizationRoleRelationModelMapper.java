@@ -59,4 +59,5 @@ public interface AuthorizationRoleRelationModelMapper {
      */
     Integer deleteAuthorizationRoleRelationModelByRoleId(@Param("roleId") Long roleId);
 
+    List<Long> getUserIdsByAuthorizationCodeAndUserIds(@Param("authorizationCode") String authorizationCode, @Param("userIds") List<Long> userIds);
 }
