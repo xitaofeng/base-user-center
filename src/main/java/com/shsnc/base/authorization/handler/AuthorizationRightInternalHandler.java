@@ -55,9 +55,9 @@ public class AuthorizationRightInternalHandler implements RequestHandler {
     /**
      * 移除授权
      */
-    @RequestMapper("/deleteRights")
+    @RequestMapper("/removeRights")
     @Validate
-    public boolean deleteRights(@NotNull String sourceType, @NotNull Long sourceId) throws BaseException {
+    public boolean removeRights(@NotNull String sourceType, @NotNull Long sourceId) throws BaseException {
         authorizationRightsService.deleteByObjectId(DataObject.of(sourceType), sourceId);
         return true;
     }
@@ -65,9 +65,9 @@ public class AuthorizationRightInternalHandler implements RequestHandler {
     /**
      * 移除授权
      */
-    @RequestMapper("/batchDeleteRights")
+    @RequestMapper("/batchRemoveRights")
     @Validate
-    public boolean batchDeleteRights(@NotNull String sourceType, @NotEmpty List<Long> sourceIds) throws BaseException {
+    public boolean batchRemoveRights(@NotNull String sourceType, @NotEmpty List<Long> sourceIds) throws BaseException {
         authorizationRightsService.deleteByObjectIds(DataObject.of(sourceType), sourceIds);
         return true;
     }
