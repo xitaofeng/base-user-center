@@ -11,10 +11,8 @@ import com.shsnc.api.core.validation.ValidationType;
 import com.shsnc.base.authorization.service.AuthorizationRoleRelationService;
 import com.shsnc.base.constants.LogConstant;
 import com.shsnc.base.user.bean.ExtendPropertyValue;
-import com.shsnc.base.user.bean.Group;
 import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.bean.UserInfoParam;
-import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.model.ExtendPropertyValueModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.model.condition.UserInfoCondition;
@@ -71,18 +69,29 @@ public class UserInfoHandler implements RequestHandler {
 
     @RequestMapper("/getAuditorList")
     @Authentication("BASE_USER_INFO_GET_AUDITOR_LIST")
-    public List<Group> getAuditorList(UserInfoCondition condition){
-        List<UserInfoModel> users = userInfoService.findUsers(condition, true);
-        users = users.stream().filter(v -> {
-            if (v.getInternal().equals(UserConstant.USER_INTERNAL_FALSE)) {
-                try {
-                    return authorizationRoleRelationService.userHaveAuthorization(v.getUserId(), "ATM_SCRIPT_INFO_UPDATE_AUDIT_PASS");
-                } catch (BizException ignored) {
-                    // nothing to do
-                }
-            }
-            return true;
-        }).collect(Collectors.toList());
+    public List<UserInfoModel> getAuditorList(UserInfoCondition condition){
+        List<UserInfoModel> users = userInfoService.getAuditorList();
+//        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+//            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+//            if (!groupIds.isEmpty()) {
+//                List<Long> userIds = userInfoGroupRelationModelMapper.getUserIdsByGroupIds(groupIds);
+//                condition.setUserIds(userIds);
+//            } else {
+//                return new ArrayList<>();
+//            }
+//        }
+//
+//        List<UserInfoModel> users = userInfoService.findUsers(condition, true);
+//        users = users.stream().filter(v -> {
+//            if (v.getInternal().equals(UserConstant.USER_INTERNAL_FALSE)) {
+//                try {
+//                    return authorizationRoleRelationService.userHaveAuthorization(v.getUserId(), "ATM_SCRIPT_INFO_UPDATE_AUDIT_PASS");
+//                } catch (BizException ignored) {
+//                    // nothing to do
+//                }
+//            }
+//            return true;
+//        }).collect(Collectors.toList());
         return JsonUtil.convert(users, List.class, UserInfo.class);
     }
 

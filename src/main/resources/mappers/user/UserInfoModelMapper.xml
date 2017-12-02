@@ -379,4 +379,21 @@
         FROM user_info ui
         WHERE ui.user_id=#{userId}
     </select>
+    <select id="getInternalUserIdsByUserIds" resultType="java.lang.Long">
+        SELECT user_id
+        FROM user_info
+        <where>
+            <if test="userIds != null">
+                <choose>
+                    <when test="userIds.size()>0">
+                        user_id IN
+                        <foreach collection="userIds" item="userId" separator="," close=")" open="(">
+                            #{userId}
+                        </foreach>
+                    </when>
+                </choose>
+            </if>
+            AND internal=2
+        </where>
+    </select>
 </mapper>

@@ -87,5 +87,26 @@
         </foreach>
     </select>
 
+    <select id="getUserIdsByAuthorizationCodeAndUserIds" resultType="java.lang.Long">
+        SELECT user_id
+        FROM authorization_info a, authorization_role_relation ar, authorization_user_role_relation ur
+        WHERE a.authorization_code=#{authorizationCode} AND a.authorization_id=ar.authorization_id
+        AND ar.role_id=ur.role_id
+        <if test="userIds != null">
+            AND
+            <choose>
+                <when test="userIds.size() > 0">
+                    ur.user_id IN
+                    <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                        #{userId}
+                    </foreach>
+                </when>
+                <otherwise>
+                    1=2
+                </otherwise>
+            </choose>
+        </if>
+    </select>
+
 
 </mapper>

@@ -1,15 +1,17 @@
 package com.shsnc.base.user.service;
 
 import com.shsnc.api.core.ThreadContext;
+import com.shsnc.base.authorization.config.AuthorizationConstant;
 import com.shsnc.base.authorization.mapper.AuthorizationRoleModelMapper;
+import com.shsnc.base.authorization.mapper.AuthorizationRoleRelationModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationUserRoleRelationModelMapper;
 import com.shsnc.base.authorization.model.AuthorizationRoleModel;
 import com.shsnc.base.authorization.model.AuthorizationUserRoleRelationModel;
 import com.shsnc.base.authorization.service.AssignService;
+import com.shsnc.base.bean.Condition;
 import com.shsnc.base.user.config.UserConstant;
 import com.shsnc.base.user.mapper.*;
 import com.shsnc.base.user.model.*;
-import com.shsnc.base.bean.Condition;
 import com.shsnc.base.user.model.condition.UserInfoCondition;
 import com.shsnc.base.user.support.Assert;
 import com.shsnc.base.util.BizAssert;
@@ -26,7 +28,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -60,6 +64,8 @@ public class UserInfoService {
     private AuthorizationRoleModelMapper authorizationRoleModelMapper;
     @Autowired
     private AuthorizationUserRoleRelationModelMapper authorizationUserRoleRelationModelMapper;
+    @Autowired
+    private AuthorizationRoleRelationModelMapper authorizationRoleRelationModelMapper;
 
     public UserInfoModel getUserInfo(Long userId) throws BizException {
         Assert.notNull(userId,"用户id不能为空！");
@@ -560,5 +566,25 @@ public class UserInfoService {
 
     public String getPasswordByUserId(Long userId) {
         return userInfoModelMapper.getPasswordByUserId(userId);
+    }
+
+    public List<UserInfoModel> getAuditorList() {
+        List<Long> userIds = null;
+        if (!ThreadContext.getUserInfo().isSuperAdmin()) {
+            List<Long> groupIds = ThreadContext.getUserInfo().getGroupIds();
+            if (!groupIds.isEmpty()) {
+                userIds = userInfoGroupRelationModelMapper.getUserIdsByGroupIds(groupIds);
+            } else {
+                return new ArrayList<>();
+            }
+        }
+        List<Long> dbUserIds = userInfoModelMapper.getInternalUserIdsByUserIds(userIds);
+        UserInfoCondition condition = new UserInfoCondition();
+        List<Long> superRoleUserIds = authorizationUserRoleRelationModelMapper.getUserIdsByRoleCodeAndUserIds(AuthorizationConstant.ROLE_CODE_SUPER_ADMIN, userIds);
+        List<Long> auditorCodeUserIds = authorizationRoleRelationModelMapper.getUserIdsByAuthorizationCodeAndUserIds("ATM_SCRIPT_INFO_UPDATE_AUDIT_PASS", userIds);
+        dbUserIds.addAll(superRoleUserIds);
+        dbUserIds.addAll(auditorCodeUserIds);
+        condition.setUserIds(dbUserIds);
+        return userInfoModelMapper.getListByCondition(condition);
     }
 }
