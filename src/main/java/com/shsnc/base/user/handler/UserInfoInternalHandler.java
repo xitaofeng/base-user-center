@@ -2,7 +2,6 @@ package com.shsnc.base.user.handler;
 
 import com.shsnc.api.core.RequestHandler;
 import com.shsnc.api.core.ThreadContext;
-import com.shsnc.api.core.annotation.Authentication;
 import com.shsnc.api.core.annotation.LoginRequired;
 import com.shsnc.api.core.annotation.RequestMapper;
 import com.shsnc.api.core.util.LogRecord;
@@ -66,10 +65,10 @@ public class UserInfoInternalHandler implements RequestHandler{
         return JsonUtil.convert(userInfoModels,List.class, UserInfo.class);
     }
 
-    @RequestMapper("/findUsers")
-    public List<UserInfo> findUsers(UserInfoCondition condition){
-        List<UserInfoModel> users = userInfoService.findUsers(condition, true);
-        return JsonUtil.convert(users, List.class, UserInfo.class);
+    @RequestMapper("/getUserIdsByCondition")
+    public List<Long> findUsers(UserInfoCondition condition){
+        List<Long> userIds = userInfoService.getUserIdsByCondition(condition);
+        return userIds;
     }
 
     @RequestMapper("/getUserIdsByCondition")
