@@ -66,6 +66,12 @@ public class UserInfoInternalHandler implements RequestHandler{
     }
 
     @RequestMapper("/getUserIdsByCondition")
+    public List<Long> findUsers(UserInfoCondition condition){
+        List<Long> userIds = userInfoService.getUserIdsByCondition(condition);
+        return userIds;
+    }
+
+    @RequestMapper("/getUserIdsByCondition")
     public List<Long> getUserIdsByCondition(UserInfoCondition condition) throws BaseException {
         return userInfoService.getUserIdsByCondition(condition);
     }
