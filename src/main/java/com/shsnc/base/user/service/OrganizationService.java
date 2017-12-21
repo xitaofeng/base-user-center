@@ -70,14 +70,21 @@ public class OrganizationService {
         OrganizationModel dbOrganizationModel = organizationModelMapper.selectByPrimaryKey(organizationModel.getOrganizationId());
         Assert.notNull(dbOrganizationModel,"组织部门id不存在！");
 
-        // 新增节点信息
+        // 更新节点信息
         BeanHelper.populateNullProperties(dbOrganizationModel, organizationModel);
         organizationModelMapper.updateByPrimaryKeySelective(organizationModel);
 
         // 更新父节点关系
+        Long dbParentId = organizationStructureModelMapper.getParentIdByOrganizationId(organizationModel.getOrganizationId());
         if(parentId != null){
-            Long dbParentId = organizationStructureModelMapper.getParentIdByOrganizationId(organizationModel.getOrganizationId());
-            if(parentId != dbParentId){
+            // 跟旧的父节点不一样才需要进行节点移动
+            if(!parentId.equals(dbParentId)){
+                // 父节点不能等于自己
+                Assert.isTrue(!organizationModel.getOrganizationId().equals(parentId), "不能指定自己为上级部门！");
+                // 不能指定子节点为父节点
+                List<Long> childIds = organizationStructureModelMapper.getChildIdsByOrganizationId(organizationModel.getOrganizationId());
+                Assert.isTrue(!childIds.contains(parentId), "不能直接指定下级部门作为自己的上级部门！");
+
                 // 断开与所有祖先节点的关系
                 if(dbParentId != null){
                     organizationStructureModelMapper.deleteOldRelation(organizationModel.getOrganizationId());
@@ -85,6 +92,9 @@ public class OrganizationService {
                 // 连接与新的父节点的关系
                 organizationStructureModelMapper.insertNewRelation(organizationModel.getOrganizationId(), parentId);
             }
+        } else if (dbParentId != null) {
+            // 子节点变成根节点
+            organizationStructureModelMapper.deleteOldRelation(organizationModel.getOrganizationId());
         }
         return true;
     }

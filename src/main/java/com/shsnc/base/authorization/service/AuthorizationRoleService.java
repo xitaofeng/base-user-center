@@ -2,6 +2,8 @@
 
 package com.shsnc.base.authorization.service;
 
+import com.shsnc.api.core.ThreadContext;
+import com.shsnc.api.core.UserInfo;
 import com.shsnc.base.authorization.config.AuthorizationConstant;
 import com.shsnc.base.authorization.mapper.AuthorizationGroupRoleRelationModelMapper;
 import com.shsnc.base.authorization.mapper.AuthorizationRoleModelMapper;
@@ -19,12 +21,12 @@ import com.shsnc.base.util.bean.RelationMap;
 import com.shsnc.base.util.config.BizException;
 import com.shsnc.base.util.sql.Pagination;
 import com.shsnc.base.util.sql.QueryData;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -229,18 +231,28 @@ public class AuthorizationRoleService {
     }
 
     public void selectUsers(List<AuthorizationRoleModel> authorizationRoleModels) {
-        if (org.apache.commons.collections4.CollectionUtils.isEmpty(authorizationRoleModels)) {
+        if (authorizationRoleModels == null || authorizationRoleModels.isEmpty()) {
+            return;
+        }
+        UserInfo userInfo = ThreadContext.getUserInfo();
+        if (userInfo == null) {
             return;
         }
         List<Long> roleIds = authorizationRoleModels.stream().map(AuthorizationRoleModel::getRoleId).collect(Collectors.toList());
         if (!roleIds.isEmpty()) {
+
             List<AuthorizationUserRoleRelationModel> relations = authorizationUserRoleRelationModelMapper.getByRoleIds(roleIds);
             RelationMap relationMap = new RelationMap();
             for (AuthorizationUserRoleRelationModel relation : relations) {
                 relationMap.addRelation(relation.getRoleId(),relation.getUserId());
             }
             if (relationMap.hasRelatedIds()) {
-                List<UserInfoModel> userInfoModels = userInfoModelMapper.getByUserIds(relationMap.getRelatedIds());
+                Collection<Long> userIds = relationMap.getRelatedIds();
+                if (!userInfo.isSuperAdmin()) {
+                    List<Long> currentUserIds = userInfoService.getCurrentUserIds(userInfo.getUserId());
+                    userIds = relationMap.getRelatedIds().stream().filter(currentUserIds::contains).collect(Collectors.toList());
+                }
+                List<UserInfoModel> userInfoModels = userInfoModelMapper.getByUserIds(userIds);
                 Map<Long, UserInfoModel> userInfoModelMap = userInfoModels.stream().collect(Collectors.toMap(UserInfoModel::getUserId, x -> x, (oldValue, newValue)->oldValue));
                 for (AuthorizationRoleModel authorizationRoleModel : authorizationRoleModels) {
                     authorizationRoleModel.setUsers(relationMap.getRelatedObjects(authorizationRoleModel.getRoleId(),userInfoModelMap));
