@@ -3,6 +3,8 @@ package com.shsnc.base.user.mapper;
 import com.shsnc.base.user.model.OrganizationStructureModel;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface OrganizationStructureModelMapper {
     int deleteByPrimaryKey(Long structureId);
 
@@ -29,4 +31,6 @@ public interface OrganizationStructureModelMapper {
     int deleteOrganizationStructure(Long organizationId);
 
     int deleteOrganizationAndChildrenRelation(Long organizationId);
+
+    List<Long> getChildIdsByOrganizationId(Long organizationId);
 }

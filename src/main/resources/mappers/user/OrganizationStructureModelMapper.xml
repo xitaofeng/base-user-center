@@ -28,6 +28,14 @@
         WHERE descendant_id = #{organizationId} AND level = 1
     </select>
 
+    <select id="getChildIdsByOrganizationId" resultType="_long">
+        SELECT
+            descendant_id
+        FROM
+            user_organization_structure
+        WHERE ancestor_id = #{organizationId} AND level != 1
+    </select>
+
     <delete id="deleteByPrimaryKey">
         DELETE FROM user_organization_structure
         WHERE structure_id = #{structureId}
