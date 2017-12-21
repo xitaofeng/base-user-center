@@ -33,7 +33,7 @@
             descendant_id
         FROM
             user_organization_structure
-        WHERE ancestor_id = #{organizationId} AND level != 1
+        WHERE ancestor_id = #{organizationId} AND level != 0
     </select>
 
     <delete id="deleteByPrimaryKey">
