@@ -11,8 +11,13 @@ import com.shsnc.api.core.validation.ValidationType;
 import com.shsnc.base.constants.LogConstant;
 import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.bean.UserInfoParam;
+import com.shsnc.base.user.config.UserConstant;
+import com.shsnc.base.user.model.GroupModel;
+import com.shsnc.base.user.model.UserInfoGroupRelationModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.model.condition.UserInfoCondition;
+import com.shsnc.base.user.service.GroupService;
+import com.shsnc.base.user.service.UserInfoGroupRelationService;
 import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BaseException;
@@ -22,16 +27,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
 @Component
 @RequestMapper("/user/internal/info")
-public class UserInfoInternalHandler implements RequestHandler{
+public class UserInfoInternalHandler implements RequestHandler {
 
     @Autowired
     private UserInfoService userInfoService;
+    @Autowired
+    private UserInfoGroupRelationService userInfoGroupRelationService;
+    @Autowired
+    private GroupService groupService;
 
     @RequestMapper("/getObject")
     @Validate
@@ -56,13 +64,74 @@ public class UserInfoInternalHandler implements RequestHandler{
         return JsonUtil.convert(userInfoModel, UserInfo.class);
     }
 
+    @RequestMapper("/getFullUserInfo")
+    @Validate
+    public UserInfo getFullUserInfo(@NotNull Long userId) throws BizException {
+        UserInfoModel userInfoModel = userInfoService.getUserInfoByCache(userId);
+        List<Long> groupIds = userInfoGroupRelationService.getAllGroupIdsByUserId(userId);
+        if (groupIds != null && !groupIds.isEmpty()) {
+            userInfoModel.setGroupIds(groupIds);
+            List<GroupModel> groupModels = groupService.getByGroupIds(groupIds);
+            userInfoModel.setGroups(groupModels);
+        }
+        UserInfo userInfo = JsonUtil.convert(userInfoModel, UserInfo.class);
+        userInfo.setSuperAdmin(userInfoModel.getInternal() == UserConstant.USER_INTERNAL_TRUE);
+        return userInfo;
+    }
+
+    @RequestMapper("/getFullUserByIds")
+    @Validate
+    public List<UserInfo> getFullUserByIds(@NotEmpty List<Long> userIds) throws BaseException {
+        List<UserInfoModel> userInfoModels = userInfoService.getUserInfoListByUserIds(userIds);
+
+        List<UserInfoGroupRelationModel> userInfoGroupRelationModels = userInfoGroupRelationService.getByUserIdsNoPermission(userIds);
+        List<Long> groupIds = new ArrayList<>();
+        Map<Long,List<Long>> userGroupMap = new HashMap<>();
+        userInfoGroupRelationModels.forEach(userInfoGroupRelationModel -> {
+            if (!groupIds.contains(userInfoGroupRelationModel.getGroupId())){
+                groupIds.add(userInfoGroupRelationModel.getGroupId());
+            }
+            if (userGroupMap.containsKey(userInfoGroupRelationModel.getUserId())){
+                userGroupMap.get(userInfoGroupRelationModel.getUserId()).add(userInfoGroupRelationModel.getGroupId());
+            }else {
+                List<Long> groupIdList = new ArrayList<>();
+                groupIdList.add(userInfoGroupRelationModel.getGroupId());
+                userGroupMap.put(userInfoGroupRelationModel.getUserId(),groupIdList);
+            }
+        });
+
+        List<GroupModel> groupModels = null;
+        if (!groupIds.isEmpty()) {
+            groupModels = groupService.getByGroupIds(groupIds);
+        }
+        List<UserInfo> resultList = new ArrayList<>();
+        List<GroupModel> finalGroupModels = groupModels;
+        userInfoModels.forEach(userInfoModel -> {
+            List<Long> groupIdList = userGroupMap.get(userInfoModel.getUserId());
+            if (groupIdList !=null &&! groupIdList.isEmpty()){
+                List<GroupModel> groupModelList = new ArrayList<>();
+                for (GroupModel groupModel : finalGroupModels){
+                    for (Long groupId : groupIdList){
+                        if (groupModel.getGroupId().longValue() == groupId.longValue()){
+                            groupModelList.add(groupModel);
+                        }
+                    }
+                }
+                userInfoModel.setGroups(groupModelList);
+            }
+            UserInfo userInfo = JsonUtil.convert(userInfoModel, UserInfo.class);
+            userInfo.setSuperAdmin(userInfoModel.getInternal() == UserConstant.USER_INTERNAL_TRUE);
+            resultList.add(userInfo);
+        });
+        return resultList;
+    }
 
     @RequestMapper("/getList")
     @Validate
     public List<UserInfo> getList(@NotEmpty List<Long> userIds) throws BaseException {
         List<UserInfoModel> userInfoModels = userInfoService.getUserInfoListByUserIds(userIds);
 
-        return JsonUtil.convert(userInfoModels,List.class, UserInfo.class);
+        return JsonUtil.convert(userInfoModels, List.class, UserInfo.class);
     }
 
     @RequestMapper("/getUserIdsByCondition")
@@ -73,12 +142,13 @@ public class UserInfoInternalHandler implements RequestHandler{
     @RequestMapper("/getCurrentUserIds")
     @Validate
     @LoginRequired
-    public List<Long> getCurrentUserIds(Long userId){
+    public List<Long> getCurrentUserIds(Long userId) {
         return userInfoService.getCurrentUserIds(userId);
     }
 
     /**
      * 内部调用用于4A用户同步
+     *
      * @param userInfo
      * @return
      * @throws BaseException
@@ -94,7 +164,7 @@ public class UserInfoInternalHandler implements RequestHandler{
             ThreadContext.setUserInfo(apiUserInfo);
         }
         LogRecord logRecord = new LogRecord(LogConstant.Module.USER, LogConstant.Action.ADD);
-        logRecord.setDescription(String.format("新增用户【%s】",userInfo.getAlias()));
+        logRecord.setDescription(String.format("新增用户【%s】", userInfo.getAlias()));
         LogWriter.writeLog(logRecord);
 
         UserInfoModel userInfoModel = JsonUtil.convert(userInfo, UserInfoModel.class);

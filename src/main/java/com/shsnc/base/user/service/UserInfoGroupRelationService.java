@@ -208,4 +208,11 @@ public class UserInfoGroupRelationService {
         userInfoGroupRelationModelMapper.deleteByGroupIds(groupIds);
     }
 
+    public List<Long> getAllGroupIdsByUserId(Long userId){
+        return userInfoGroupRelationModelMapper.getAllGroupIdsByUserId(userId);
+    }
+
+    public List<UserInfoGroupRelationModel> getByUserIdsNoPermission(List<Long> userIds){
+        return userInfoGroupRelationModelMapper.getByUserIdsNoPermission(userIds);
+    }
 }
