@@ -11,8 +11,11 @@ import com.shsnc.api.core.validation.ValidationType;
 import com.shsnc.base.constants.LogConstant;
 import com.shsnc.base.user.bean.UserInfo;
 import com.shsnc.base.user.bean.UserInfoParam;
+import com.shsnc.base.user.model.GroupModel;
 import com.shsnc.base.user.model.UserInfoModel;
 import com.shsnc.base.user.model.condition.UserInfoCondition;
+import com.shsnc.base.user.service.GroupService;
+import com.shsnc.base.user.service.UserInfoGroupRelationService;
 import com.shsnc.base.user.service.UserInfoService;
 import com.shsnc.base.util.JsonUtil;
 import com.shsnc.base.util.config.BaseException;
@@ -32,6 +35,10 @@ public class UserInfoInternalHandler implements RequestHandler{
 
     @Autowired
     private UserInfoService userInfoService;
+    @Autowired
+    private UserInfoGroupRelationService userInfoGroupRelationService;
+    @Autowired
+    private GroupService groupService;
 
     @RequestMapper("/getObject")
     @Validate
@@ -56,6 +63,18 @@ public class UserInfoInternalHandler implements RequestHandler{
         return JsonUtil.convert(userInfoModel, UserInfo.class);
     }
 
+    @RequestMapper("/getFullUserInfo")
+    @Validate
+    public UserInfoModel getFullUserInfo(@NotNull Long userId) throws BizException {
+        UserInfoModel userInfoModel = userInfoService.getUserInfoByCache(userId);
+        List<Long> groupIds = userInfoGroupRelationService.getAllGroupIdsByUserId(userId);
+        if (groupIds!=null && !groupIds.isEmpty()){
+            userInfoModel.setGroupIds(groupIds);
+            List<GroupModel> groupModels = groupService.getByGroupIds(groupIds);
+            userInfoModel.setGroups(groupModels);
+        }
+        return userInfoModel;
+    }
 
     @RequestMapper("/getList")
     @Validate

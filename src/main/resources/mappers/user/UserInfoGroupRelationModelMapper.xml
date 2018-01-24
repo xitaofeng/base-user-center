@@ -71,6 +71,7 @@
         WHERE ur.group_id=#{groupId} AND ur.user_id = ui.user_id AND ui.is_delete = 1
     </select>
 
+
     <select id="getByGroupids" resultType="com.shsnc.base.user.model.UserInfoGroupRelationModel">
         SELECT
             <include refid="BaseColumn" />
@@ -234,4 +235,10 @@
         AND ur2.user_id = ui.user_id AND ui.is_delete = 1
     </select>
 
+    <select id="getAllGroupIdsByUserId" resultType="java.lang.Long">
+        SELECT
+        DISTINCT ur.group_id
+        FROM user_info_group_relation ur
+        WHERE ur.user_id=#{userId}
+    </select>
 </mapper>
