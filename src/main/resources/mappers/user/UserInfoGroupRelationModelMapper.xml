@@ -56,6 +56,8 @@
         AND ur.user_id = ui.user_id AND ui.is_delete = 1
         <include refid="PermissionSql"/>
     </select>
+
+
     <select id="getByUserId" resultMap="BaseResultMap">
         SELECT
             <include refid="BaseColumn" />
@@ -241,4 +243,16 @@
         FROM user_info_group_relation ur
         WHERE ur.user_id=#{userId}
     </select>
+
+    <select id="getByUserIdsNoPermission" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumn" />
+        FROM user_info_group_relation ur, user_info ui
+        WHERE ur.user_id IN
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+        AND ur.user_id = ui.user_id AND ui.is_delete = 1
+    </select>
+
 </mapper>
