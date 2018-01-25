@@ -321,6 +321,20 @@
                         WHERE ancestor_id=#{condition.organizationId}
                     )
                 </if>
+                <if test="condition.groupIds != null">
+                    AND
+                    <choose>
+                        <when test="condition.groupIds.size()>0">
+                            ug.group_id IN
+                            <foreach collection="condition.groupIds" item="groupId" open="(" close=")" separator=",">
+                                #{groupId}
+                            </foreach>
+                        </when>
+                        <otherwise>
+                            1=2
+                        </otherwise>
+                    </choose>
+                </if>
             </if>
         </where>
     </sql>
@@ -345,10 +359,13 @@
 
     <select id="getListByCondition" resultMap="BaseResultMap">
         SELECT
-            ui.*
+            DISTINCT ui.*
         FROM user_info ui
         <if test="condition != null and condition.organizationId != null">
             LEFT JOIN user_info_organization_relation uo ON ui.user_id=uo.user_id
+        </if>
+        <if test="condition != null and condition.groupIds != null">
+            LEFT JOIN user_info_group_relation ug ON ui.user_id=ug.user_id
         </if>
         <include refid="conditionSql"/>
     </select>

@@ -20,6 +20,8 @@ public class UserInfoCondition {
 
     private List<Long> userIds;
 
+    private List<Long> groupIds;
+
     public Long getUserId() {
         return userId;
     }
@@ -82,5 +84,13 @@ public class UserInfoCondition {
 
     public void setUserIds(List<Long> userIds) {
         this.userIds = userIds;
+    }
+
+    public List<Long> getGroupIds() {
+        return groupIds;
+    }
+
+    public void setGroupIds(List<Long> groupIds) {
+        this.groupIds = groupIds;
     }
 }
